@@ -1,0 +1,7 @@
+.no-residents-message {
+  text-align: center;
+  font-style: italic;
+  color: #6b7280;
+  padding: 16px;
+  grid-column: 1 / -1;
+}

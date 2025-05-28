@@ -8,11 +8,14 @@ import Table from "../../components/Table";
 import ResidentSearchDropdown from "../../components/ResidentSearchDropdown";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "./ApartmentForm.css";
 
 interface Resident {
   id: number;
   name: string;
-  dob: string;
+  status: string;
+  gender: string;
+  cic: string;
 }
 
 interface OwnerResident {
@@ -34,7 +37,7 @@ interface ApartmentFormProps {
     ownerName: string;
     ownerPhone: string;
     owner: { id: number; name: string };
-    residentList: Resident[];
+    residents: Resident[]; 
     vehicleList: Vehicle[];
   };
   fetchApartments: () => void; // A function to refresh the apartment list after adding a new apartment
@@ -260,9 +263,39 @@ export default function ApartmentForm({
             value={formValues.ownerPhone}
             onChange={handleChange}
             error={errors.ownerPhone}
-          />
-        </FormField>
+          />        
+          </FormField>
         </Form.Fields>
+
+      {/* Resident List Section - Only show for existing apartment details */}
+      {apartment?.residents && (
+        <>
+          <label>Residents:</label>
+          <Table columns="1fr 1fr 1fr 1fr">
+            <Table.Header size="small">
+              <div>ID</div>
+              <div>Name</div>
+              <div>Status</div>
+              <div>Gender</div>
+            </Table.Header>
+            {apartment.residents.length > 0 ? (
+              apartment.residents.map((resident) => (
+                <Table.Row size="small" key={resident.id}>
+                  <div>{resident.id}</div>
+                  <div>{resident.name}</div>
+                  <div>{resident.status}</div>
+                  <div>{resident.gender}</div>
+                </Table.Row>
+              ))            ) : (
+              <Table.Row size="small">
+                <div className="no-residents-message">
+                  No residents assigned to this apartment
+                </div>
+              </Table.Row>
+            )}
+          </Table>
+        </>
+      )}
 
       {apartment?.vehicleList && (
         <>
