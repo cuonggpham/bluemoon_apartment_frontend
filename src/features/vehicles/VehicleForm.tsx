@@ -83,10 +83,8 @@ export default function VehicleForm({ vehicle }: any) {
   };
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    
     console.log("handleSubmit được gọi!");
     console.log("Form values:", formValues);
-
     // Kiểm tra validation
     if (!formValues.apartmentId) {
       toast.error("Vui lòng chọn phòng!");
@@ -100,38 +98,36 @@ export default function VehicleForm({ vehicle }: any) {
       toast.error("Vui lòng chọn loại xe!");
       return;
     }
-
     const vehicleData = {
       apartmentId: formValues.apartmentId,
       id: formValues.id,
       category: formValues.category
     };
-
     console.log("Sending vehicle data:", vehicleData);
-
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/vehicles", 
-        vehicleData,
-        {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-      
-      console.log("Response:", response.data);
-      
+      let response;
+      if (vehicle) {
+        response = await axios.put(
+          `http://localhost:8080/api/v1/vehicles/${formValues.id}`,
+          vehicleData,
+          { headers: { "Content-Type": "application/json" } }
+        );
+        toast.success("Update vehicle successful");
+      } else {
+        response = await axios.post(
+          "http://localhost:8080/api/v1/vehicles",
+          vehicleData,
+          { headers: { "Content-Type": "application/json" } }
+        );
+        toast.success("Add vehicle successful");
+      }
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-
-      toast.success("Add vehicle successfull");
     } catch (error: any) {
       console.error("Error details:", error);
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
-      
       toast.error(`Có lỗi xảy ra: ${error.response?.data?.message || error.message}`);
     }
   };
@@ -185,12 +181,12 @@ export default function VehicleForm({ vehicle }: any) {
               <HiTrash />
             </span>
           </Button>
-          {/* <Button variation="secondary" size="medium">
+          <Button type="submit" size="medium" variation="secondary">
             Update
             <span>
               <HiPencil />
             </span>
-          </Button> */}
+          </Button>
         </Form.Buttons>
       ) : (        
       <Form.Buttons>
