@@ -3,7 +3,8 @@ import Form from "../../components/Form";
 import FormField from "../../components/FormField";
 import Button from "../../components/Button";
 import Selector from "../../components/Selector";
-import { HiOutlinePlusCircle, HiPencil, HiTrash } from "react-icons/hi2";
+import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
+import { HiOutlinePlusCircle, HiPencil, HiTrash, HiPlus, HiMinus } from "react-icons/hi2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./ResidentForm.css";
@@ -21,9 +22,15 @@ export default function ResidentForm({ resident }: any) {
 
   // Add validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Add apartment management states
+  const [selectedApartment, setSelectedApartment] = useState<any>(null);
+  const [showApartmentSearch, setShowApartmentSearch] = useState(false);
+  const [isUpdatingApartments, setIsUpdatingApartments] = useState(false);
 
   const statusOptions = ["Resident", "Moved", "Temporary", "Absent"];
   const genderOptions = ["Male", "Female"];
+  
   // Validation function
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -77,6 +84,110 @@ export default function ResidentForm({ resident }: any) {
       }));
     }
   };
+
+  // Apartment management functions
+  const handleApartmentSelect = (apartment: any) => {
+    setSelectedApartment(apartment);
+  };
+
+  const handleAddApartment = async () => {
+    if (!selectedApartment) {
+      toast.error("Please select an apartment to add");
+      return;
+    }
+
+    // Check if apartment is already assigned
+    const isAlreadyAssigned = formValues.apartments.some(
+      (apt: any) => apt.addressNumber === selectedApartment.addressNumber
+    );
+
+    if (isAlreadyAssigned) {
+      toast.warning("This apartment is already assigned to the resident");
+      return;
+    }
+
+    setIsUpdatingApartments(true);    
+    try {
+      // Update apartment assignments via apartment API
+      await axios.put(
+        `http://localhost:8080/api/v1/apartments/${selectedApartment.addressNumber}`,
+        {
+          residents: [parseInt(formValues.id)] // Add this resident to the apartment
+        }
+      );
+
+      // Update local state
+      const newApartment = {
+        addressNumber: selectedApartment.addressNumber,
+        area: selectedApartment.area,
+        status: selectedApartment.status
+      };
+
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        apartments: [...prevValues.apartments, newApartment],
+      }));
+
+      setSelectedApartment(null);
+      setShowApartmentSearch(false);
+      toast.success("Apartment added successfully!");
+
+    } catch (err: any) {
+      console.error("Error adding apartment:", err);
+      toast.error("Failed to add apartment. Please try again.");
+    } finally {
+      setIsUpdatingApartments(false);
+    }
+  };
+
+  const handleRemoveApartment = async (apartmentId: number) => {
+    if (!resident) {
+      toast.error("Cannot remove apartment - resident not found");
+      return;
+    }
+
+    setIsUpdatingApartments(true);
+
+    try {
+      // Get current residents of this apartment
+      const apartmentResponse = await axios.get(
+        `http://localhost:8080/api/v1/apartments/${apartmentId}`
+      );
+      
+      const apartmentData = apartmentResponse.data.data;
+      const currentResidents = apartmentData.residents || [];
+      
+      // Remove this resident from the apartment's resident list
+      const updatedResidents = currentResidents
+        .filter((res: any) => res.id !== parseInt(formValues.id))
+        .map((res: any) => res.id);
+
+      // Update apartment with new resident list
+      await axios.put(
+        `http://localhost:8080/api/v1/apartments/${apartmentId}`,
+        {
+          residents: updatedResidents
+        }
+      );
+
+      // Update local state
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        apartments: prevValues.apartments.filter(
+          (apt: any) => apt.addressNumber !== apartmentId
+        ),
+      }));
+
+      toast.success("Apartment removed successfully!");
+
+    } catch (err: any) {
+      console.error("Error removing apartment:", err);
+      toast.error("Failed to remove apartment. Please try again.");
+    } finally {
+      setIsUpdatingApartments(false);
+    }
+  };
+
   const handleAddResident = async (e: any) => {
     e.preventDefault();
     
@@ -114,6 +225,7 @@ export default function ResidentForm({ resident }: any) {
       console.error(err);
     }
   };
+  
   const handleUpdate = async (e: any) => {
     e.preventDefault();
     
@@ -226,7 +338,58 @@ export default function ResidentForm({ resident }: any) {
       </div>      
       
       <div>
-        <label>Apartments:</label>
+        <div className="apartment-header">
+          <label>Apartments:</label>
+          {resident && (
+            <Button 
+              type="button" 
+              size="small" 
+              variation="primary"
+              onClick={() => setShowApartmentSearch(!showApartmentSearch)}
+              disabled={isUpdatingApartments}
+            >
+              <HiPlus />
+              Add Apartment
+            </Button>
+          )}
+        </div>
+        
+        {/* Apartment Search Section - Only show for existing residents */}
+        {resident && showApartmentSearch && (
+          <div className="apartment-search-section">
+            <FormField>
+              <FormField.Label label="Search Apartment" />
+              <ApartmentSearchDropdown
+                value={selectedApartment?.addressNumber?.toString() || ""}
+                onChange={handleApartmentSelect}
+                placeholder="Search by apartment number..."
+              />
+            </FormField>
+            <div className="apartment-search-buttons">
+              <Button 
+                type="button" 
+                size="small" 
+                variation="primary"
+                onClick={handleAddApartment}
+                disabled={!selectedApartment || isUpdatingApartments}
+              >
+                Add Selected
+              </Button>
+              <Button 
+                type="button" 
+                size="small" 
+                variation="secondary"
+                onClick={() => {
+                  setShowApartmentSearch(false);
+                  setSelectedApartment(null);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+        
         <Form.Fields>          
           <div>
             {formValues.apartments && formValues.apartments.length > 0 ? (
@@ -242,6 +405,18 @@ export default function ResidentForm({ resident }: any) {
                         Apartment {apartment.addressNumber} 
                         ({apartment.area}m² - {apartment.status})
                       </span>
+                      {resident && (
+                        <Button 
+                          type="button" 
+                          size="small" 
+                          variation="danger"
+                          onClick={() => handleRemoveApartment(apartment.addressNumber)}
+                          disabled={isUpdatingApartments}
+                          className="remove-apartment-btn"
+                        >
+                          <HiMinus />
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>

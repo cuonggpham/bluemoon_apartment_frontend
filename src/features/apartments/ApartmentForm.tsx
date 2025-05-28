@@ -3,7 +3,7 @@ import Form from "../../components/Form";
 import FormField from "../../components/FormField";
 import Selector from "../../components/Selector";
 import Button from "../../components/Button";
-import { HiOutlinePlusCircle, HiPencil} from "react-icons/hi2";
+import { HiOutlinePlusCircle, HiPencil, HiTrash} from "react-icons/hi2";
 import Table from "../../components/Table";
 import ResidentSearchDropdown from "../../components/ResidentSearchDropdown";
 import axios from "axios";
@@ -195,19 +195,37 @@ export default function ApartmentForm({
   };
 
   const statusOptions = ["Business", "Residential"];
-
   // API xoá căn hộ (delete)
+  const handleDelete = async (e: any) => {
+    e.preventDefault();
 
-  // const handleDelete = async (e: any) => {
-  //   e.preventDefault();
+    // Show confirmation dialog
+    if (!window.confirm(`Bạn có chắc chắn muốn xoá căn hộ ${apartment?.addressNumber}? Hành động này không thể hoàn tác.`)) {
+      return;
+    }
 
-  //   try {
-  //     const response = await axios.delete(``)
-  //   } catch (err) {
-  //     toast.error("Có lỗi xảy ra");
-  //   }
-
-  // }
+    try {
+      await axios.delete(`http://localhost:8080/api/v1/apartments/${apartment?.addressNumber}`);
+      
+      toast.success("Xoá căn hộ thành công");
+      
+      // Refresh the apartment list and navigate back
+      setTimeout(() => {
+        fetchApartments();
+        window.location.reload();
+      }, 1500);
+      
+    } catch (err: any) {
+      console.error('Delete error:', err);
+      if (err.response?.status === 404) {
+        toast.error("Căn hộ không tồn tại");
+      } else if (err.response?.status === 400) {
+        toast.error("Không thể xoá căn hộ do ràng buộc dữ liệu");
+      } else {
+        toast.error("Có lỗi xảy ra khi xoá căn hộ");
+      }
+    }
+  };
 
   return (
     <Form width="800px">
@@ -313,17 +331,20 @@ export default function ApartmentForm({
             ))}
           </Table>
         </>
-      )}
-
-      {/* Action Buttons */}
+      )}      {/* Action Buttons */}
       {apartment ? (
         <Form.Buttons>
-          {/* <Button type="button" variation="danger" size="medium">
+          <Button 
+            onClick={handleDelete}
+            type="button" 
+            variation="danger" 
+            size="medium"
+          >
             Delete
             <span>
               <HiTrash />
             </span>
-          </Button> */}
+          </Button>
           <Button
             onClick={handleUpdate}
             type="button"
