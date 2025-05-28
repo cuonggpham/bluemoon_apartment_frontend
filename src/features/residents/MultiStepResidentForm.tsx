@@ -6,6 +6,7 @@ import Selector from "../../components/Selector";
 import { HiOutlinePlusCircle, HiArrowLeft, HiArrowRight, HiExclamationTriangle } from "react-icons/hi2";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "./MultiStepResidentForm.css";
 
 interface ResidentData {
   id: string;
@@ -26,6 +27,9 @@ interface ApartmentData {
 export default function MultiStepResidentForm({ onCloseModal }: any) {
   const [currentStep, setCurrentStep] = useState(1);
   const [apartmentOption, setApartmentOption] = useState<"existing" | "new" | null>(null);
+  
+  // Add validation state
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
   // Step 1: Resident Information
   const [residentData, setResidentData] = useState<ResidentData>({
@@ -54,13 +58,20 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
   const statusOptions = ["Resident", "Moved", "Temporary", "Absent"];
   const genderOptions = ["Male", "Female"];
   const apartmentStatusOptions = ["Business", "Residential"];
-
   const handleResidentChange = (e: any) => {
     const { id, value } = e.target;
     setResidentData((prevValues) => ({
       ...prevValues,
       [id]: value,
     }));
+    
+    // Clear error when user starts typing
+    if (errors[id]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [id]: "",
+      }));
+    }
   };
 
   const handleApartmentChange = (e: any) => {
@@ -69,6 +80,14 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
       ...prevValues,
       [id]: value,
     }));
+    
+    // Clear error when user starts typing
+    if (errors[id]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [id]: "",
+      }));
+    }
   };
   // Search for existing apartments with debounce
   const searchApartments = useCallback(async (searchValue: string) => {
@@ -111,31 +130,107 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
 
     return () => clearTimeout(delayedSearch);
   }, [searchValue, searchApartments]);
-
   const handleApartmentSearch = (e: any) => {
     const value = e.target.value;
     setSearchValue(value);
     setSelectedApartmentId(value);
+    
+    // Clear error when user starts typing
+    if (errors.selectedApartmentId) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        selectedApartmentId: "",
+      }));
+    }
     
     if (value.trim() === "") {
       setApartmentSuggestions([]);
       setNoResultsFound(false);
       setIsSearching(false);
     }
-  };
-  const selectApartment = (apartment: any) => {
+  };const selectApartment = (apartment: any) => {
     setSelectedApartmentId(apartment.addressNumber.toString());
     setSearchValue(apartment.addressNumber.toString());
     setApartmentSuggestions([]);
     setNoResultsFound(false);
+    
+    // Clear error when apartment is selected
+    if (errors.selectedApartmentId) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        selectedApartmentId: "",
+      }));
+    }
   };
 
+  // Validation functions
+  const validateStep1 = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!residentData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    
+    if (!residentData.id.trim()) {
+      newErrors.id = "CCCD is required";
+    } else if (!/^\d{12}$/.test(residentData.id)) {
+      newErrors.id = "CCCD must be 12 digits";
+    }
+    
+    if (!residentData.dob) {
+      newErrors.dob = "Date of birth is required";
+    }
+    
+    if (!residentData.gender.trim()) {
+      newErrors.gender = "Gender is required";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!apartmentOption) {
+      newErrors.apartmentOption = "Please select an apartment option";
+    }
+    
+    if (apartmentOption === "existing" && !selectedApartmentId) {
+      newErrors.selectedApartmentId = "Please select an apartment";
+    }
+    
+    if (apartmentOption === "new") {
+      if (!apartmentData.addressNumber.trim()) {
+        newErrors.addressNumber = "Room number is required";
+      }
+      
+      if (!apartmentData.area.trim()) {
+        newErrors.area = "Room area is required";
+      } else if (isNaN(Number(apartmentData.area)) || Number(apartmentData.area) <= 0) {
+        newErrors.area = "Area must be a positive number";
+      }
+      
+      if (apartmentData.ownerPhone && !/^\d{10,11}$/.test(apartmentData.ownerPhone)) {
+        newErrors.ownerPhone = "Phone number must be 10-11 digits";
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   // Step navigation
   const nextStep = () => {
     if (currentStep === 1) {
       // Validate step 1
-      if (!residentData.name || !residentData.dob || !residentData.id || !residentData.gender) {
-        toast.error("Please fill in all required fields");
+      if (!validateStep1()) {
+        toast.error("Please fill in all required fields correctly");
+        return;
+      }
+    } else if (currentStep === 2) {
+      // Validate step 2
+      if (!validateStep2()) {
+        toast.error("Please complete the apartment selection");
         return;
       }
     }
@@ -194,43 +289,19 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
   };
 
   return (
-    <Form width="500px">
-      {/* Step Indicator */}
-      <div style={{ marginBottom: "20px", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
-          <div 
-            style={{ 
-              width: "30px", 
-              height: "30px", 
-              borderRadius: "50%", 
-              backgroundColor: currentStep >= 1 ? "#3b82f6" : "#e5e7eb",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold"
-            }}
-          >
+    <Form width="500px">      
+    {/* Step Indicator */}
+      <div className="step-indicator">
+        <div className="step-flex">
+          <div className={`step-circle ${currentStep >= 1 ? 'active' : 'inactive'}`}>
             1
           </div>
-          <div style={{ width: "50px", height: "2px", backgroundColor: currentStep >= 2 ? "#3b82f6" : "#e5e7eb" }}></div>
-          <div 
-            style={{ 
-              width: "30px", 
-              height: "30px", 
-              borderRadius: "50%", 
-              backgroundColor: currentStep >= 2 ? "#3b82f6" : "#e5e7eb",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold"
-            }}
-          >
+          <div className={`step-line ${currentStep >= 2 ? 'active' : 'inactive'}`}></div>
+          <div className={`step-circle ${currentStep >= 2 ? 'active' : 'inactive'}`}>
             2
           </div>
         </div>
-        <div style={{ marginTop: "10px", fontWeight: "bold" }}>
+        <div className="step-title">
           {currentStep === 1 ? "Personal Information" : "Apartment Selection"}
         </div>
       </div>
@@ -238,37 +309,43 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
       {/* Step 1: Personal Information */}
       {currentStep === 1 && (
         <div>
-          <h3>Step 1: Personal Information</h3>
+          <h3>Step 1: Personal Information</h3>          
           <Form.Fields>
             <FormField>
-              <FormField.Label label="Full Name *" />
+              <FormField.Label label="Full Name" required />
               <FormField.Input
                 id="name"
                 type="text"
                 value={residentData.name}
                 onChange={handleResidentChange}
                 placeholder="Enter full name"
+                required
+                error={errors.name}
               />
             </FormField>
             
             <FormField>
-              <FormField.Label label="Date of Birth *" />
+              <FormField.Label label="Date of Birth" required />
               <FormField.Input
                 id="dob"
                 type="date"
                 value={residentData.dob}
                 onChange={handleResidentChange}
+                required
+                error={errors.dob}
               />
             </FormField>
             
             <FormField>
-              <FormField.Label label="CCCD *" />
+              <FormField.Label label="CCCD" required />
               <FormField.Input
                 id="id"
                 type="text"
                 value={residentData.id}
                 onChange={handleResidentChange}
                 placeholder="Enter citizen ID"
+                required
+                error={errors.id}
               />
             </FormField>
 
@@ -288,7 +365,9 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
               onChange={handleResidentChange}
               id="gender"
               options={genderOptions}
-              label="Gender *"
+              label="Gender"
+              required
+              error={errors.gender}
             />
             
             <Selector
@@ -297,8 +376,9 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
               id="status"
               options={statusOptions}
               label="Status"
-            />
-          </Form.Fields>
+              required
+              error={errors.status}
+            />          </Form.Fields>
         </div>
       )}
 
@@ -306,40 +386,33 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
       {currentStep === 2 && (
         <div>
           <h3>Step 2: Apartment Assignment</h3>
-          
-          {/* Apartment Option Selection */}
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ fontWeight: "bold", marginBottom: "10px", display: "block" }}>
-              Choose an option:
+            {/* Apartment Option Selection */}
+          <div className="apartment-option-section">
+            <label className="apartment-option-label">
+              Choose an option: {errors.apartmentOption && <span className="error-message">{errors.apartmentOption}</span>}
             </label>
-            <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
+            <div className="apartment-option-buttons">
               <button
                 type="button"
-                onClick={() => setApartmentOption("existing")}
-                style={{
-                  padding: "10px 20px",
-                  border: apartmentOption === "existing" ? "2px solid #3b82f6" : "2px solid #e5e7eb",
-                  borderRadius: "8px",
-                  backgroundColor: apartmentOption === "existing" ? "#eff6ff" : "white",
-                  color: apartmentOption === "existing" ? "#3b82f6" : "#374151",
-                  cursor: "pointer",
-                  fontWeight: apartmentOption === "existing" ? "bold" : "normal"
+                onClick={() => {
+                  setApartmentOption("existing");
+                  if (errors.apartmentOption) {
+                    setErrors(prev => ({ ...prev, apartmentOption: "" }));
+                  }
                 }}
+                className={`apartment-option-button ${apartmentOption === "existing" ? "selected" : ""}`}
               >
                 Find Existing Apartment
               </button>
               <button
                 type="button"
-                onClick={() => setApartmentOption("new")}
-                style={{
-                  padding: "10px 20px",
-                  border: apartmentOption === "new" ? "2px solid #3b82f6" : "2px solid #e5e7eb",
-                  borderRadius: "8px",
-                  backgroundColor: apartmentOption === "new" ? "#eff6ff" : "white",
-                  color: apartmentOption === "new" ? "#3b82f6" : "#374151",
-                  cursor: "pointer",
-                  fontWeight: apartmentOption === "new" ? "bold" : "normal"
+                onClick={() => {
+                  setApartmentOption("new");
+                  if (errors.apartmentOption) {
+                    setErrors(prev => ({ ...prev, apartmentOption: "" }));
+                  }
                 }}
+                className={`apartment-option-button ${apartmentOption === "new" ? "selected" : ""}`}
               >
                 Create New Apartment
               </button>
@@ -348,41 +421,29 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
           {apartmentOption === "existing" && (
             <div>
               <FormField>
-                <FormField.Label label="Search Apartment by Number" />
+                <FormField.Label label="Search Apartment by Number" required />
                 <FormField.Input
                   type="text"
                   value={searchValue}
                   onChange={handleApartmentSearch}
                   placeholder="Enter apartment number"
+                  required
+                  error={errors.selectedApartmentId}
                 />
               </FormField>
               
               {/* Loading indicator */}
               {isSearching && (
-                <div style={{ 
-                  padding: "10px", 
-                  textAlign: "center",
-                  color: "#6b7280",
-                  fontSize: "0.875rem"
-                }}>
+                <div className="loading-indicator">
                   Searching...
                 </div>
               )}
               
               {/* No results message */}
               {noResultsFound && searchValue.trim() !== "" && !isSearching && (
-                <div style={{ 
-                  padding: "15px", 
-                  backgroundColor: "#fef2f2", 
-                  border: "1px solid #fecaca", 
-                  borderRadius: "8px",
-                  marginTop: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px"
-                }}>
-                  <HiExclamationTriangle style={{ color: "#dc2626", fontSize: "1.25rem" }} />
-                  <span style={{ color: "#dc2626", fontSize: "0.875rem" }}>
+                <div className="no-results-container">
+                  <HiExclamationTriangle className="no-results-icon" />
+                  <span className="no-results-text">
                     No apartment found with number "{searchValue}". Please check the number or create a new apartment.
                   </span>
                 </div>
@@ -390,28 +451,15 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
               
               {/* Apartment Suggestions */}
               {apartmentSuggestions.length > 0 && !isSearching && (
-                <div style={{ 
-                  border: "1px solid #e5e7eb", 
-                  borderRadius: "8px", 
-                  maxHeight: "200px", 
-                  overflowY: "auto",
-                  marginTop: "5px"
-                }}>
+                <div className="apartment-suggestions-container">
                   {apartmentSuggestions.map((apartment) => (
                     <div
                       key={apartment.addressNumber}
                       onClick={() => selectApartment(apartment)}
-                      style={{
-                        padding: "10px",
-                        borderBottom: "1px solid #f3f4f6",
-                        cursor: "pointer",
-                        backgroundColor: "white"
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f9fafb"}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
+                      className="apartment-suggestion"
                     >
-                      <div style={{ fontWeight: "bold" }}>Apartment {apartment.addressNumber}</div>
-                      <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                      <div className="apartment-suggestion-title">Apartment {apartment.addressNumber}</div>
+                      <div className="apartment-suggestion-details">
                         Owner: {apartment.owner?.name || "N/A"} | Status: {apartment.status}
                       </div>
                     </div>
@@ -419,32 +467,35 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                 </div>
               )}
             </div>
-          )}
-
+          )}          
           {/* New Apartment Form */}
           {apartmentOption === "new" && (
             <div>
-              <h4 style={{ marginBottom: "15px" }}>Create New Apartment</h4>
+              <h4 className="new-apartment-title">Create New Apartment</h4>
               <Form.Fields>
                 <FormField>
-                  <FormField.Label label="Apartment Number *" />
+                  <FormField.Label label="Apartment Number" required />
                   <FormField.Input
                     id="addressNumber"
                     type="text"
                     value={apartmentData.addressNumber}
                     onChange={handleApartmentChange}
                     placeholder="Enter apartment number"
+                    required
+                    error={errors.addressNumber}
                   />
                 </FormField>
                 
                 <FormField>
-                  <FormField.Label label="Area (m²) *" />
+                  <FormField.Label label="Area (m²)" required />
                   <FormField.Input
                     id="area"
                     type="number"
                     value={apartmentData.area}
                     onChange={handleApartmentChange}
                     placeholder="Enter area in square meters"
+                    required
+                    error={errors.area}
                   />
                 </FormField>
                 
@@ -456,6 +507,7 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                     value={apartmentData.ownerPhone}
                     onChange={handleApartmentChange}
                     placeholder="Enter owner phone number"
+                    error={errors.ownerPhone}
                   />
                 </FormField>
                 
@@ -465,17 +517,13 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                   id="status"
                   options={apartmentStatusOptions}
                   label="Apartment Type"
+                  required
+                  error={errors.status}
                 />
               </Form.Fields>
               
-              <div style={{ 
-                padding: "10px", 
-                backgroundColor: "#f0f9ff", 
-                border: "1px solid #bae6fd", 
-                borderRadius: "8px",
-                marginTop: "15px"
-              }}>
-                <p style={{ margin: "0", fontSize: "0.875rem", color: "#0369a1" }}>
+              <div className="new-apartment-info-note">
+                <p className="new-apartment-info-text">
                   <strong>Note:</strong> {residentData.name} will be set as the owner of this new apartment.
                 </p>
               </div>

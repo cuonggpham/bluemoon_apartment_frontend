@@ -53,12 +53,41 @@ export default function ApartmentForm({
     ownerId: apartment?.owner?.id || "",
   });
 
+  // Add validation state
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const [selectedOwner, setSelectedOwner] = useState<OwnerResident | null>(
     apartment?.owner ? { 
       id: apartment.owner.id, 
       name: apartment.owner.name 
     } : null
   );
+
+  // Validation function
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formValues.addressNumber.trim()) {
+      newErrors.addressNumber = "Room number is required";
+    }
+    
+    if (!formValues.area.trim()) {
+      newErrors.area = "Room area is required";
+    } else if (isNaN(Number(formValues.area)) || Number(formValues.area) <= 0) {
+      newErrors.area = "Area must be a positive number";
+    }
+    
+    if (!formValues.status.trim()) {
+      newErrors.status = "Status is required";
+    }
+
+    if (formValues.ownerPhone && !/^\d{10,11}$/.test(formValues.ownerPhone)) {
+      newErrors.ownerPhone = "Phone number must be 10-11 digits";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -67,6 +96,14 @@ export default function ApartmentForm({
       ...prevValues,
       [id]: value,
     }));
+    
+    // Clear error when user starts typing
+    if (errors[id]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [id]: "",
+      }));
+    }
   };
   const handleOwnerSelect = (owner: OwnerResident | null) => {
     setSelectedOwner(owner);
@@ -77,6 +114,12 @@ export default function ApartmentForm({
     }));
   };  const handleUpdate = async (e: any) => {
     e.preventDefault();
+
+    // Validate the form before submitting
+    if (!validateForm()) {
+      toast.warning("Vui lòng điền đầy đủ thông tin hợp lệ");
+      return;
+    }
 
     try {      const data = {
         area: formValues.area,
@@ -105,6 +148,12 @@ export default function ApartmentForm({
     // Validate that owner is selected if we want to require it
     if (!formValues.ownerId) {
       toast.warning("Vui lòng chọn chủ hộ hoặc để trống nếu chưa có chủ hộ");
+    }
+
+    // Validate the form before submitting
+    if (!validateForm()) {
+      toast.warning("Vui lòng điền đầy đủ thông tin hợp lệ");
+      return;
     }
 
     const apartmentData = {
@@ -159,36 +208,41 @@ export default function ApartmentForm({
 
   return (
     <Form width="800px">
-      <label>Room:</label>
+      <label>Room:</label>      
       <Form.Fields type="horizontal">
         <FormField>
-          <FormField.Label label="Room" />
+          <FormField.Label label="Room" required />
           <FormField.Input
             id="addressNumber"
             type="text"
             value={formValues.addressNumber}
             onChange={handleChange}
+            required
+            error={errors.addressNumber}
           />
         </FormField>
 
         <FormField>
-          <FormField.Label label="Room Area" />
+          <FormField.Label label="Room Area" required />
           <FormField.Input
             id="area"
             type="text"
             value={formValues.area}
             onChange={handleChange}
+            required
+            error={errors.area}
           />
         </FormField>
-      </Form.Fields>
-
+      </Form.Fields>      
       <Selector
         id="status"
         value={formValues.status}
         onChange={handleChange}
         options={statusOptions}
         label="Status"
-      />      <label>Chủ hộ (tuỳ chọn):</label>
+        required
+        error={errors.status}
+      /><label>Chủ hộ (tuỳ chọn):</label>
       <Form.Fields type="horizontal">
         <FormField>
           <FormField.Label label="Chủ hộ" />          
@@ -197,7 +251,7 @@ export default function ApartmentForm({
             onChange={handleOwnerSelect}
             placeholder="Click để chọn chủ hộ..."
           />
-        </FormField>
+        </FormField>        
         <FormField>
           <FormField.Label label="Số điện thoại:" />
           <FormField.Input
@@ -205,8 +259,9 @@ export default function ApartmentForm({
             type="text"
             value={formValues.ownerPhone}
             onChange={handleChange}
+            error={errors.ownerPhone}
           />
-        </FormField>      
+        </FormField>
         </Form.Fields>
 
       {apartment?.vehicleList && (

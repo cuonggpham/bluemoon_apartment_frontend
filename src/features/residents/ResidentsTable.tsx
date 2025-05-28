@@ -33,12 +33,11 @@ export default function ResidentsTable({ keyword }: ResidentsTableProps) {
 
   const handlePageChange = (page: number) => {
     setCurPage(page);
-  };
-  return (
-    <Table columns="0.5fr 1fr 1.5fr 1.5fr 1fr 1.5fr 1fr 1fr">
+  };  return (
+    <Table columns="0.5fr 1.2fr 1.5fr 1.5fr 1fr 1.5fr 1fr 1fr">
       <Table.Header>
         <div>STT</div>
-        <div>Room</div>
+        <div>Apartments</div>
         <div>Name</div>
         <div>CCCD</div>
         <div>Gender</div>
