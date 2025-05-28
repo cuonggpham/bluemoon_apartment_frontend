@@ -1,0 +1,20 @@
+.apartment-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.apartment-tag {
+  background-color: #e5f3ff;
+  color: #0066cc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.no-apartments {
+  color: #999;
+  font-style: italic;
+}

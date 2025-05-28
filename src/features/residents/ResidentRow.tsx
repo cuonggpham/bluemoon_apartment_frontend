@@ -3,9 +3,10 @@ import Tag from "../../components/Tag";
 import { capitalize } from "../../utils/helpers";
 import Modal from "../../components/Modal";
 import ResidentForm from "./ResidentForm";
+import "./ResidentRow.css";
 
 export default function ResidentRow({ resident, index }:{ resident: any; index: number }) {
-  const { id, apartmentId, name, dob, status, gender } = resident;
+  const { id, apartments, name, dob, status, gender } = resident;
 
   const statusStyled = {
     Resident: "green",
@@ -22,13 +23,26 @@ export default function ResidentRow({ resident, index }:{ resident: any; index: 
     return `${day}-${month}-${year}`;
   }
   
-
   return (
     <Table.Row key={id}>
       {" "}
       {/* Ensure the row is uniquely identified */}
-      <div>{index + 1}</div>
-      <div>{apartmentId}</div>
+      <div>{index + 1}</div>      <div>
+        {apartments && apartments.length > 0 ? (
+          <div className="apartment-tags">
+            {apartments.map((apartment: any, idx: number) => (
+              <span
+                key={apartment.addressNumber || idx}
+                className="apartment-tag"
+              >
+                {apartment.addressNumber}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className="no-apartments">No apartments</span>
+        )}
+      </div>
       <div>{name}</div>
       <div>{id}</div>
       <div>{gender}</div>
