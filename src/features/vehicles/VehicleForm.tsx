@@ -140,9 +140,9 @@ export default function VehicleForm({ vehicle }: any) {
     <Form width="400px" onSubmit={handleSubmit}>      
     <Form.Fields>
         <FormField>
-          <FormField.Label label={"Room"} />
+          <FormField.Label label={"Room"} />          
           <ApartmentSearchDropdown
-            value={selectedApartment?.addressNumber?.toString() || formValues.apartmentId}
+            value={selectedApartment?.addressNumber?.toString() || (formValues.apartmentId?.toString() || "")}
             onChange={handleApartmentSelect}
             placeholder="Search apartment by room number..."
           />

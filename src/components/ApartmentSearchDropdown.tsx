@@ -121,7 +121,7 @@ export default function ApartmentSearchDropdown({
   placeholder = "Nhập số phòng để tìm kiếm căn hộ...",
   disabled = false,
 }: ApartmentSearchDropdownProps) {
-  const [searchValue, setSearchValue] = useState(value);
+  const [searchValue, setSearchValue] = useState(String(value || ""));
   const [suggestions, setSuggestions] = useState<Apartment[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -129,7 +129,6 @@ export default function ApartmentSearchDropdown({
   
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout>();
-
   // Fetch all apartments on component mount
   useEffect(() => {
     const fetchApartments = async () => {
@@ -149,6 +148,11 @@ export default function ApartmentSearchDropdown({
 
     fetchApartments();
   }, []);
+
+  // Update searchValue when value prop changes
+  useEffect(() => {
+    setSearchValue(String(value || ""));
+  }, [value]);
 
   // Debounced search function
   const debouncedSearch = (searchTerm: string) => {
@@ -178,12 +182,12 @@ export default function ApartmentSearchDropdown({
     setSearchValue(newValue);
     debouncedSearch(newValue);
   };
-
   const handleInputClick = () => {
-    if (searchValue.trim() !== "" && !isOpen) {
+    const searchStr = String(searchValue || "");
+    if (searchStr.trim() !== "" && !isOpen) {
       const filteredApartments = allApartments.filter((apartment) =>
-        apartment.addressNumber.toString().includes(searchValue) ||
-        apartment.status.toLowerCase().includes(searchValue.toLowerCase())
+        apartment.addressNumber.toString().includes(searchStr) ||
+        apartment.status.toLowerCase().includes(searchStr.toLowerCase())
       );
       setSuggestions(filteredApartments);
       setIsOpen(true);
@@ -191,10 +195,11 @@ export default function ApartmentSearchDropdown({
   };
 
   const handleInputFocus = () => {
-    if (!isOpen && searchValue.trim() !== "") {
+    const searchStr = String(searchValue || "");
+    if (!isOpen && searchStr.trim() !== "") {
       const filteredApartments = allApartments.filter((apartment) =>
-        apartment.addressNumber.toString().includes(searchValue) ||
-        apartment.status.toLowerCase().includes(searchValue.toLowerCase())
+        apartment.addressNumber.toString().includes(searchStr) ||
+        apartment.status.toLowerCase().includes(searchStr.toLowerCase())
       );
       setSuggestions(filteredApartments);
       setIsOpen(true);
@@ -277,8 +282,7 @@ export default function ApartmentSearchDropdown({
                 </ApartmentInfo>
               </div>
             </DropdownItem>
-          ))
-        ) : searchValue.trim() !== "" ? (
+          ))        ) : String(searchValue || "").trim() !== "" ? (
           <NoResults>Không tìm thấy căn hộ phù hợp</NoResults>
         ) : null}
       </DropdownList>
