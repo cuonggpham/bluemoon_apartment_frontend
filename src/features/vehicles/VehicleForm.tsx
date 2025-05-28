@@ -1,19 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Form from "../../components/Form";
 import FormField from "../../components/FormField";
 import Selector from "../../components/Selector";
 import Button from "../../components/Button";
 import { HiOutlinePlusCircle, HiPencil, HiTrash } from "react-icons/hi2";
+import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 export default function VehicleForm({ vehicle }: any) {
   const [formValues, setFormValues] = useState({
-    apartmentId: vehicle?.apartmentId || "",
+    apartmentId: vehicle?.apartment?.addressNumber || vehicle?.apartmentId || "",
     registerDate: vehicle?.registerDate || "",
     id: vehicle?.id || "",
     category: vehicle?.category || "",
   });
+  
+  const [selectedApartment, setSelectedApartment] = useState<any>(null);
   const vehicleTypeOptions = ["Motorbike", "Car"];
 
   const handleChange = (e: any) => {
@@ -23,15 +26,49 @@ export default function VehicleForm({ vehicle }: any) {
       [id]: value,
     }));
   };
-
+  const handleApartmentSelect = (apartment: any) => {
+    setSelectedApartment(apartment);
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      apartmentId: apartment?.addressNumber || "",
+    }));
+  };
+  // Initialize selected apartment when editing existing vehicle
+  useEffect(() => {
+    // Check if we have apartment data from VehicleResponse
+    if (vehicle?.apartment) {
+      setSelectedApartment({
+        addressNumber: vehicle.apartment.addressNumber,
+        area: vehicle.apartment.area,
+        status: vehicle.apartment.status,
+      });
+    } else if (vehicle?.apartmentId && !selectedApartment) {
+      // Fallback: fetch apartment details for old structure
+      const fetchApartmentDetails = async () => {
+        try {
+          const response = await axios.get(`http://localhost:8080/api/v1/apartments/${vehicle.apartmentId}`);
+          const apartmentData = response.data.data;
+          setSelectedApartment({
+            addressNumber: apartmentData.addressNumber,
+            area: apartmentData.area,
+            status: apartmentData.status,
+          });
+        } catch (error) {
+          console.error("Error fetching apartment details:", error);
+        }
+      };
+      fetchApartmentDetails();
+    }
+  }, [vehicle?.apartment, vehicle?.apartmentId, selectedApartment]);
   const handleDelete = async (e: any) => {
     e.preventDefault();
 
     try {
-      console.log(formValues.apartmentId);
+      // Use apartmentId from formValues (which is set from apartment.addressNumber or direct apartmentId)
+      console.log("Deleting vehicle with apartmentId:", formValues.apartmentId);
       const response = await axios.delete(`http://localhost:8080/api/v1/vehicles/${formValues.apartmentId}`, {
         data: { id: formValues.id }, // Payload gửi kèm
-        headers: { "Content-Type": "application/json" }, // Đảm bảo header đúng
+        headers: { "Content-Type": "application/json" },
       });
       
       // console.log(response.data);
@@ -44,9 +81,25 @@ export default function VehicleForm({ vehicle }: any) {
       // console.log(error);
     }
   };
-
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    
+    console.log("handleSubmit được gọi!");
+    console.log("Form values:", formValues);
+
+    // Kiểm tra validation
+    if (!formValues.apartmentId) {
+      toast.error("Vui lòng chọn phòng!");
+      return;
+    }
+    if (!formValues.id) {
+      toast.error("Vui lòng nhập số xe!");
+      return;
+    }
+    if (!formValues.category) {
+      toast.error("Vui lòng chọn loại xe!");
+      return;
+    }
 
     const vehicleData = {
       apartmentId: formValues.apartmentId,
@@ -54,32 +107,44 @@ export default function VehicleForm({ vehicle }: any) {
       category: formValues.category
     };
 
-    console.log(vehicleData);
+    console.log("Sending vehicle data:", vehicleData);
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/v1/vehicles", vehicleData
+        "http://localhost:8080/api/v1/vehicles", 
+        vehicleData,
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
       );
+      
+      console.log("Response:", response.data);
+      
       setTimeout(() => {
         window.location.reload();
       }, 1000);
+
       toast.success("Add vehicle successfull");
-    } catch (error) {
-      toast.error("Có lỗi xảy ra");
-      console.log(error);
+    } catch (error: any) {
+      console.error("Error details:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      
+      toast.error(`Có lỗi xảy ra: ${error.response?.data?.message || error.message}`);
     }
   };
 
   return (
-    <Form width="400px" onSubmit={handleSubmit}>
-      <Form.Fields>
+    <Form width="400px" onSubmit={handleSubmit}>      
+    <Form.Fields>
         <FormField>
           <FormField.Label label={"Room"} />
-          <FormField.Input
-            id="apartmentId"
-            type="text"
-            value={formValues.apartmentId}
-            onChange={handleChange}
+          <ApartmentSearchDropdown
+            value={selectedApartment?.addressNumber?.toString() || formValues.apartmentId}
+            onChange={handleApartmentSelect}
+            placeholder="Search apartment by room number..."
           />
         </FormField>
 
@@ -127,9 +192,9 @@ export default function VehicleForm({ vehicle }: any) {
             </span>
           </Button> */}
         </Form.Buttons>
-      ) : (
-        <Form.Buttons>
-          <Button size="medium" variation="primary">
+      ) : (        
+      <Form.Buttons>
+          <Button type="submit" size="medium" variation="primary">
             Add
             <span>
               <HiOutlinePlusCircle />
