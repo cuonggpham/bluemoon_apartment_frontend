@@ -3,7 +3,7 @@ import Modal from "../../components/Modal";
 import VehicleForm from "./VehicleForm";
 
 export default function VehicleRow({ vehicle }: any) {
-  const { id, apartmentId, category, registerDate } = vehicle;
+  const { id, apartment, category, registerDate } = vehicle;
 
   function formatDate(dateString: any) {
     const date = new Date(dateString);
@@ -16,7 +16,7 @@ export default function VehicleRow({ vehicle }: any) {
   return (
     <Table.Row>
       <div>{id}</div>
-      <div>{apartmentId}</div>
+      <div>{apartment?.addressNumber || 'N/A'}</div>
       <div>{category}</div>
       <div>{formatDate(registerDate)}</div>
       <Modal>
