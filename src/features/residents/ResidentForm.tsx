@@ -8,15 +8,15 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "./ResidentForm.css";
 
-export default function ResidentForm({ resident, onCloseModal }: any) {
+export default function ResidentForm({ resident }: any) {
   const [formValues, setFormValues] = useState({
-    id: resident?.id || "",
-    name: resident?.name || "",
-    dob: resident?.dob || "",
+    id: resident?.id?.toString() || "",
+    name: resident?.name?.toString() || "",
+    dob: resident?.dob?.toString() || "",
     apartments: resident?.apartments || [],
-    status: resident?.status || "Resident",
-    cic: resident?.cic || "",
-    gender: resident?.gender || "",
+    status: resident?.status?.toString() || "Resident",
+    cic: resident?.cic?.toString() || "",
+    gender: resident?.gender?.toString() || "",
   });
 
   // Add validation state
@@ -24,18 +24,18 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
 
   const statusOptions = ["Resident", "Moved", "Temporary", "Absent"];
   const genderOptions = ["Male", "Female"];
-
   // Validation function
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formValues.name.trim()) {
+    if (!formValues.name || !formValues.name.toString().trim()) {
       newErrors.name = "Name is required";
     }
     
-    if (!formValues.id.trim()) {
+    const idStr = formValues.id ? formValues.id.toString().trim() : "";
+    if (!idStr) {
       newErrors.id = "CCCD is required";
-    } else if (!/^\d{12}$/.test(formValues.id)) {
+    } else if (!/^\d{12}$/.test(idStr)) {
       newErrors.id = "CCCD must be 12 digits";
     }
     
@@ -43,15 +43,22 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
       newErrors.dob = "Date of birth is required";
     }
     
-    if (!formValues.gender.trim()) {
+    if (!formValues.gender || !formValues.gender.toString().trim()) {
       newErrors.gender = "Gender is required";
     }
     
-    if (!formValues.status.trim()) {
+    if (!formValues.status || !formValues.status.toString().trim()) {
       newErrors.status = "Status is required";
     }
     
     setErrors(newErrors);
+    
+    // Show toast for validation errors
+    if (Object.keys(newErrors).length > 0) {
+      const errorMessages = Object.values(newErrors);
+      toast.error(`Validation errors: ${errorMessages.join(', ')}`);
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 
@@ -75,7 +82,43 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
     
     // Validate form before submission
     if (!validateForm()) {
-      toast.error("Vui lòng điền đầy đủ thông tin hợp lệ!");
+      return;
+    }
+    
+    const data = {
+      id: formValues.id,
+      name: formValues.name,
+      dob: formValues.dob,
+      status: formValues.status,
+      gender: formValues.gender,
+      cic: formValues.cic
+    };
+    
+    // Note: For creating new residents, apartment assignment is handled separately
+    // or through the MultiStepResidentForm component
+
+    try {
+      await axios.post(
+        "http://localhost:8080/api/v1/residents",
+        data
+      );
+
+      toast.success("Add Resident Successful!");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
+    } catch (err) {
+      toast.error("Có lỗi xảy ra!!");
+      console.error(err);
+    }
+  };
+  const handleUpdate = async (e: any) => {
+    e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
       return;
     }
 
@@ -84,53 +127,53 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
       name: formValues.name,
       dob: formValues.dob,
       status: formValues.status,
-      gender: formValues.gender
-    }
-    // Note: For creating new residents, apartment assignment is handled separately
-    // or through the MultiStepResidentForm component
+      gender: formValues.gender,
+      cic: formValues.cic
+    };
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/residents",
+      await axios.put(
+        `http://localhost:8080/api/v1/residents/${formValues.id}`,
         data
       );
 
-      toast.success(`Add Resident Successfull!`);
+      toast.success("Update Resident Successful!");
 
       setTimeout(() => {
         window.location.reload();
       }, 1000);
 
     } catch (err) {
-      toast.error("Có lỗi xảy ra!!");
+      toast.error("Có lỗi xảy ra khi cập nhật!");
+      console.error(err);
     }
   };
 
   const handleDelete = async () => {
     try {
-      console.log(formValues.id);
-      const response = await axios.delete(`http://localhost:8080/api/v1/residents/${formValues.id}`)
-      // console.log(response.data);
+      await axios.delete(`http://localhost:8080/api/v1/residents/${formValues.id}`);
+      
+      toast.success("Delete successful");
+      
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-      toast.success("Delete successful");
     } catch (err) {
-      toast.error("Có lỗi xảy ra!!")
+      toast.error("Có lỗi xảy ra!!");
       console.error(err);
     }
-  }
+  };
 
   return (
     <Form width="400px">
       <div>
         <label>Information:</label>        
-        <Form.Fields>
+        <Form.Fields>          
           <FormField>
             <FormField.Label label={"Name"} required />
             <FormField.Input
               id="name"
-              type="name"
+              type="text"
               value={formValues.name}
               onChange={handleChange}
               required
@@ -157,6 +200,17 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
               onChange={handleChange}
               required
               error={errors.id}
+              readOnly={!!resident} // Only CCCD is read-only when editing existing resident
+            />
+          </FormField>
+          <FormField>
+            <FormField.Label label={"CIC Number"} />
+            <FormField.Input
+              id="cic"
+              type="text"
+              value={formValues.cic}
+              onChange={handleChange}
+              error={errors.cic}
             />
           </FormField>
           <Selector
@@ -167,7 +221,7 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
             label={"Gender:"}
             required
             error={errors.gender}
-          ></Selector>
+          />
         </Form.Fields>
       </div>      
       
@@ -211,7 +265,7 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
           </FormField>
         </Form.Fields>
       </div>
-
+      
       {resident ? (
         <Form.Buttons>
           <Button type="button" onClick={handleDelete} variation="danger" size="medium">
@@ -220,12 +274,12 @@ export default function ResidentForm({ resident, onCloseModal }: any) {
               <HiTrash />
             </span>
           </Button>
-          {/* <Button type="button" variation="secondary" size="medium">
+          <Button type="button" onClick={handleUpdate} variation="secondary" size="medium">
             Update
             <span>
               <HiPencil />
             </span>
-          </Button> */}
+          </Button>
         </Form.Buttons>
       ) : (
         <Form.Buttons>

@@ -286,7 +286,7 @@ export default function ApartmentForm({
                   <div>{resident.status}</div>
                   <div>{resident.gender}</div>
                 </Table.Row>
-              ))            ) : (
+              ))) : (
               <Table.Row size="small">
                 <div className="no-residents-message">
                   No residents assigned to this apartment
