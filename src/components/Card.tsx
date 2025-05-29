@@ -4,16 +4,16 @@ const CardStyled = styled.div`
   background: var(--color-grey-0);
   color: var(--color-grey-700);
   border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-xl);
-  padding: var(--space-6);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
     border-color: var(--color-grey-300);
   }
 
@@ -23,7 +23,7 @@ const CardStyled = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: linear-gradient(90deg, var(--color-brand-500), var(--color-brand-400));
     opacity: 0;
     transition: opacity var(--transition-fast);
@@ -33,12 +33,18 @@ const CardStyled = styled.div`
     opacity: 1;
   }
 
-  /* Modern Grid Layout */
+  /* Compact Grid Layout */
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto 1fr auto;
-  gap: var(--space-4);
-  min-height: 140px;
+  gap: 0.75rem;
+  min-height: 110px;
+
+  @media (max-width: 480px) {
+    min-height: 100px;
+    padding: 1rem;
+    gap: 0.5rem;
+  }
 `;
 
 const IconBox = styled.div`
@@ -46,22 +52,26 @@ const IconBox = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.5rem;
   grid-column: 2;
   grid-row: 1 / -1;
-  padding-left: var(--space-4);
+  padding-left: 0.75rem;
+
+  @media (max-width: 480px) {
+    padding-left: 0.5rem;
+  }
 `;
 
 const Icon = styled.div<{ color: string }>`
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: var(--border-radius-xl);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-lg);
   background: linear-gradient(135deg, var(--color-${(props) => props.color}-100), var(--color-${(props) => props.color}-200));
   color: var(--color-${(props) => props.color}-600);
-  font-size: var(--font-size-xl);
+  font-size: 1.25rem;
   box-shadow: var(--shadow-xs);
   transition: all var(--transition-fast);
 
@@ -69,10 +79,16 @@ const Icon = styled.div<{ color: string }>`
     transform: scale(1.05);
     box-shadow: var(--shadow-sm);
   }
+
+  @media (max-width: 480px) {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
 `;
 
 const Title = styled.p`
-  font-size: var(--font-size-sm);
+  font-size: 0.75rem;
   font-weight: var(--font-weight-medium);
   color: var(--color-grey-600);
   margin: 0;
@@ -80,10 +96,14 @@ const Title = styled.p`
   grid-row: 1;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+  }
 `;
 
 const Value = styled.div`
-  font-size: var(--font-size-3xl);
+  font-size: 1.75rem;
   font-weight: var(--font-weight-extrabold);
   line-height: var(--line-height-tight);
   color: var(--color-grey-900);
@@ -92,16 +112,24 @@ const Value = styled.div`
   grid-row: 2;
   display: flex;
   align-items: center;
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const Description = styled.span`
   display: block;
-  font-size: var(--font-size-xs);
+  font-size: 0.625rem;
   font-weight: var(--font-weight-medium);
   color: var(--color-grey-500);
   text-align: center;
-  margin-top: var(--space-1);
+  margin-top: 0.25rem;
   line-height: var(--line-height-tight);
+
+  @media (max-width: 480px) {
+    font-size: 0.6rem;
+  }
 `;
 
 interface CardProps {

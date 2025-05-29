@@ -111,19 +111,19 @@ const spacingStyles = {
 };
 
 const defaultSizesByTag = {
-  h1: "3xl",
-  h2: "2xl",
-  h3: "xl",
-  h4: "lg",
-  h5: "base",
-  h6: "sm",
+  h1: "2xl",
+  h2: "lg",
+  h3: "base",
+  h4: "base",
+  h5: "sm",
+  h6: "xs",
 } as const;
 
 const defaultWeightsByTag = {
-  h1: "extrabold",
-  h2: "bold",
+  h1: "bold",
+  h2: "semibold",
   h3: "semibold",
-  h4: "semibold",
+  h4: "medium",
   h5: "medium",
   h6: "medium",
 } as const;
@@ -172,6 +172,15 @@ const Heading = styled.h1.withConfig({
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    font-size: 90%;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 85%;
+  }
 `;
 
 export default Heading;

@@ -40,7 +40,7 @@ const StyledTable = styled.div`
   text-align: left;
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition-fast);
-  
+  margin-top: 60px;  
   &:hover {
     box-shadow: var(--shadow-md);
   }
