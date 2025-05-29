@@ -74,9 +74,7 @@ export default function Invoice() {
   );
 }
 
-function InvoiceTDN() {
-  const [formValues, setFormValues] = useState({
-    id: "",
+function InvoiceTDN() {  const [formValues, setFormValues] = useState({
     name: "",
     feeType: "",
     fundType: "",
@@ -113,9 +111,7 @@ function InvoiceTDN() {
     };
 
     fetchData();
-  }, []);
-
-  const handleChange = (e: any) => {
+  }, []);  const handleChange = (e: any) => {
     const { id, value } = e.target;
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -132,7 +128,6 @@ function InvoiceTDN() {
       setFeeIds((prev) => [...prev, selectedFee.id]);
     }
   };
-
   const addFund = () => {
     const selectedFund = fundOptions.find(
       (fund) => fund.name === formValues.fundType
@@ -143,30 +138,52 @@ function InvoiceTDN() {
     }
   };
 
+  const removeFee = (feeName: string) => {
+    const feeToRemove = feeOptions.find((fee) => fee.name === feeName);
+    if (feeToRemove) {
+      setSelectedFees((prev) => prev.filter((fee) => fee !== feeName));
+      setFeeIds((prev) => prev.filter((id) => id !== feeToRemove.id));
+    }
+  };
+
+  const removeFund = (fundName: string) => {
+    const fundToRemove = fundOptions.find((fund) => fund.name === fundName);
+    if (fundToRemove) {
+      setSelectedFunds((prev) => prev.filter((fund) => fund !== fundName));
+      setFundIds((prev) => prev.filter((id) => id !== fundToRemove.id));
+    }
+  };
   const saveForm = async (event: React.FormEvent) => {
     event.preventDefault();
 
     // Gộp feeIds và fundIds thành một mảng duy nhất
     const combinedFeeIds = [...feeIds, ...fundIds];
 
-    // Chuẩn bị payload
+    // Validation: Kiểm tra xem có ít nhất một fee hoặc fund được chọn
+    if (combinedFeeIds.length === 0) {
+      toast.error("Please select at least one fee or fund before creating an invoice");
+      return;
+    }    
+    
+    // Validation: Kiểm tra các trường bắt buộc
+    // Invoice ID is now optional - will be auto-generated if empty
+    if (!formValues.name.trim()) {
+      toast.error("Invoice name is required");
+      return;
+    }
+
+    // Hiển thị loading state
+    toast.info("Creating invoice...");    // Chuẩn bị payload
     const payload = {
-      invoiceId: formValues.id, // Map `id` thành `invoiceId`
       name: formValues.name,
       description: formValues.description,
       feeIds: combinedFeeIds, // Gửi mảng gộp
-    };
-
-    try {
+    };try {
       // Gửi dữ liệu tới API
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8080/api/v1/invoices",
         payload
       );
-      // console.log("Response:", response.data);
-
-      // Lưu phản hồi từ server (nếu cần)
-      // setSavedData((prevData) => [...prevData, payload]);
 
       toast.success("Create Invoice Successfull");
     } catch (error) {
@@ -175,10 +192,7 @@ function InvoiceTDN() {
     }
 
     setSavedData((prevData) => [...prevData, payload]);
-    console.log(savedData);
-
-    setFormValues({
-      id: "",
+    console.log(savedData);    setFormValues({
       name: "",
       feeType: "",
       fundType: "",
@@ -193,18 +207,7 @@ function InvoiceTDN() {
   return (
     <div style={invoiceStyles.container}>
       <form style={invoiceStyles.form}>
-        <div style={invoiceStyles.leftColumn}>
-          <Form.Fields>
-            <FormField>
-              <FormField.Label label={"Invoice ID"} />
-              <FormField.Input
-                id="id"
-                type="text"
-                value={formValues.id}
-                onChange={handleChange}
-              />
-            </FormField>
-
+        <div style={invoiceStyles.leftColumn}>          <Form.Fields>
             <FormField>
               <FormField.Label label={"Name"} />
               <FormField.Input
@@ -270,48 +273,92 @@ function InvoiceTDN() {
             value={formValues.description}
             onChange={handleChange}
           />
-        </div>
+        </div>        
         <div style={invoiceStyles.rightColumn}>
-          <div>
-            <strong>Selected Fees:</strong>
-            <ul>
+          <div style={invoiceStyles.summarySection}>
+            <div style={invoiceStyles.summaryHeader}>
+              <strong>Invoice Summary</strong>
+              <div style={invoiceStyles.totalCount}>
+                Total Items: {selectedFees.length + selectedFunds.length}
+              </div>
+              {selectedFees.length === 0 && selectedFunds.length === 0 && (
+                <div style={invoiceStyles.warningMessage}>
+                  ⚠️ No fees or funds selected
+                </div>
+              )}
+            </div>
+          </div>
+            <div>
+            <strong>Selected Fees ({selectedFees.length}):</strong>
+            <ul style={invoiceStyles.itemList}>
               {selectedFees.map((fee, index) => (
-                <li key={index}>{fee}</li>
+                <li key={index} style={invoiceStyles.listItem}>
+                  <span>{fee}</span>
+                  <button
+                    type="button"
+                    style={invoiceStyles.removeButton}
+                    onClick={() => removeFee(fee)}
+                    title="Remove fee"
+                  >
+                    ×
+                  </button>
+                </li>
               ))}
             </ul>
+            {selectedFees.length === 0 && (
+              <div style={invoiceStyles.emptyMessage}>No fees selected</div>
+            )}
           </div>
           <div>
-            <strong>Selected Funds:</strong>
-            <ul>
+            <strong>Selected Funds ({selectedFunds.length}):</strong>
+            <ul style={invoiceStyles.itemList}>
               {selectedFunds.map((fund, index) => (
-                <li key={index}>{fund}</li>
+                <li key={index} style={invoiceStyles.listItem}>
+                  <span>{fund}</span>
+                  <button
+                    type="button"
+                    style={invoiceStyles.removeButton}
+                    onClick={() => removeFund(fund)}
+                    title="Remove fund"
+                  >
+                    ×
+                  </button>
+                </li>
               ))}
             </ul>
+            {selectedFunds.length === 0 && (
+              <div style={invoiceStyles.emptyMessage}>No funds selected</div>
+            )}
           </div>
-        </div>
-      </form>
+        </div>      
+        </form>
 
-      <button style={invoiceStyles.saveButton} onClick={saveForm}>
-        Save
+      <button 
+        style={{
+          ...invoiceStyles.saveButton,
+          ...(selectedFees.length === 0 && selectedFunds.length === 0 
+            ? invoiceStyles.saveButtonDisabled 
+            : {})
+        }}
+        onClick={saveForm}
+        disabled={selectedFees.length === 0 && selectedFunds.length === 0}
+        title={selectedFees.length === 0 && selectedFunds.length === 0 
+          ? "Please select at least one fee or fund" 
+          : "Save invoice"}
+      >
+        Save {selectedFees.length === 0 && selectedFunds.length === 0 && "⚠️"}
       </button>
     </div>
   );
 }
 
-const UtilityBillStyles = {
+const invoiceStyles: { [key: string]: React.CSSProperties } = {
   container: {
-    width: "500px",
-    hight: "300px",
-  }
-}
-
-const invoiceStyles = {
-  container: {
-    position: "relative",
+    position: "relative" as const,
     top: "8px",
     padding: "10px",
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     gap: "15px",
   },
   btTdn: {
@@ -324,13 +371,13 @@ const invoiceStyles = {
   },
   leftColumn: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     gap: "10px",
     flex: 1,
   },
   rightColumn: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     gap: "10px",
     padding: "12px",
     flex: 1,
@@ -348,25 +395,89 @@ const invoiceStyles = {
     padding: "5px",
     border: "1px solid #ccc",
     borderRadius: "4px",
-  },
-  addButton: {
+  },  addButton: {
     backgroundColor: "#18BB4C",
     color: "white",
     padding: "8px 8px",
     border: "none",
-    borderRadius: "15px",
+    borderRadius: "4px",
     cursor: "pointer",
   },
   saveButton: {
-    position: "relative",
-    top: "15px",
-    background: "#4caf50",
+    backgroundColor: "#667BC6",
     color: "white",
-    padding: "8px 28px",
+    padding: "8px 16px",
     border: "none",
-    borderRadius: "12px",
-    fontSize: "1rem",
+    borderRadius: "8px",
     cursor: "pointer",
-    alignSelf: "center",
+    fontSize: "16px",
+  },
+  saveButtonDisabled: {
+    backgroundColor: "#6c757d",
+    cursor: "not-allowed",
+    opacity: "0.6",
+  },
+  summarySection: {
+    marginBottom: "15px",
+    padding: "10px",
+    backgroundColor: "#f8f9fa",
+    borderRadius: "8px",
+    border: "1px solid #e9ecef",
+  },
+  summaryHeader: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "5px",
+  },
+  totalCount: {
+    fontSize: "14px",
+    color: "#6c757d",
+    fontWeight: "500",
+  },
+  warningMessage: {
+    color: "#dc3545",
+    fontSize: "14px",
+    fontWeight: "500",
+    padding: "5px 8px",
+    backgroundColor: "#f8d7da",
+    border: "1px solid #f5c6cb",
+    borderRadius: "4px",
+    marginTop: "5px",
+  },
+  emptyMessage: {
+    color: "#6c757d",
+    fontSize: "14px",
+    fontStyle: "italic",
+    marginTop: "5px",
+  },
+  itemList: {
+    listStyle: "none",
+    padding: "0",
+    margin: "8px 0",
+  },
+  listItem: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "8px 12px",
+    margin: "4px 0",
+    backgroundColor: "#f8f9fa",
+    borderRadius: "6px",
+    border: "1px solid #e9ecef",
+  },
+  removeButton: {
+    backgroundColor: "#dc3545",
+    color: "white",
+    border: "none",
+    borderRadius: "50%",
+    width: "24px",
+    height: "24px",
+    fontSize: "16px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    lineHeight: "1",
   },
 };
