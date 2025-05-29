@@ -77,13 +77,20 @@ const SideBar = () => {
             <span className="links_name">Statistics</span>
           </Link>
           <span className="tooltip">Statistics</span>
-        </li>
+        </li>        
         <li>
           <Link to="/dashboard/invoices">
             <i className='bx bxs-file-plus'></i>
             <span className="links_name">Invoices</span>
           </Link>
           <span className="tooltip">Invoices</span>
+        </li>
+        <li>
+          <Link to="/dashboard/utility-bills">
+            <i className='bx bxs-bolt'></i>
+            <span className="links_name">Utility Bills</span>
+          </Link>
+          <span className="tooltip">Utility Bills</span>
         </li>
       </ul>
       <div className="profile_content">
