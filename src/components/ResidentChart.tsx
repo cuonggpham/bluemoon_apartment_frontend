@@ -16,16 +16,31 @@ const ChartBox = styled.div`
   /* Box */
   background-color: var(--color-grey-0);
   border: 1px solid var(--color-grey-100);
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-lg);
   width: 100%;
-  padding: 24px 32px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 
   & > *:first-child {
-    margin-bottom: 1.6rem;
+    margin-bottom: 1rem;
   }
 
   & .recharts-pie-label-text {
     font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+    
+    & > *:first-child {
+      margin-bottom: 0.75rem;
+    }
   }
 `;
 
@@ -89,29 +104,27 @@ async function prepareData(): Promise<ProcessedData[]> {
 
 export default function ResidentsChart() {
   const [data, setData] = useState<ProcessedData[]>([]);
-
   useEffect(() => {
     const fetchData = async () => {
       const result = await prepareData();
       setData(result);
     };
     fetchData();
-  }, [data]);
+  }, []);
 
   // Tính tổng giá trị để hiển thị ở giữa PieChart
   const totalValue = data.reduce((total, entry) => total + entry.value, 0);
-
   return (
     <ChartBox>
       <Heading as="h2">Residents Summary</Heading>
-      <ResponsiveContainer width="100%" height={240}>
+      <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
             data={data}
             cx="35%"
             cy="50%"
-            innerRadius={85}
-            outerRadius={110}
+            innerRadius={65}
+            outerRadius={85}
             fill="#8884d8"
             paddingAngle={3}
             dataKey="value"
@@ -127,7 +140,7 @@ export default function ResidentsChart() {
             <Label
               value={totalValue}
               position="center"
-              fontSize={60}
+              fontSize={44}
               fontWeight="bold"
               fill="#333"
             />
@@ -137,8 +150,8 @@ export default function ResidentsChart() {
             verticalAlign="middle"
             align="right"
             layout="vertical"
-            iconSize={15}
-            width={150}
+            iconSize={12}
+            width={120}
             iconType="circle"
             formatter={(value, entry, index) =>
               `${entry.payload.status}: ${entry.payload.value}`
