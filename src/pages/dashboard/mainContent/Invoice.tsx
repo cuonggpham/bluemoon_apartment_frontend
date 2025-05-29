@@ -7,36 +7,196 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Form from "../../../components/Form";
 import FormField from "../../../components/FormField";
+import Button from "../../../components/Button";
 import { toast } from "react-toastify";
+import styled from "styled-components";
+
+// Styled components for modern invoice form
+const InvoiceContainer = styled.div`
+  position: relative;
+  top: 8px;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+`;
+
+const InvoiceForm = styled.form`
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  gap: var(--space-6);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const LeftColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+`;
+
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  flex: 1;
+  width: 300px;
+  background: var(--color-grey-0);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+`;
+
+const SelectRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+`;
+
+const SelectLabel = styled.label`
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  color: var(--color-grey-700);
+  min-width: 60px;
+`;
+
+const SelectField = styled.select`
+  flex: 1;
+  padding: var(--space-3);
+  border: 1px solid var(--color-grey-300);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-base);
+  background: var(--color-grey-0);
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+`;
+
+const SummarySection = styled.div`
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--color-grey-50), var(--color-grey-100));
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-grey-200);
+`;
+
+const SummaryHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  
+  & > strong {
+    font-size: var(--font-size-lg);
+    color: var(--color-grey-800);
+  }
+`;
+
+const TotalCount = styled.div`
+  font-size: var(--font-size-sm);
+  color: var(--color-grey-600);
+  font-weight: 500;
+`;
+
+const WarningMessage = styled.div`
+  color: var(--color-red-700);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-red-100);
+  border: 1px solid var(--color-red-200);
+  border-radius: var(--border-radius-md);
+  margin-top: var(--space-2);
+`;
+
+const EmptyMessage = styled.div`
+  color: var(--color-grey-500);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  margin-top: var(--space-2);
+`;
+
+const ItemList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0;
+`;
+
+const ListItem = styled.li`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  margin: var(--space-2) 0;
+  background: var(--color-grey-50);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-grey-200);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: var(--color-grey-100);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+`;
+
+const RemoveButton = styled.button`
+  background: var(--color-red-600);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: var(--color-red-700);
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+const SectionTitle = styled.strong`
+  font-size: var(--font-size-base);
+  color: var(--color-grey-800);
+  margin-bottom: var(--space-2);
+  display: block;
+`;
 
 export default function Invoice() {
 
   const [keyword, setKeyword] = useState('')
 
   return (
-    <Modal>
-      <Row type="horizontal">
+    <Modal>      <Row type="horizontal">
         <Heading as="h1">Invoices</Heading>
         <Search setKeyword={setKeyword} keyword={keyword}></Search>
-      </Row>      
-      <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+      </Row>        <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
         <Modal.Open id="createInvoice">
-          <button
-            className="btTdn"
-            style={{
-              backgroundColor: "#667BC6",
-              color: "white",
-              fontWeight: "400",
-              padding: "9px 8px",
-              border: "none",
-              borderRadius: "16px",
-              fontSize: "16px",
-              cursor: "pointer",
-              width: "155px",
-            }}
-          >
+          <Button variation="primary" size="compact">
             Create Invoice +
-          </button>
+          </Button>
         </Modal.Open>
       </div>
 
@@ -177,11 +337,11 @@ function InvoiceTDN() {  const [formValues, setFormValues] = useState({
     setFeeIds([]);
     setFundIds([]);
   };
-
   return (
-    <div style={invoiceStyles.container}>
-      <form style={invoiceStyles.form}>
-        <div style={invoiceStyles.leftColumn}>          <Form.Fields>
+    <InvoiceContainer>
+      <InvoiceForm>
+        <LeftColumn>
+          <Form.Fields>
             <FormField>
               <FormField.Label label={"Name"} />
               <FormField.Input
@@ -193,10 +353,9 @@ function InvoiceTDN() {  const [formValues, setFormValues] = useState({
             </FormField>
           </Form.Fields>
 
-          <div style={invoiceStyles.row}>
-            <label className="font-bold">Fee: </label>
-            <select
-              style={invoiceStyles.input}
+          <SelectRow>
+            <SelectLabel>Fee:</SelectLabel>
+            <SelectField
               id="feeType"
               value={formValues.feeType}
               onChange={handleChange}
@@ -207,20 +366,20 @@ function InvoiceTDN() {  const [formValues, setFormValues] = useState({
                   {fee.name}
                 </option>
               ))}
-            </select>
-            <button
+            </SelectField>
+            <Button
               type="button"
-              style={invoiceStyles.addButton}
+              variation="success"
+              size="small"
               onClick={addFee}
             >
               Add Fee
-            </button>
-          </div>
+            </Button>
+          </SelectRow>
 
-          <div style={invoiceStyles.row}>
-            <label className="font-bold">Fund: </label>
-            <select
-              style={invoiceStyles.input}
+          <SelectRow>
+            <SelectLabel>Fund:</SelectLabel>
+            <SelectField
               id="fundType"
               value={formValues.fundType}
               onChange={handleChange}
@@ -231,227 +390,98 @@ function InvoiceTDN() {  const [formValues, setFormValues] = useState({
                   {fund.name}
                 </option>
               ))}
-            </select>
-            <button
+            </SelectField>
+            <Button
               type="button"
-              style={invoiceStyles.addButton}
+              variation="success"
+              size="small"
               onClick={addFund}
             >
               Add Fund
-            </button>
-          </div>
+            </Button>
+          </SelectRow>
 
-          <label>Description: </label>
-          <Form.TextArea
-            id="description"
-            value={formValues.description}
-            onChange={handleChange}
-          />
-        </div>        
-        <div style={invoiceStyles.rightColumn}>
-          <div style={invoiceStyles.summarySection}>
-            <div style={invoiceStyles.summaryHeader}>
+          <FormField>
+            <FormField.Label label={"Description"} />
+            <Form.TextArea
+              id="description"
+              value={formValues.description}
+              onChange={handleChange}
+            />
+          </FormField>
+        </LeftColumn>        
+        
+        <RightColumn>
+          <SummarySection>
+            <SummaryHeader>
               <strong>Invoice Summary</strong>
-              <div style={invoiceStyles.totalCount}>
+              <TotalCount>
                 Total Items: {selectedFees.length + selectedFunds.length}
-              </div>
+              </TotalCount>
               {selectedFees.length === 0 && selectedFunds.length === 0 && (
-                <div style={invoiceStyles.warningMessage}>
+                <WarningMessage>
                   ⚠️ No fees or funds selected
-                </div>
+                </WarningMessage>
               )}
-            </div>
-          </div>
-            <div>
-            <strong>Selected Fees ({selectedFees.length}):</strong>
-            <ul style={invoiceStyles.itemList}>
+            </SummaryHeader>
+          </SummarySection>
+          
+          <div>
+            <SectionTitle>Selected Fees ({selectedFees.length}):</SectionTitle>
+            <ItemList>
               {selectedFees.map((fee, index) => (
-                <li key={index} style={invoiceStyles.listItem}>
+                <ListItem key={index}>
                   <span>{fee}</span>
-                  <button
+                  <RemoveButton
                     type="button"
-                    style={invoiceStyles.removeButton}
                     onClick={() => removeFee(fee)}
                     title="Remove fee"
                   >
                     ×
-                  </button>
-                </li>
+                  </RemoveButton>
+                </ListItem>
               ))}
-            </ul>
+            </ItemList>
             {selectedFees.length === 0 && (
-              <div style={invoiceStyles.emptyMessage}>No fees selected</div>
+              <EmptyMessage>No fees selected</EmptyMessage>
             )}
           </div>
+          
           <div>
-            <strong>Selected Funds ({selectedFunds.length}):</strong>
-            <ul style={invoiceStyles.itemList}>
+            <SectionTitle>Selected Funds ({selectedFunds.length}):</SectionTitle>
+            <ItemList>
               {selectedFunds.map((fund, index) => (
-                <li key={index} style={invoiceStyles.listItem}>
+                <ListItem key={index}>
                   <span>{fund}</span>
-                  <button
+                  <RemoveButton
                     type="button"
-                    style={invoiceStyles.removeButton}
                     onClick={() => removeFund(fund)}
                     title="Remove fund"
                   >
                     ×
-                  </button>
-                </li>
+                  </RemoveButton>
+                </ListItem>
               ))}
-            </ul>
+            </ItemList>
             {selectedFunds.length === 0 && (
-              <div style={invoiceStyles.emptyMessage}>No funds selected</div>
+              <EmptyMessage>No funds selected</EmptyMessage>
             )}
           </div>
-        </div>      
-        </form>
+        </RightColumn>
+      </InvoiceForm>
 
-      <button 
-        style={{
-          ...invoiceStyles.saveButton,
-          ...(selectedFees.length === 0 && selectedFunds.length === 0 
-            ? invoiceStyles.saveButtonDisabled 
-            : {})
-        }}
+      <Button 
+        variation={selectedFees.length === 0 && selectedFunds.length === 0 ? "secondary" : "primary"}
+        size="large"
         onClick={saveForm}
         disabled={selectedFees.length === 0 && selectedFunds.length === 0}
         title={selectedFees.length === 0 && selectedFunds.length === 0 
           ? "Please select at least one fee or fund" 
           : "Save invoice"}
+        style={{ alignSelf: 'flex-start', marginTop: 'var(--space-4)' }}
       >
         Save {selectedFees.length === 0 && selectedFunds.length === 0 && "⚠️"}
-      </button>
-    </div>
+      </Button>
+    </InvoiceContainer>
   );
 }
-
-const invoiceStyles: { [key: string]: React.CSSProperties } = {
-  container: {
-    position: "relative" as const,
-    top: "8px",
-    padding: "10px",
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "15px",
-  },
-  btTdn: {
-    display: "inline-flex",
-  },
-  form: {
-    width: "800px",
-    display: "flex",
-    gap: "20px",
-  },
-  leftColumn: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "10px",
-    flex: 1,
-  },
-  rightColumn: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "10px",
-    padding: "12px",
-    flex: 1,
-    width: "300px",
-    border: "1px solid black",
-    borderRadius: "12px",
-  },
-  row: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  input: {
-    flex: 1,
-    padding: "5px",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-  },  addButton: {
-    backgroundColor: "#18BB4C",
-    color: "white",
-    padding: "8px 8px",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
-  saveButton: {
-    backgroundColor: "#667BC6",
-    color: "white",
-    padding: "8px 16px",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "16px",
-  },
-  saveButtonDisabled: {
-    backgroundColor: "#6c757d",
-    cursor: "not-allowed",
-    opacity: "0.6",
-  },
-  summarySection: {
-    marginBottom: "15px",
-    padding: "10px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px",
-    border: "1px solid #e9ecef",
-  },
-  summaryHeader: {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: "5px",
-  },
-  totalCount: {
-    fontSize: "14px",
-    color: "#6c757d",
-    fontWeight: "500",
-  },
-  warningMessage: {
-    color: "#dc3545",
-    fontSize: "14px",
-    fontWeight: "500",
-    padding: "5px 8px",
-    backgroundColor: "#f8d7da",
-    border: "1px solid #f5c6cb",
-    borderRadius: "4px",
-    marginTop: "5px",
-  },
-  emptyMessage: {
-    color: "#6c757d",
-    fontSize: "14px",
-    fontStyle: "italic",
-    marginTop: "5px",
-  },
-  itemList: {
-    listStyle: "none",
-    padding: "0",
-    margin: "8px 0",
-  },
-  listItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "8px 12px",
-    margin: "4px 0",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "6px",
-    border: "1px solid #e9ecef",
-  },
-  removeButton: {
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "50%",
-    width: "24px",
-    height: "24px",
-    fontSize: "16px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    lineHeight: "1",
-  },
-};

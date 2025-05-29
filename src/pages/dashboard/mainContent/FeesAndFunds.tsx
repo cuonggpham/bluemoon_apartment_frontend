@@ -9,8 +9,7 @@ import { useState } from "react";
 export default function FeesAndFunds() {
   const [keyword, setKeyword] = useState('');
   return (
-    <Modal>
-      <Row type="horizontal">
+    <Modal>      <Row type="horizontal" justify="start" gap="lg">
         <Heading as="h1">Fee and Fund</Heading>
         <AddAndSearch title="Add Fee/Fund" setKeyword={setKeyword} keyword={keyword}>
           <FeeAndFundForm />

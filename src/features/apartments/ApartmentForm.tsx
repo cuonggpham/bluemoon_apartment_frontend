@@ -331,14 +331,13 @@ export default function ApartmentForm({
             ))}
           </Table>
         </>
-      )}      {/* Action Buttons */}
-      {apartment ? (
+      )}      {/* Action Buttons */}      {apartment ? (
         <Form.Buttons>
           <Button 
             onClick={handleDelete}
             type="button" 
             variation="danger" 
-            size="medium"
+            size="compact"
           >
             Delete
             <span>
@@ -349,7 +348,7 @@ export default function ApartmentForm({
             onClick={handleUpdate}
             type="button"
             variation="secondary"
-            size="medium"
+            size="compact"
           >
             Update
             <span>
@@ -362,7 +361,7 @@ export default function ApartmentForm({
           <Button
             type="button"
             onClick={handleSubmit}
-            size="medium"
+            size="compact"
             variation="primary"
           >
             Add

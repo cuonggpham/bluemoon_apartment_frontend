@@ -171,26 +171,24 @@ export default function VehicleForm({ vehicle }: any) {
         id="category"
         options={vehicleTypeOptions}
         label={"Type:"}
-      ></Selector>
-
-      {vehicle ? (
+      ></Selector>      {vehicle ? (
         <Form.Buttons>
-          <Button variation="danger" size="medium" onClick={handleDelete}>
+          <Button variation="danger" size="compact" onClick={handleDelete}>
             Delete
             <span>
               <HiTrash />
             </span>
           </Button>
-          <Button type="submit" size="medium" variation="secondary">
+          <Button type="submit" size="compact" variation="secondary">
             Update
             <span>
               <HiPencil />
             </span>
           </Button>
         </Form.Buttons>
-      ) : (        
-      <Form.Buttons>
-          <Button type="submit" size="medium" variation="primary">
+      ) : (
+        <Form.Buttons>
+          <Button type="submit" size="compact" variation="primary">
             Add
             <span>
               <HiOutlinePlusCircle />

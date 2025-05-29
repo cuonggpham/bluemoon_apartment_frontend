@@ -33,41 +33,48 @@ type BodyProps<T> = {
 
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
-  border-radius: 14px;
-  font-size: 14px;
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-size-base);
   background-color: var(--color-grey-0);
   overflow: hidden;
-  text-align: center;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 `;
 
 const CommonRow = styled.div<CommonRowProps>`
   display: grid;
   grid-template-columns: ${(props) => props.columns};
-  column-gap: 24px;
+  column-gap: var(--space-6);
   align-items: center;
-  transition: none;
+  transition: background-color var(--transition-fast);
 `;
 
 const StyledHeader = styled(CommonRow)<CommonRowProps>`
   ${(props) =>
     props.size === "small" &&
     css`
-      padding: 4px 24px;
+      padding: var(--space-2) var(--space-6);
     `}
 
   ${(props) =>
     props.size === "normal" &&
     css`
-      padding: 12px 24px;
+      padding: var(--space-4) var(--space-6);
     `}
-
-  background-color: var(--color-grey-700);
-  border-bottom: 1px solid var(--color-grey-100);
-  letter-spacing: 0.4px;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--color-grey-800), var(--color-grey-900));
+  border-bottom: 1px solid var(--color-grey-700);
+  letter-spacing: 0.025em;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-grey-0);
-  border-top-right-radius: 15px;
-  border-top-left-radius: 15px;
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  border-top-right-radius: var(--border-radius-xl);
+  border-top-left-radius: var(--border-radius-xl);
 `;
 
 StyledHeader.defaultProps = {
@@ -78,17 +85,29 @@ const StyledRow = styled(CommonRow)<CommonRowProps>`
   ${(props) =>
     props.size === "small" &&
     css`
-      padding: 4px 24px;
+      padding: var(--space-2) var(--space-6);
     `}
 
   ${(props) =>
     props.size === "normal" &&
     css`
-      padding: 12px 24px;
+      padding: var(--space-4) var(--space-6);
     `}
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
+  }
+  
+  &:hover {
+    background-color: var(--color-grey-50);
+  }
+  
+  &:nth-child(even) {
+    background-color: var(--color-grey-25);
+    
+    &:hover {
+      background-color: var(--color-grey-75);
+    }
   }
 `;
 
@@ -97,16 +116,20 @@ StyledRow.defaultProps = {
 };
 
 const StyledBody = styled.section`
-  margin: 4px 0;
+  /* No margin needed with modern design */
 `;
 
 const Footer = styled.footer`
-  background-color: var(--color-grey-0);
-  color: var(--color-grey-0);
-  border-bottom-right-radius: 15px;
-  border-bottom-left-radius: 15px;
+  background-color: var(--color-grey-50);
+  color: var(--color-grey-700);
+  border-top: 1px solid var(--color-grey-200);
+  border-bottom-right-radius: var(--border-radius-xl);
+  border-bottom-left-radius: var(--border-radius-xl);
   display: flex;
   justify-content: center;
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 
   &:not(:has(*)) {
     display: none;
@@ -114,10 +137,19 @@ const Footer = styled.footer`
 `;
 
 const Empty = styled.p`
-  font-size: 16px;
-  font-weight: 500;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
   text-align: center;
-  margin: 24px;
+  margin: var(--space-12) var(--space-6);
+  color: var(--color-grey-500);
+  
+  &::before {
+    content: "📋";
+    display: block;
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--space-4);
+    opacity: 0.5;
+  }
 `;
 
 const TableContext = createContext<{ columns?: string }>({});

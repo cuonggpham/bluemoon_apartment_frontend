@@ -13,18 +13,35 @@ import styled from "styled-components";
 const StyledModal = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  overflow-y: scroll;
-  max-height: 650px;
-  border: 1px solid black;
-  background-color: var(--color-grey-0);
-  border-radius: 15px;
-  padding: 30px 15px;
-  transition: all 0.5s;
+  max-height: 90vh;
+  max-width: 90vw;
+  width: auto;
+  min-width: 400px;
+  background: var(--color-grey-0);
+  border-radius: var(--border-radius-2xl);
+  box-shadow: var(--shadow-2xl);
+  overflow: hidden;
+  animation: modalSlideIn 0.3s var(--transition-spring);
+  
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -48%) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @media (max-width: 640px) {
+    min-width: 90vw;
+    max-height: 85vh;
+  }
 `;
 
 const Overlay = styled.div`
@@ -33,41 +50,91 @@ const Overlay = styled.div`
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: var(--backdrop-color);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.60);
+  backdrop-filter: blur(8px);
   z-index: 1000;
-  transition: all 0.5s;
+  animation: overlayFadeIn 0.25s ease-out;
+  
+  @keyframes overlayFadeIn {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(8px);
+    }
+  }
+`;
+
+const ModalHeader = styled.header`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--color-grey-200);
+`;
+
+const ModalBody = styled.div`
+  padding: var(--space-6);
+  overflow-y: auto;
+  flex: 1;
+  
+  /* Custom scrollbar for modal */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--color-grey-100);
+    border-radius: var(--border-radius-full);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-grey-300);
+    border-radius: var(--border-radius-full);
+    
+    &:hover {
+      background: var(--color-grey-400);
+    }
+  }
 `;
 
 const Button = styled.button`
-  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--color-grey-100);
   border: none;
-  padding: 4px;
-  border-radius: 50%;
-  transform: translateX(0.8rem);
-  transition: all 0.2s;
-  position: absolute;
-  top: 12px;
-  right: 19px;
-  background-color: var(--color-red-500); 
-
+  border-radius: var(--border-radius-lg);
+  color: var(--color-grey-600);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
   &:hover {
-    background-color: var(--color-red-700);
+    background: var(--color-red-100);
+    color: var(--color-red-600);
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 
   & svg {
-    width: 14px;
-    height: 14px;
-    color: white;
+    width: 18px;
+    height: 18px;
   }
 `;
 
-const Title = styled.label`
-  text-align: center;
-  font-weight: 700;
-  font-size: 25px;
-  color: #374151;
-  text-decoration: underline;
+const Title = styled.h2`
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-grey-900);
+  margin: 0;
+  letter-spacing: -0.025em;
 `;
 
 // Context and modal logic
@@ -120,18 +187,20 @@ function Window({ children, id, name }: WindowProps) {
   if (id !== openName) return null;
 
   return createPortal(
-    <Overlay>
-      <StyledModal>
-        <Title>{name}</Title>
-        <Button onClick={close}>
-          <HiXMark />
-        </Button>
-
-        <div>
+    <Overlay onClick={close}>
+      <StyledModal onClick={(e) => e.stopPropagation()}>
+        <ModalHeader>
+          <Title>{name}</Title>
+          <Button onClick={close}>
+            <HiXMark />
+          </Button>
+        </ModalHeader>
+        
+        <ModalBody>
           {cloneElement(children as React.ReactElement, {
             onCloseModal: close,
           })}
-        </div>
+        </ModalBody>
       </StyledModal>
     </Overlay>,
     document.body

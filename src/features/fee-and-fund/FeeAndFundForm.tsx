@@ -141,17 +141,15 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
         id="description"
         value={formValues.description}
         onChange={handleChange}
-      />
-
-      {feeOrFund ? (
+      />      {feeOrFund ? (
         <Form.Buttons>
-          <Button variation="danger" size="medium" onClick={handleDelete}>
+          <Button variation="danger" size="compact" onClick={handleDelete}>
             Delete
             <span>
               <HiTrash />
             </span>
           </Button>
-          <Button variation="secondary" size="medium" onClick={handleUpdate}>
+          <Button variation="secondary" size="compact" onClick={handleUpdate}>
             Update
             <span>
               <HiPencil />
@@ -160,7 +158,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
         </Form.Buttons>
       ) : (
         <Form.Buttons>
-          <Button size="medium" variation="primary" onClick={handleSubmit}>
+          <Button size="compact" variation="primary" onClick={handleSubmit}>
             Add
             <span>
               <HiOutlinePlusCircle />

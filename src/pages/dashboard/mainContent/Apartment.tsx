@@ -8,8 +8,8 @@ import { useState } from "react";
 export default function Apartments() {
   const [keyword, setKeyword] = useState('');
   return (
-    <>
-      <Row type="horizontal">
+    <>      
+    <Row type="horizontal" justify="start" gap="lg">
         <Heading as="h1">Apartments Management</Heading>
         <AddAndSearch title="Add Appartment" setKeyword={setKeyword} keyword={keyword}>
           <ApartmentForm />

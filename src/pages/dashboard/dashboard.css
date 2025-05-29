@@ -1,14 +1,58 @@
 .main-dashboard {
   display: flex;
+  min-height: 100vh;
+  background: var(--color-grey-50);
 }
 
 .dashboard-content {
-  background-color: var(--color-grey-100);
-  padding: 20px;
-  overflow: scroll;
-  max-width: 100%;
+  background: var(--color-grey-50);
+  padding: var(--space-8);
+  overflow-y: auto;
+  flex: 1;
+  animation: contentFadeIn 0.5s ease-out;
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-grey-300);
+    border-radius: var(--border-radius-full);
+    
+    &:hover {
+      background: var(--color-grey-400);
+    }
+  }
 
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: var(--space-8);
+  max-width: 100%;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-dashboard {
+    flex-direction: column;
+  }
+  
+  .dashboard-content {
+    padding: var(--space-4);
+    gap: var(--space-6);
+  }
 }

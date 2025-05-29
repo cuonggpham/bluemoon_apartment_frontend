@@ -2,6 +2,214 @@ import { useEffect, useState } from "react";
 import "./form.css";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Button from "../../components/Button";
+import FormField from "../../components/FormField";
+import styled from "styled-components";
+
+// Modern styled components for statistics form
+const StatisticsWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  max-width: 800px;
+  height: 500px;
+  background: var(--color-grey-0);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+`;
+
+const StatisticsContent = styled.div`
+  overflow-y: auto;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: var(--space-6);
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--color-grey-100);
+    border-radius: var(--border-radius-md);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-grey-300);
+    border-radius: var(--border-radius-md);
+    
+    &:hover {
+      background: var(--color-grey-400);
+    }
+  }
+`;
+
+const SectionTitle = styled.p`
+  color: var(--color-grey-800);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--color-grey-200);
+`;
+
+const BillingHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  &.incomplete {
+    background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
+    color: white;
+    box-shadow: var(--shadow-sm);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  &.complete {
+    background: linear-gradient(135deg, var(--color-green-500), var(--color-green-600));
+    color: white;
+    box-shadow: var(--shadow-sm);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+`;
+
+const BillingDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6);
+  background: var(--color-grey-50);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-sm);
+`;
+
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-4);
+  background: var(--color-grey-0);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  
+  th {
+    font-weight: 600;
+    background: var(--color-grey-800);
+    color: white;
+    padding: var(--space-4);
+    text-align: center;
+    font-size: var(--font-size-base);
+    
+    &:first-child {
+      border-radius: var(--border-radius-lg) 0 0 0;
+    }
+    
+    &:last-child {
+      border-radius: 0 var(--border-radius-lg) 0 0;
+    }
+  }
+  
+  td {
+    font-weight: 500;
+    font-size: var(--font-size-base);
+    padding: var(--space-4);
+    text-align: center;
+    border-bottom: 1px solid var(--color-grey-200);
+    
+    &:hover {
+      background: var(--color-grey-50);
+    }
+  }
+`;
+
+const TotalDue = styled.div`
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
+  color: white;
+  text-align: right;
+  border-radius: var(--border-radius-lg);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  width: fit-content;
+  margin-left: auto;
+  margin-top: var(--space-3);
+  box-shadow: var(--shadow-sm);
+`;
+
+const Arrow = styled.span`
+  font-size: var(--font-size-base);
+  transition: transform 0.3s ease;
+  color: white;
+  
+  &.open {
+    transform: rotate(180deg);
+  }
+`;
+
+const StatusSpan = styled.span`
+  color: white;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+`;
+
+const VoluntaryFundContainer = styled.div`
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  background: var(--color-grey-0);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-grey-200);
+  
+  label {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--color-grey-700);
+    display: block;
+    margin-bottom: var(--space-2);
+    
+    strong {
+      color: var(--color-brand-600);
+    }
+  }
+`;
+
+const VoluntaryInput = styled.input`
+  border: 1px solid var(--color-grey-300);
+  margin-left: var(--space-2);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-3);
+  font-size: var(--font-size-base);
+  width: 200px;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+`;
+
+const PayButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-4);
+`;
 
 interface StatisticsFormProps {
   statistic: {
@@ -96,32 +304,27 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
     apiInvoice();
     apiUtility();
   }, []);
-
   return (
-    <div className="wra">
-      <div className="cts">
-        <p className="invoiceText">Invoice (Fee and Fund):</p>
+    <StatisticsWrapper>
+      <StatisticsContent>
+        <SectionTitle>Invoice (Fee and Fund):</SectionTitle>
         {dataInvoice.map((invoice, index) => (
           <div key={index}>
-            <div
-              className={`billing-header ${
-                invoice.paymentStatus === "Unpaid" ? "incomplete" : "complete"
-              }`}
+            <BillingHeader
+              className={invoice.paymentStatus === "Unpaid" ? "incomplete" : "complete"}
               onClick={() => toggleDropdown(invoice.id)}
             >
-              <span className="spanText">{invoice.name}</span>
-              <span className="status">
+              <StatusSpan>{invoice.name}</StatusSpan>
+              <StatusSpan>
                 {invoice.paymentStatus === "Unpaid" ? "Unpaid" : "Paid"}
-              </span>
-              <span
-                className={`arrow ${openDropdowns[invoice.id] ? "open" : ""}`}
-              >
+              </StatusSpan>
+              <Arrow className={openDropdowns[invoice.id] ? "open" : ""}>
                 &#9662;
-              </span>
-            </div>
+              </Arrow>
+            </BillingHeader>
             {openDropdowns[invoice.id] && (
-              <div className="billing-details">
-                <table>
+              <BillingDetails>
+                <StyledTable>
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -145,18 +348,18 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-                {/* Nhập số tiền tự nguyện */}
+                </StyledTable>
+                
+                {/* Voluntary fund input */}
                 {invoice.paymentStatus === "Unpaid" &&
                   invoice.feeList.map(
                     (fee: any) =>
                       fee.feeType === "ContributionFund" && (
-                        <div className="voluntary-fund" key={fee.name}>
+                        <VoluntaryFundContainer key={fee.name}>
                           <label>
                             Enter voluntary contribution for{" "}
                             <strong>{fee.name}</strong>:{" "}
-                            <input
-                              className="inputFund"
+                            <VoluntaryInput
                               type="text"
                               value={voluntaryFund[invoice.id] || ""}
                               onChange={(e) =>
@@ -167,10 +370,11 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
                               }
                             />
                           </label>
-                        </div>
+                        </VoluntaryFundContainer>
                       )
                   )}
-                <div className="total-due">
+                
+                <TotalDue>
                   Total amount:{" "}
                   {invoice.feeList
                     .reduce((sum: number, fee: any) => {
@@ -183,45 +387,42 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
                     }, 0)
                     .toLocaleString()}{" "}
                   VND
-                </div>
-                {/* Chỉ hiển thị nút "Pay" nếu trạng thái là "Unpaid" */}
+                </TotalDue>
+                  {/* Pay button for unpaid invoices */}
                 {invoice.paymentStatus === "Unpaid" && (
-                  <div className="divPay">
-                    <button
-                      onClick={() => apiPayInvoice(invoice.id, invoice.feeList)} // Truyền feeList của hóa đơn
-                      className="payButton"
-                      type="submit"
+                  <PayButtonContainer>
+                    <Button
+                      onClick={() => apiPayInvoice(invoice.id, invoice.feeList)}
+                      variation="success"
+                      size="compact"
                     >
-                      Pay <i className="bx bxs-credit-card-alt"></i>
-                    </button>
-                  </div>
+                      Pay 💳
+                    </Button>
+                  </PayButtonContainer>
                 )}
-              </div>
+              </BillingDetails>
             )}
           </div>
         ))}
-        <p className="invoiceText">Utility Bill:</p>
+        
+        <SectionTitle>Utility Bill:</SectionTitle>
         {dataUtility.map((utility, index) => (
           <div key={index}>
-            <div
-              className={`billing-header ${
-                utility.paymentStatus === "Unpaid" ? "incomplete" : "complete"
-              }`}
+            <BillingHeader
+              className={utility.paymentStatus === "Unpaid" ? "incomplete" : "complete"}
               onClick={() => toggleDropdown(utility.id)}
             >
-              <span className="spanText">{utility.name}</span>
-              <span className="status">
+              <StatusSpan>{utility.name}</StatusSpan>
+              <StatusSpan>
                 {utility.paymentStatus === "Unpaid" ? "Unpaid" : "Paid"}
-              </span>
-              <span
-                className={`arrow ${openDropdowns[utility.id] ? "open" : ""}`}
-              >
+              </StatusSpan>
+              <Arrow className={openDropdowns[utility.id] ? "open" : ""}>
                 &#9662;
-              </span>
-            </div>
+              </Arrow>
+            </BillingHeader>
             {openDropdowns[utility.id] && (
-              <div className="billing-details">
-                <table>
+              <BillingDetails>
+                <StyledTable>
                   <thead>
                     <tr>
                       <th>Electricity</th>
@@ -249,22 +450,24 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
                       </td>
                     </tr>
                   </tbody>
-                </table>
-                <div className="divPay">
-                  <button
-                    onClick={() => apiPayUtility(utility.id)}
-                    className="payButton"
-                    type="submit"
-                  >
-                    Pay <i className="bx bxs-credit-card-alt"></i>
-                  </button>
-                </div>
-              </div>
+                </StyledTable>
+                  {utility.paymentStatus === "Unpaid" && (
+                  <PayButtonContainer>
+                    <Button
+                      onClick={() => apiPayUtility(utility.id)}
+                      variation="success"
+                      size="compact"
+                    >
+                      Pay 💳
+                    </Button>
+                  </PayButtonContainer>
+                )}
+              </BillingDetails>
             )}
           </div>
         ))}
-      </div>
-    </div>
+      </StatisticsContent>
+    </StatisticsWrapper>
   );
 };
 

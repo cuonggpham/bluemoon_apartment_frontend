@@ -7,7 +7,80 @@ import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
 import { HiOutlinePlusCircle, HiPencil, HiTrash, HiPlus, HiMinus } from "react-icons/hi2";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "./ResidentForm.css";
+import styled from "styled-components";
+
+// Styled Components
+const ApartmentHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-grey-200);
+`;
+
+const ApartmentSearchSection = styled.div`
+  background: linear-gradient(135deg, var(--color-grey-50) 0%, var(--color-grey-25) 100%);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-md) 0;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+`;
+
+const ApartmentSearchButtons = styled.div`
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  justify-content: flex-end;
+`;
+
+const ApartmentsContainer = styled.div`
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm);
+  background: linear-gradient(135deg, var(--color-grey-25) 0%, white 100%);
+  min-height: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+`;
+
+const ApartmentItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--border-radius-md);
+  background: white;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-xs);
+
+  &:hover {
+    border-color: var(--color-primary-300);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+
+  span {
+    font-weight: 500;
+    color: var(--color-grey-700);
+    font-size: var(--font-size-sm);
+  }
+`;
+
+const NoApartmentsMessage = styled.div`
+  text-align: center;
+  color: var(--color-grey-500);
+  font-style: italic;
+  padding: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  background: var(--color-grey-50);
+  border-radius: var(--border-radius-md);
+  border: 2px dashed var(--color-grey-300);
+`;
 
 export default function ResidentForm({ resident }: any) {
   const [formValues, setFormValues] = useState({
@@ -336,14 +409,12 @@ export default function ResidentForm({ resident }: any) {
           />
         </Form.Fields>
       </div>      
-      
-      <div>
-        <div className="apartment-header">
-          <label>Apartments:</label>
-          {resident && (
+        <div>
+        <ApartmentHeader>
+          <label>Apartments:</label>          {resident && (
             <Button 
               type="button" 
-              size="small" 
+              size="compact" 
               variation="primary"
               onClick={() => setShowApartmentSearch(!showApartmentSearch)}
               disabled={isUpdatingApartments}
@@ -352,23 +423,21 @@ export default function ResidentForm({ resident }: any) {
               Add Apartment
             </Button>
           )}
-        </div>
+        </ApartmentHeader>
         
         {/* Apartment Search Section - Only show for existing residents */}
         {resident && showApartmentSearch && (
-          <div className="apartment-search-section">
+          <ApartmentSearchSection>
             <FormField>
               <FormField.Label label="Search Apartment" />
               <ApartmentSearchDropdown
                 value={selectedApartment?.addressNumber?.toString() || ""}
                 onChange={handleApartmentSelect}
                 placeholder="Search by apartment number..."
-              />
-            </FormField>
-            <div className="apartment-search-buttons">
+              />            </FormField>            <ApartmentSearchButtons>
               <Button 
                 type="button" 
-                size="small" 
+                size="compact" 
                 variation="primary"
                 onClick={handleAddApartment}
                 disabled={!selectedApartment || isUpdatingApartments}
@@ -377,7 +446,7 @@ export default function ResidentForm({ resident }: any) {
               </Button>
               <Button 
                 type="button" 
-                size="small" 
+                size="compact" 
                 variation="secondary"
                 onClick={() => {
                   setShowApartmentSearch(false);
@@ -386,8 +455,8 @@ export default function ResidentForm({ resident }: any) {
               >
                 Cancel
               </Button>
-            </div>
-          </div>
+            </ApartmentSearchButtons>
+          </ApartmentSearchSection>
         )}
         
         <Form.Fields>          
@@ -404,11 +473,10 @@ export default function ResidentForm({ resident }: any) {
                       <span>
                         Apartment {apartment.addressNumber} 
                         ({apartment.area}m² - {apartment.status})
-                      </span>
-                      {resident && (
+                      </span>                      {resident && (
                         <Button 
                           type="button" 
-                          size="small" 
+                          size="compact" 
                           variation="danger"
                           onClick={() => handleRemoveApartment(apartment.addressNumber)}
                           disabled={isUpdatingApartments}
@@ -440,16 +508,15 @@ export default function ResidentForm({ resident }: any) {
           </FormField>
         </Form.Fields>
       </div>
-      
-      {resident ? (
+        {resident ? (
         <Form.Buttons>
-          <Button type="button" onClick={handleDelete} variation="danger" size="medium">
+          <Button type="button" onClick={handleDelete} variation="danger" size="compact">
             Delete
             <span>
               <HiTrash />
             </span>
           </Button>
-          <Button type="button" onClick={handleUpdate} variation="secondary" size="medium">
+          <Button type="button" onClick={handleUpdate} variation="secondary" size="compact">
             Update
             <span>
               <HiPencil />
@@ -460,7 +527,7 @@ export default function ResidentForm({ resident }: any) {
         <Form.Buttons>
           <Button
             onClick={handleAddResident}
-            size="medium"
+            size="compact"
             variation="primary"
             type="submit"
           >

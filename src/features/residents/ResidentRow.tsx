@@ -3,7 +3,43 @@ import Tag from "../../components/Tag";
 import { capitalize } from "../../utils/helpers";
 import Modal from "../../components/Modal";
 import ResidentForm from "./ResidentForm";
-import "./ResidentRow.css";
+import styled from "styled-components";
+
+// Styled Components
+const ApartmentTags = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 2rem;
+`;
+
+const ApartmentTag = styled.span`
+  background: linear-gradient(135deg, var(--color-blue-100) 0%, var(--color-blue-50) 100%);
+  color: var(--color-blue-700);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid var(--color-blue-200);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, var(--color-blue-200) 0%, var(--color-blue-100) 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+`;
+
+const NoApartments = styled.span`
+  color: var(--color-grey-500);
+  font-style: italic;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs);
+`;
+
+
 
 export default function ResidentRow({ resident, index }:{ resident: any; index: number }) {
   const { id, apartments, name, dob, status, gender } = resident;
@@ -29,18 +65,17 @@ export default function ResidentRow({ resident, index }:{ resident: any; index: 
       {/* Ensure the row is uniquely identified */}
       <div>{index + 1}</div>      <div>
         {apartments && apartments.length > 0 ? (
-          <div className="apartment-tags">
+          <ApartmentTags>
             {apartments.map((apartment: any, idx: number) => (
-              <span
+              <ApartmentTag
                 key={apartment.addressNumber || idx}
-                className="apartment-tag"
               >
                 {apartment.addressNumber}
-              </span>
+              </ApartmentTag>
             ))}
-          </div>
+          </ApartmentTags>
         ) : (
-          <span className="no-apartments">No apartments</span>
+          <NoApartments>No apartments</NoApartments>
         )}
       </div>
       <div>{name}</div>
@@ -55,8 +90,7 @@ export default function ResidentRow({ resident, index }:{ resident: any; index: 
         }
       >
         {capitalize(status) || "Unknown"}
-      </Tag>
-      <Modal>
+      </Tag>      <Modal>
         <Modal.Open id="details">
           <button>Details</button>
         </Modal.Open>

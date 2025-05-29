@@ -63,8 +63,8 @@ const StyledOption = styled.div`
 `;
 
 const StyledInput = styled.input`
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   appearance: none;
   border: 1px solid var(--color-grey-400);
   border-radius: 50%;
@@ -78,11 +78,10 @@ const StyledInput = styled.input`
     background-color: var(--color-green-500);
     border-color: var(--color-grey-400);
   }
-
   &:checked::after {
     content: '';
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background-color: white;
     position: absolute;

@@ -1,12 +1,13 @@
 import "./sideBar.css";
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const SideBar = () => {
   const [extended, setExtended] = useState(false);
   const [name, setName] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const storedName = localStorage.getItem("name");
@@ -21,12 +22,27 @@ const SideBar = () => {
     navigate("/");
   };
 
-  // active la full
+  const isActiveLink = (path: string) => {
+    if (path === "/dashboard/" && location.pathname === "/dashboard") return true;
+    if (path !== "/dashboard/" && location.pathname.includes(path.replace("/dashboard", ""))) return true;
+    return false;
+  };
+
+  const menuItems = [
+    { path: "/dashboard/", icon: "bx bxs-grid-alt", name: "Dashboard", tooltip: "Dashboard" },
+    { path: "/dashboard/residents", icon: "bx bx-user", name: "Resident Management", tooltip: "Resident Management" },
+    { path: "/dashboard/apartments", icon: "bx bxs-home", name: "Apartment Management", tooltip: "Apartment Management" },
+    { path: "/dashboard/vehicles", icon: "bx bxs-car", name: "Vehicle Management", tooltip: "Vehicle Management" },
+    { path: "/dashboard/fee-and-fund", icon: "bx bx-money-withdraw", name: "Fee and Fund", tooltip: "Fee and Fund" },
+    { path: "/dashboard/statistics", icon: "bx bx-folder", name: "Statistics", tooltip: "Statistics" },
+    { path: "/dashboard/invoices", icon: "bx bxs-file-plus", name: "Invoices", tooltip: "Invoices" },
+    { path: "/dashboard/utility-bills", icon: "bx bxs-bolt", name: "Utility Bills", tooltip: "Utility Bills" },
+  ];
+
   return (
     <div className={extended ? "sidebar active" : "sidebar"}>
       <div className="logo_content">
         <div className="logo">
-          {/* <img src={assets.logo} alt="" /> */}
           <div className="logo_name">HustCity.</div>
         </div>
         <i
@@ -35,64 +51,22 @@ const SideBar = () => {
           onClick={() => setExtended((prev) => !prev)}
         ></i>
       </div>
+      
       <ul className="nav_list">
-        <li>
-          <Link to="/dashboard/">
-            <i className="bx bxs-grid-alt"></i>
-            <span className="links_name">Dashboard</span>
-          </Link>
-          <span className="tooltip">Dashboard</span>
-        </li>
-        <li>
-          <Link to="/dashboard/residents">
-            <i className="bx bx-user"></i>
-            <span className="links_name">Resident Management</span>
-          </Link>
-          <span className="tooltip">Resident Management</span>
-        </li>
-        <li>
-          <Link to="/dashboard/apartments">
-            <i className='bx bxs-home'></i>
-            <span className="links_name">Apartment Management</span>
-          </Link>
-          <span className="tooltip">Apartment Management</span>
-        </li>
-        <li>
-          <Link to="/dashboard/vehicles">
-            <i className='bx bxs-car'></i>
-            <span className="links_name">Vehicle Management</span>
-          </Link>
-          <span className="tooltip">Vehicle Management</span>
-        </li>
-        <li>
-          <Link to="/dashboard/fee-and-fund">
-            <i className='bx bx-money-withdraw'></i>
-            <span className="links_name">Fee and Fund</span>
-          </Link>
-          <span className="tooltip">Fee and Fund</span>
-        </li>
-        <li>
-          <Link to="/dashboard/statistics">
-            <i className="bx bx-folder"></i>
-            <span className="links_name">Statistics</span>
-          </Link>
-          <span className="tooltip">Statistics</span>
-        </li>        
-        <li>
-          <Link to="/dashboard/invoices">
-            <i className='bx bxs-file-plus'></i>
-            <span className="links_name">Invoices</span>
-          </Link>
-          <span className="tooltip">Invoices</span>
-        </li>
-        <li>
-          <Link to="/dashboard/utility-bills">
-            <i className='bx bxs-bolt'></i>
-            <span className="links_name">Utility Bills</span>
-          </Link>
-          <span className="tooltip">Utility Bills</span>
-        </li>
+        {menuItems.map((item, index) => (
+          <li key={index}>
+            <Link 
+              to={item.path}
+              className={isActiveLink(item.path) ? "active" : ""}
+            >
+              <i className={item.icon}></i>
+              <span className="links_name">{item.name}</span>
+            </Link>
+            <span className="tooltip">{item.tooltip}</span>
+          </li>
+        ))}
       </ul>
+      
       <div className="profile_content">
         <div className="profile">
           <div className="profile_details">
