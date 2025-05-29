@@ -8,6 +8,7 @@ import Vehicles from "./mainContent/Vehicles";
 import SideBar from "./sideBar/SideBar";
 import { Routes, Route } from "react-router-dom";
 import Invoice from "./mainContent/Invoice";
+import UtilityBills from "./mainContent/UtilityBills";
 
 const DashBoard = () => {
   return (
@@ -20,9 +21,10 @@ const DashBoard = () => {
           <Route path="/residents" element={<Resident />}></Route>
           <Route path="/apartments" element={<Apartments />}></Route>
           <Route path="/fee-and-fund" element={<FeesAndFunds />}></Route>
-          <Route path="/vehicles" element={<Vehicles />}></Route>
+          <Route path="/vehicles" element={<Vehicles />}></Route>          
           <Route path="/statistics" element={<Statistics />}></Route>
           <Route path="/invoices" element={<Invoice />}></Route>
+          <Route path="/utility-bills" element={<UtilityBills />}></Route>
         </Routes>
       </div>
     </div>

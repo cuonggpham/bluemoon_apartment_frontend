@@ -16,15 +16,16 @@ const UtilityBill = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Fetch utility bills từ API
+  // Fetch utility bills từ API  
   const fetchUtilityBills = async (page = 1) => {
     setLoading(true);
     try {
       const response = await axios.get(
         `http://localhost:8080/api/v1/utilitybills?page=${page}&size=10`
       );
-      setUtilityBills(response.data.result || []);
-      setTotalPages(response.data.totalPages || 0);
+      console.log("API Response:", response.data); // Debug log
+      setUtilityBills(response.data.data.result || []);
+      setTotalPages(response.data.data.totalPages || 0);
       setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching utility bills:", error);
@@ -167,63 +168,132 @@ const UtilityBill = () => {
     };
     reader.readAsArrayBuffer(file); // Đọc file Excel
   };
-
   return (
-    <div className="ctn-tdn">
-      <input
-        type="file"
-        id="upload"
-        style={{ display: "none" }}
-        onChange={handleFileChange} // Gọi hàm xử lý khi chọn file
-      />
-      <label id="uploadLabel" htmlFor="upload">
-        <i className="bx bx-upload"></i> Upload File
-      </label>
-
-      {/* Hiển thị tên file nếu người dùng đã chọn */}
-      {fileName && <p className="file-name">Selected File: {fileName}</p>}
-
-      <div className="table-tdn">
-        <label id="utilityLabel" htmlFor="">
-          Utility Bill
+    <div style={{ 
+      padding: "20px",
+      maxWidth: "100%",
+      margin: "0 auto"
+    }}>
+      {/* File Upload Section */}
+      <div style={{
+        backgroundColor: "#f8f9fa",
+        padding: "20px",
+        borderRadius: "8px",
+        marginBottom: "30px",
+        border: "1px solid #dee2e6"
+      }}>
+        <h3 style={{ marginBottom: "15px", color: "#495057" }}>Upload Utility Bill File</h3>
+        
+        <input
+          type="file"
+          id="upload"
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+        />
+        <label 
+          id="uploadLabel" 
+          htmlFor="upload"
+          style={{
+            display: "inline-block",
+            padding: "10px 20px",
+            backgroundColor: "#007bff",
+            color: "white",
+            borderRadius: "5px",
+            cursor: "pointer",
+            border: "none"
+          }}
+        >
+          <i className="bx bx-upload"></i> Upload File
         </label>
 
-        <Table columns="1fr 1.4fr 1.4fr 1.4fr">
-          <Table.Header size="small">
-            <div>Apartment</div>
-            <div>Electricity</div>
-            <div>Water</div>
-            <div>Internet</div>
-          </Table.Header>          
-          {dataExcel.map((room, index) => (
-            <Table.Row size="small" key={index}>
-              <div>{room.apartmentId || room.apartment}</div>
-              <div>{room.electricity}</div>
-              <div>{room.water}</div>
-              <div>{room.internet}</div>
-            </Table.Row>
-          ))}
-        </Table>
-        <div className="inputName">
-          <label id="lbName" htmlFor="billName">
-            Bill Name:{" "}
-          </label>
-          <input
-            id="billName"
-            type="text"
-            value={billName}
-            onChange={(e) => setBillName(e.target.value)} // Cập nhật state
-          />
-        </div>        <button type="submit" className="saveBtn" onClick={handleSubmit}>
-          Save
-        </button>
+        {fileName && (
+          <p style={{ 
+            marginTop: "10px", 
+            color: "#28a745",
+            fontWeight: "500"
+          }}>
+            Selected File: {fileName}
+          </p>
+        )}
       </div>
 
-      {/* Danh sách Utility Bills */}
-      <div className="table-tdn" style={{ marginTop: "40px" }}>
-        <label id="utilityLabel" htmlFor="">
-          Utility Bills List
-        </label>
+      {/* Preview Section */}
+      {dataExcel.length > 0 && (
+        <div style={{
+          backgroundColor: "#fff",
+          padding: "20px",
+          borderRadius: "8px",
+          marginBottom: "20px",
+          border: "1px solid #dee2e6"
+        }}>
+          <h3 style={{ marginBottom: "15px", color: "#495057" }}>Preview Data</h3>
+          
+          <Table columns="1fr 1.4fr 1.4fr 1.4fr">
+            <Table.Header size="small">
+              <div>Apartment</div>
+              <div>Electricity</div>
+              <div>Water</div>
+              <div>Internet</div>
+            </Table.Header>          
+            {dataExcel.map((room, index) => (
+              <Table.Row size="small" key={index}>
+                <div>{room.apartmentId || room.apartment}</div>
+                <div>{room.electricity}</div>
+                <div>{room.water}</div>
+                <div>{room.internet}</div>
+              </Table.Row>
+            ))}
+          </Table>
+
+          <div style={{ 
+            marginTop: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px"
+          }}>
+            <label htmlFor="billName" style={{ fontWeight: "500" }}>
+              Bill Name:
+            </label>
+            <input
+              id="billName"
+              type="text"
+              value={billName}
+              onChange={(e) => setBillName(e.target.value)}
+              style={{
+                padding: "8px 12px",
+                border: "1px solid #ced4da",
+                borderRadius: "4px",
+                minWidth: "250px"
+              }}
+              placeholder="Enter bill name..."
+            />
+            <button 
+              type="submit" 
+              onClick={handleSubmit}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontWeight: "500"
+              }}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Utility Bills List */}
+      <div style={{
+        backgroundColor: "#fff",
+        padding: "20px",
+        borderRadius: "8px",
+        border: "1px solid #dee2e6"
+      }}>
+        <h3 style={{ marginBottom: "15px", color: "#495057" }}>Utility Bills List</h3>
 
         {loading ? (
           <p>Loading...</p>

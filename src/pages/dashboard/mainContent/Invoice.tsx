@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Form from "../../../components/Form";
 import FormField from "../../../components/FormField";
-import UtilityBill from "../../../components/UtilityBill";
 import { toast } from "react-toastify";
 
 export default function Invoice() {
@@ -19,8 +18,7 @@ export default function Invoice() {
       <Row type="horizontal">
         <Heading as="h1">Invoices</Heading>
         <Search setKeyword={setKeyword} keyword={keyword}></Search>
-      </Row>
-
+      </Row>      
       <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
         <Modal.Open id="createInvoice">
           <button
@@ -40,35 +38,11 @@ export default function Invoice() {
             Create Invoice +
           </button>
         </Modal.Open>
-
-        <Modal.Open id="addUtility">
-          <button
-            className="btTdn"
-            style={{
-              backgroundColor: "#708871",
-              color: "white",
-              fontWeight: "400",
-              padding: "7px 8px",
-              border: "none",
-              borderRadius: "16px",
-              fontSize: "16px",
-              cursor: "pointer",
-              width: "145px",
-            }}
-          >
-            Add Utility Bill +
-          </button>
-        </Modal.Open>
       </div>
 
-      <InvoiceTable keyword={keyword}/>
-
+      <InvoiceTable keyword={keyword}/>      
       <Modal.Window id="createInvoice" name="Create Invoice">
         <InvoiceTDN />
-      </Modal.Window>
-
-      <Modal.Window id="addUtility" name="Add Utility Bill">
-        <UtilityBill />
       </Modal.Window>
     </Modal>
   );
