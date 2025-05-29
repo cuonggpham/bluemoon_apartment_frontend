@@ -7,7 +7,6 @@ interface TagProps {
 const Tag = styled.span<TagProps>`
   width: fit-content;
   text-align: center;
-  margin: auto;
   font-weight: 600;
 
   // Dynamic status based on received prop

@@ -8,8 +8,7 @@ import { useState } from "react";
 export default function Vehicles() {
   const [keyword, setKeyword] = useState('');
   return (
-    <>
-      <Row type="horizontal">
+    <>      <Row type="horizontal" justify="start" gap="lg">
         <Heading as="h1">Vehicles Management</Heading>
         <AddAndSearch title="Add Vehicle" setKeyword={setKeyword} keyword={keyword}>
           <VehicleForm />

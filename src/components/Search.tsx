@@ -6,26 +6,54 @@ const SearchStyled = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  border-radius: 20px;
-  padding: 6px 12px;
-  background-color: var(--color-grey-700);
+  gap: var(--space-2);
+  border-radius: var(--border-radius-xl);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-grey-0);
+  border: 1px solid var(--color-grey-200);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  max-width: 280px;
+
+  &:hover {
+    border-color: var(--color-brand-300);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:focus-within {
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px var(--color-brand-100);
+  }
 `;
 
 const SearchIcon = styled(HiOutlineSearch)`
-  color: white;
+  color: var(--color-grey-500);
+  font-size: var(--font-size-base);
+  transition: color var(--transition-fast);
+
+  ${SearchStyled}:hover & {
+    color: var(--color-brand-500);
+  }
 `;
 
 const Input = styled.input`
-  color: white;
-  width: 200px;
+  color: var(--color-grey-900);
+  width: 160px;
   border: none;
   outline: none;
-  transition: width 0.3s ease;
-  background-color: var(--color-grey-700);
+  transition: all var(--transition-normal);
+  background-color: transparent;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  
+  &::placeholder {
+    color: var(--color-grey-400);
+    font-size: var(--font-size-sm);
+  }
 
   &:focus {
-    width: 300px;
+    width: 200px;
+    color: var(--color-grey-900);
   }
 `;
 

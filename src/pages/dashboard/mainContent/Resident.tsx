@@ -10,8 +10,7 @@ export default function Residents() {
   const [keyword, setKeyword] = useState('');
 
   return (
-    <>
-      <Row type="horizontal">
+    <>      <Row type="horizontal" justify="start" gap="lg">
         <Heading as="h1">Residents Management</Heading>        
         <AddAndSearch title="Add Resident" setKeyword={setKeyword} keyword={keyword}>
           <MultiStepResidentForm />

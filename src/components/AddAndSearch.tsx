@@ -3,10 +3,10 @@ import styled from "styled-components";
 import Add from "./Add";
 
 const AddAndSearchStyled = styled.div`
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  // justify-content: space-between;
   gap: 10px;
+  margin-left: 20px;
 `;
 
 export default function AddAndSearch({ children, title, setKeyword, keyword }) {

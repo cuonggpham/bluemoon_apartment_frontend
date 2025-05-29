@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,22 +8,112 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "SF Pro Display", sans-serif;
 }
 
-/* #root {
-    background-color: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-} */
+body {
+    font-size: 24px;
+    line-height: 1.6;
+    color: var(--color-grey-900);
+    background-color: var(--color-grey-50);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    font-feature-settings: "liga", "kern";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 
+html {
+    font-size: 24px;
+}
+
+/* Enhanced modern scrollbar styling */
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 8px;
     background: transparent;
-  }
+}
   
-  ::-webkit-scrollbar-thumb {
-    background: #4C585B;
-    border-radius: 10px;
-  }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--color-grey-300), var(--color-grey-400));
+    border-radius: var(--border-radius-full);
+    transition: all var(--transition-fast);
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--color-brand-400), var(--color-brand-500));
+    transform: scaleY(1.1);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-grey-50);
+    border-radius: var(--border-radius-full);
+}
+
+/* Modern glass-morphism effect for elevated surfaces */
+.glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Smooth focus rings inspired by Apple's design */
+.focus-ring {
+    transition: box-shadow var(--transition-fast);
+}
+
+.focus-ring:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-brand-200);
+}
+
+/* Modern button base styles */
+.btn-modern {
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    transform-origin: center;
+}
+
+.btn-modern:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-modern:active {
+    transform: translateY(0);
+}
+
+/* Subtle animations for micro-interactions */
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

@@ -15,44 +15,59 @@ const InputContainer = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  padding: 12px;
-  padding-right: 40px;
-  border: 1px solid var(--color-grey-300);
-  border-radius: 4px;
-  font-size: 14px;
+  padding: var(--space-2-5) var(--space-3);
+  padding-right: var(--space-10);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-sm);
   background-color: var(--color-grey-0);
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
   
   &:focus {
     outline: none;
-    border-color: var(--color-brand-600);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px var(--color-brand-100);
+  }
+  
+  &:hover {
+    border-color: var(--color-brand-300);
+    box-shadow: var(--shadow-md);
   }
   
   &.dropdown-open {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    border-bottom-color: var(--color-brand-600);
+    border-bottom-color: var(--color-brand-500);
+  }
+
+  &::placeholder {
+    color: var(--color-grey-400);
+    font-size: var(--font-size-sm);
   }
 `;
 
 const ClearButton = styled.button`
   position: absolute;
-  right: 8px;
+  right: var(--space-2);
   background: none;
   border: none;
-  color: var(--color-grey-500);
+  color: var(--color-grey-400);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 2px;
+  padding: var(--space-1);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
   
   &:hover {
     color: var(--color-grey-700);
     background-color: var(--color-grey-100);
+    transform: scale(1.1);
   }
   
   &:focus {
     outline: none;
+    box-shadow: 0 0 0 2px var(--color-brand-100);
   }
 `;
 
