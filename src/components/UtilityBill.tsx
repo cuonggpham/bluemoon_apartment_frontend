@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./utility.css";
 import Table from "./Table";
 import * as XLSX from "xlsx";
@@ -11,6 +11,45 @@ const UtilityBill = () => {
   const [fileName, setFileName] = useState(""); // Lưu tên file
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // Lưu file được chọn
   const [billName, setBillName] = useState(""); // Lưu tên hóa đơn
+  const [utilityBills, setUtilityBills] = useState<any[]>([]); // Lưu danh sách utility bills từ server
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch utility bills từ API
+  const fetchUtilityBills = async (page = 1) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/utilitybills?page=${page}&size=10`
+      );
+      setUtilityBills(response.data.result || []);
+      setTotalPages(response.data.totalPages || 0);
+      setCurrentPage(page);
+    } catch (error) {
+      console.error("Error fetching utility bills:", error);
+      toast.error("Failed to fetch utility bills");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load utility bills khi component mount
+  useEffect(() => {
+    fetchUtilityBills();
+  }, []);
+
+  // Update payment status
+  const updatePaymentStatus = async (billId: number) => {
+    try {
+      await axios.post(`http://localhost:8080/api/v1/utilitybills/update/${billId}`);
+      toast.success("Payment status updated successfully!");
+      fetchUtilityBills(currentPage); // Refresh data
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      toast.error("Failed to update payment status");
+    }
+  };
 
   // Xử lý khi người dùng chọn file
   const handleFileChange = (e: any) => {
@@ -43,21 +82,78 @@ const UtilityBill = () => {
             "Content-Type": "multipart/form-data",
           },
         }
-      );
-
-      // Hiển thị thông báo thành công
+      );      // Hiển thị thông báo thành công
       toast.success("Add Utility Bill Successfully!");
       console.log(response.data); // In dữ liệu phản hồi từ server
-    } catch (err) {
+      
+      // Reset form và refresh utility bills list
+      setFileName("");
+      setSelectedFile(null);
+      setBillName("");
+      setDataExcel([]);
+      fetchUtilityBills(currentPage);
+    } catch (err: any) {
       console.error(err);
-      toast.error("An error occurred while uploading the file.");
+      
+      // Extract error message from backend response
+      let errorMessage = "An error occurred while uploading the file.";
+      
+      if (err.response?.data?.message) {
+        // Backend trả về ApiResponse với message
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.error) {
+        // Fallback cho error field
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        // Axios error message
+        errorMessage = err.message;
+      }
+      
+      toast.error(errorMessage);
+    }
+  };
+  // Hàm đọc và parse file excel/csv
+  const readExcel = (file: any) => {
+    const fileName = file.name.toLowerCase();
+    
+    if (fileName.endsWith('.csv')) {
+      readCSV(file);
+    } else if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
+      readExcelFile(file);
+    } else {
+      toast.error("Unsupported file type. Please use CSV, XLS, or XLSX files.");
+      return;
     }
   };
 
-  // Hàm đọc và parse file excel
-  const readExcel = (file: any) => {
+  // Hàm đọc file CSV
+  const readCSV = (file: File) => {
     const reader = new FileReader();
+    reader.onload = (event: any) => {
+      const text = event.target.result;
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map((h: string) => h.trim());
+      
+      const jsonData = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line) {
+          const values = line.split(',').map((v: string) => v.trim());
+          const row: any = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index];
+          });
+          jsonData.push(row);
+        }
+      }
+      setDataExcel(jsonData);
+    };
+    reader.readAsText(file);
+  };
 
+  // Hàm đọc file Excel
+  const readExcelFile = (file: File) => {
+    const reader = new FileReader();
     reader.onload = (event: any) => {
       const data = new Uint8Array(event.target.result);
       const workbook = XLSX.read(data, { type: "array" });
@@ -98,11 +194,10 @@ const UtilityBill = () => {
             <div>Electricity</div>
             <div>Water</div>
             <div>Internet</div>
-          </Table.Header>
-
+          </Table.Header>          
           {dataExcel.map((room, index) => (
             <Table.Row size="small" key={index}>
-              <div>{room.apartment}</div>
+              <div>{room.apartmentId || room.apartment}</div>
               <div>{room.electricity}</div>
               <div>{room.water}</div>
               <div>{room.internet}</div>
@@ -119,10 +214,114 @@ const UtilityBill = () => {
             value={billName}
             onChange={(e) => setBillName(e.target.value)} // Cập nhật state
           />
-        </div>
-        <button type="submit" className="saveBtn" onClick={handleSubmit}>
+        </div>        <button type="submit" className="saveBtn" onClick={handleSubmit}>
           Save
         </button>
+      </div>
+
+      {/* Danh sách Utility Bills */}
+      <div className="table-tdn" style={{ marginTop: "40px" }}>
+        <label id="utilityLabel" htmlFor="">
+          Utility Bills List
+        </label>
+
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            <Table columns="0.5fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr">
+              <Table.Header size="small">
+                <div>ID</div>
+                <div>Bill Name</div>
+                <div>Apartment</div>
+                <div>Electricity</div>
+                <div>Water</div>
+                <div>Internet</div>
+                <div>Status</div>
+                <div>Action</div>
+              </Table.Header>
+
+              {utilityBills.map((bill) => (
+                <Table.Row size="small" key={bill.id}>
+                  <div>{bill.id}</div>
+                  <div>{bill.name}</div>
+                  <div>{bill.apartment?.addressNumber || bill.apartmentId}</div>
+                  <div>{bill.electricity?.toLocaleString()} VND</div>
+                  <div>{bill.water?.toLocaleString()} VND</div>
+                  <div>{bill.internet?.toLocaleString()} VND</div>
+                  <div>
+                    <span
+                      style={{
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        color: "white",
+                        backgroundColor: bill.paymentStatus === "Paid" ? "#4CAF50" : "#FF9800",
+                        fontSize: "12px"
+                      }}
+                    >
+                      {bill.paymentStatus}
+                    </span>
+                  </div>
+                  <div>
+                    {bill.paymentStatus === "Unpaid" && (
+                      <button
+                        onClick={() => updatePaymentStatus(bill.id)}
+                        style={{
+                          padding: "4px 8px",
+                          backgroundColor: "#2196F3",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          fontSize: "12px"
+                        }}
+                      >
+                        Mark Paid
+                      </button>
+                    )}
+                  </div>
+                </Table.Row>
+              ))}
+            </Table>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "20px" }}>
+                <button
+                  onClick={() => fetchUtilityBills(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: "8px 12px",
+                    backgroundColor: currentPage === 1 ? "#ccc" : "#2196F3",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: currentPage === 1 ? "not-allowed" : "pointer"
+                  }}
+                >
+                  Previous
+                </button>
+                <span style={{ alignSelf: "center" }}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => fetchUtilityBills(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: "8px 12px",
+                    backgroundColor: currentPage === totalPages ? "#ccc" : "#2196F3",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: currentPage === totalPages ? "not-allowed" : "pointer"
+                  }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
