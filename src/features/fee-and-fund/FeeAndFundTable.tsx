@@ -3,7 +3,6 @@ import Pagination from "../../components/Pagination";
 import FeeAndFundRow from "./FeeAndFundRow";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import FeeAndFundForm from "./FeeAndFundForm";
 
 interface FeeAndFundTableProps {
   keyword: string;
@@ -14,7 +13,6 @@ export default function FeeAndFundTable({ keyword }: FeeAndFundTableProps) {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [totalElements, setTotalElements] = useState<number>(0);
   const [curPage, setCurPage] = useState<number>(1);
-  const [isFormVisible, setIsFormVisible] = useState(false); // State điều khiển việc hiển thị form
 
   const apiFeesAndFunds = async (page: number = 1) => {
     try {
@@ -49,13 +47,14 @@ export default function FeeAndFundTable({ keyword }: FeeAndFundTableProps) {
   };
 
   return (
-    <>
-      <Table columns="0.5fr 1.5fr 2.5fr 2fr 2fr 1.2fr">
+    <>      
+    <Table columns="0.5fr 1.5fr 2fr 1.5fr 1fr 1.5fr 1.2fr">
         <Table.Header>
           <div>ID</div>
           <div>Name</div>
           <div>Description</div>
           <div>Unit Price</div>
+          <div>Apartment</div>
           <div>Type</div>
           <div>Actions</div>
         </Table.Header>

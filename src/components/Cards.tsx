@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import anime from "animejs";
 import Card from "./Card";
 import { PiBuildingApartmentFill } from "react-icons/pi";
 import { MdFamilyRestroom } from "react-icons/md";
@@ -8,27 +10,45 @@ import { GiPayMoney } from "react-icons/gi";
 import { FaCar } from "react-icons/fa";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
 
 const CardsStyled = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0;
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
+    gap: 1.75rem;
   }
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 1.25rem;
+  }
+`;
+
+const SectionTitle = styled.h2`
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--dashboard-text-primary);
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--dashboard-primary), var(--dashboard-accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-lg);
+    margin-bottom: 1rem;
   }
 `;
 
@@ -37,105 +57,123 @@ export default function Cards() {
   const [numOfResidents, setNumOfResidents] = useState<number>(0);
   const [numOfVehicles, setNumOfVehicles] = useState<number>(0);
   const [totalAmountLast30Days, setTotalAmountLast30Days] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const cardsRef = useRef<HTMLDivElement>(null);
 
-  // Fetch total apartments when the component mounts
   useEffect(() => {
-    const totalApartments = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/v1/apartments?size=999"
-        );
-        setNumOfApartments(response.data.data.totalElements);
-      } catch (error) {
-        console.error("Error fetching apartments:", error);
-      }
-    };
+        setLoading(true);
+        
+        // Fetch all data concurrently
+        const [apartmentsRes, residentsRes, vehiclesRes, paymentsRes] = await Promise.all([
+          axios.get("http://localhost:8080/api/v1/apartments?size=999"),
+          axios.get("http://localhost:8080/api/v1/residents?size=999"),
+          axios.get("http://localhost:8080/api/v1/vehicles?size=999"),
+          axios.get("http://localhost:8080/api/v1/payment-records")
+        ]);
 
-    const totalResidents = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/v1/residents?size=999"
-        );
-        setNumOfResidents(response.data.data.totalElements);
-      } catch (error) {
-        console.error("Error fetching residents:", error);
-      }
-    };
+        setNumOfApartments(apartmentsRes.data.data.totalElements);
+        setNumOfResidents(residentsRes.data.data.totalElements);
+        setNumOfVehicles(vehiclesRes.data.data.totalElements);
 
-    const totalVehicles = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/v1/vehicles?size=999"
-        );
-        setNumOfVehicles(response.data.data.totalElements);
-      } catch (error) {
-        console.error("Error fetching residents:", error);
-      }
-    };
-
-    const fetchTotalAmountLast30Days = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:8080/api/v1/invoices/total"
-        );
-        // Tính toán tổng amount trong 30 ngày gần nhất
-        const invoices = response.data.data;
+        // Calculate total payment amount in the last 30 days
+        let paymentRecords = [];
+        if (paymentsRes.data.code === 200 && paymentsRes.data.data) {
+          paymentRecords = paymentsRes.data.data || [];
+        }
+        
         const today = new Date();
         const thirtyDaysAgo = new Date(today.setDate(today.getDate() - 30));
 
-        const totalAmount = invoices.reduce((total: number, invoice: any) => {
-          const createDate = new Date(invoice.createDate);
-          if (createDate >= thirtyDaysAgo) {
-            total += invoice.totalAmount; // Thêm vào totalAmount nếu thuộc 30 ngày gần nhất
+        const totalAmount = paymentRecords.reduce((total: number, record: any) => {
+          const paymentDate = new Date(record.paymentDate);
+          if (paymentDate >= thirtyDaysAgo) {
+            total += record.amount;
           }
           return total;
         }, 0);
 
         setTotalAmountLast30Days(totalAmount);
       } catch (error) {
-        console.error("Error fetching invoices:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    totalApartments();
-    totalResidents();
-    totalVehicles();
-    fetchTotalAmountLast30Days();
+    fetchData();
   }, []);
 
+  useEffect(() => {
+    if (!loading && cardsRef.current) {
+      anime({
+        targets: cardsRef.current,
+        opacity: [0, 1],
+        translateY: [30, 0],
+        duration: 400,
+        easing: 'easeOutCubic',
+        delay: 150
+      });
+    }
+  }, [loading]);
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+        gap: '1.5rem',
+        marginBottom: '1.5rem'
+      }}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} style={{
+            height: '140px',
+            background: 'rgba(255, 255, 255, 0.5)',
+            borderRadius: '16px',
+            animation: 'pulse 2s ease-in-out infinite'
+          }} />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <CardsStyled>
-      <Card
-        icon={<PiBuildingApartmentLight size={40} />}
-        title="Total Apartments"
-        value={numOfApartments}
-        color="cyan"
-        iconDetails="Apartments"
-      />
+    <>
+      <SectionTitle>Key Metrics</SectionTitle>
+      <CardsStyled ref={cardsRef}>
+        <Card
+          icon={<PiBuildingApartmentLight size={28} />}
+          title="Total Apartments"
+          value={numOfApartments}
+          color="cyan"
+          iconDetails="Apartments"
+        />
 
-      <Card
-        icon={<MdFamilyRestroom size={40} />}
-        title="Total Residents"
-        value={numOfResidents}
-        color="emerald"
-        iconDetails="Residents"
-      />
+        <Card
+          icon={<MdFamilyRestroom size={28} />}
+          title="Total Residents"
+          value={numOfResidents}
+          color="emerald"
+          iconDetails="Residents"
+        />
 
-      <Card
-        icon={<FaCar size={40} />}
-        title="Total Vehicles"
-        value={numOfVehicles} // Hiển thị giá trị đã chia cho 1 triệu
-        color="pink"
-        iconDetails="Vehicles"
-      />
+        <Card
+          icon={<FaCar size={28} />}
+          title="Total Vehicles"
+          value={numOfVehicles}
+          color="pink"
+          iconDetails="Vehicles"
+        />
 
-      <Card
-        icon={<GiPayMoney size={40} />}
-        title="Last 30 days"
-        value={`₫${(totalAmountLast30Days / 1000000).toFixed(2)}M`} // Hiển thị giá trị đã chia cho 1 triệu
-        color="purple"
-        iconDetails="Open Invoices"
-      />
-    </CardsStyled>
+        <Card
+          icon={<GiPayMoney size={28} />}
+          title="Revenue (30 days)"
+          value={`₫${(totalAmountLast30Days / 1000000).toFixed(2)}M`}
+          color="purple"
+          iconDetails="Payment Records"
+        />
+      </CardsStyled>
+    </>
   );
 }

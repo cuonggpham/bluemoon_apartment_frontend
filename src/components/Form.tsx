@@ -9,8 +9,8 @@ interface StyledFormProps {
 const StyledForm = styled.form<StyledFormProps>`
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px 30px 0px 30px;
+  gap: 24px;
+  padding: 24px 36px 0px 36px;
   border-radius: 20px;
   background-color: var(--color-grey-0);
   ${(props) =>
@@ -18,8 +18,9 @@ const StyledForm = styled.form<StyledFormProps>`
       width: ${props.width || "500px"};
     `}
   overflow: hidden;
-  font-size: 14px;
+  font-size: 1.3rem;
   font-weight: 600;
+  color: #1f2937;
 `;
 
 interface FieldsProps {
@@ -32,8 +33,8 @@ const Fields = styled.div<FieldsProps>`
     css`
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      padding: 10px 10px;
+      gap: 24px;
+      padding: 12px 12px;
     `}
   ${(props) =>
     props.type === "horizontal" &&
@@ -41,8 +42,8 @@ const Fields = styled.div<FieldsProps>`
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
-      padding: 10px 10px;
+      gap: 24px;
+      padding: 12px 12px;
     `}
   width: 100%;
 `;
@@ -52,22 +53,38 @@ Fields.defaultProps = {
 };
 
 const Buttons = styled.div`
-  margin-top: 30px;
+  margin-top: 36px;
   display: flex;
   align-items: center;
   justify-content: space-around;
+  gap: 16px;
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
-  height: 150px;
-  padding: 10px;
+  height: 160px;
+  padding: 16px;
   border: 1px solid var(--color-grey-700);
   border-radius: 15px;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
   resize: none;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #1f2937;
+  line-height: 1.5;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px var(--color-brand-100);
+  }
+  
+  &::placeholder {
+    color: #6b7280;
+    font-weight: 400;
+  }
 `;
 
 interface FormProps {

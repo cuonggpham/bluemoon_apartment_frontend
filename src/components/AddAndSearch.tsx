@@ -5,8 +5,8 @@ import Add from "./Add";
 const AddAndSearchStyled = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-left: 20px;
+  gap: 12px;
+  flex-shrink: 0;
 `;
 
 export default function AddAndSearch({ children, title, setKeyword, keyword }) {

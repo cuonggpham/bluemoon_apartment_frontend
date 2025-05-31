@@ -39,7 +39,28 @@ const NoApartments = styled.span`
   padding: var(--spacing-xs);
 `;
 
-
+const DetailsButton = styled.button`
+  background: transparent;
+  border: none;
+  color: var(--color-brand-600);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  text-align: left;
+  width: 100%;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: var(--color-brand-700);
+    text-decoration: underline;
+  }
+  
+  &:focus {
+    outline: none;
+    color: var(--color-brand-700);
+  }
+`;
 
 export default function ResidentRow({ resident, index }:{ resident: any; index: number }) {
   const { id, apartments, name, dob, status, gender } = resident;
@@ -92,7 +113,7 @@ export default function ResidentRow({ resident, index }:{ resident: any; index: 
         {capitalize(status) || "Unknown"}
       </Tag>      <Modal>
         <Modal.Open id="details">
-          <button>Details</button>
+          <DetailsButton>Details</DetailsButton>
         </Modal.Open>
 
         <Modal.Window id="details" name="Resident Details">

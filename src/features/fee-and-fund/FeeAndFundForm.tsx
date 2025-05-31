@@ -1,24 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Form from "../../components/Form";
 import FormField from "../../components/FormField";
 import Selector from "../../components/Selector";
 import Button from "../../components/Button";
+import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
 import { HiOutlinePlusCircle, HiPencil, HiTrash } from "react-icons/hi2";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 
-export default function FeeAndFundForm({ feeOrFund }: any) {
-  const [formValues, setFormValues] = useState({
+export default function FeeAndFundForm({ feeOrFund }: any) {  const [formValues, setFormValues] = useState({
     id: feeOrFund?.id || "",
     name: feeOrFund?.name || "",
     unitPrice: feeOrFund?.unitPrice || "",
     description: feeOrFund?.description || "",
     feeTypeEnum: feeOrFund?.feeTypeEnum || "",
+    apartmentId: feeOrFund?.apartmentId || "",
     createdAt: feeOrFund?.createdAt || "",
   });
-  const typeOptions = ["DepartmentFee", "ContributionFund", "VehicleFee"];
+  
+  const [selectedApartment, setSelectedApartment] = useState<any>(null);
+  const typeOptions = ["Mandatory", "Voluntary"];
 
+  // Set initial apartment if editing existing fee
+  useEffect(() => {
+    if (feeOrFund?.apartmentId) {
+      setSelectedApartment({ addressNumber: feeOrFund.apartmentId });
+    }
+  }, [feeOrFund]);
   const handleChange = (e: any) => {
     const { id, value } = e.target;
     setFormValues((prevValues) => ({
@@ -27,19 +36,26 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
     }));
   };
 
-  const handleUpdate = async (e: any) => {
-    e.preventDefault();
+  const handleApartmentChange = (apartment: any) => {
+    setSelectedApartment(apartment);
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      apartmentId: apartment ? apartment.addressNumber : "",
+    }));
+  };
 
-    const data = {
+  const handleUpdate = async (e: any) => {
+    e.preventDefault();    const data = {
       id: feeOrFund.id,
       name: formValues.name,
       unitPrice: formValues.unitPrice,
       description: formValues.description,
       feeTypeEnum: formValues.feeTypeEnum,
-    }
+      apartmentId: formValues.feeTypeEnum === "Mandatory" ? formValues.apartmentId : null,
+    };
 
     try {
-      const response = await axios.put("http://localhost:8080/api/v1/fees", data);
+      await axios.put("http://localhost:8080/api/v1/fees", data);
 
       setTimeout(() => {
         window.location.reload();
@@ -52,11 +68,9 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
   }
 
   const handleDelete = async (e: any) => {
-    e.preventDefault();
-
-    try {
+    e.preventDefault();    try {
       // Xoá Fee-Fund theo ID
-      const response = await axios.delete(`http://localhost:8080/api/v1/fees/${formValues.id}`);
+      await axios.delete(`http://localhost:8080/api/v1/fees/${formValues.id}`);
 
       setTimeout(() => {
         window.location.reload();
@@ -72,17 +86,16 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    // console.log(formValues);
-    
-    const data = {
+      const data = {
       name: formValues.name,
       unitPrice: formValues.unitPrice,
       description: formValues.description,
       feeTypeEnum: formValues.feeTypeEnum,
-    }
+      apartmentId: formValues.feeTypeEnum === "Mandatory" ? formValues.apartmentId : null,
+    };
 
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/fees", data);
+      await axios.post("http://localhost:8080/api/v1/fees", data);
 
       setTimeout(() => {
         window.location.reload();
@@ -96,14 +109,25 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
   };
 
   return (
-    <Form width="500px">
-      <Selector
+    <Form width="500px">      <Selector
         value={formValues.feeTypeEnum}
         onChange={handleChange}
         id="feeTypeEnum"
         options={typeOptions}
         label={"Type:"}
-      ></Selector>
+        required={false}
+        error=""
+      ></Selector>{/* Apartment Selection - Only show for Mandatory fees */}
+      {formValues.feeTypeEnum === "Mandatory" && (
+        <FormField>
+          <FormField.Label label={"Apartment:"} />
+          <ApartmentSearchDropdown
+            value={selectedApartment?.addressNumber || ""}
+            onChange={handleApartmentChange}
+            placeholder="Search for apartment by number..."
+          />
+        </FormField>
+      )}
 
       <FormField>
         <FormField.Label label={"Name"} />
@@ -141,7 +165,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
         id="description"
         value={formValues.description}
         onChange={handleChange}
-      />      {feeOrFund ? (
+      />{feeOrFund ? (
         <Form.Buttons>
           <Button variation="danger" size="compact" onClick={handleDelete}>
             Delete

@@ -181,11 +181,27 @@ export default function ResidentForm({ resident }: any) {
 
     setIsUpdatingApartments(true);    
     try {
+      // Get current residents of this apartment first
+      const apartmentResponse = await axios.get(
+        `http://localhost:8080/api/v1/apartments/${selectedApartment.addressNumber}`
+      );
+      
+      const apartmentData = apartmentResponse.data.data;
+      const currentResidents = apartmentData.residents || [];
+      
+      // Add this resident to the existing resident list
+      const currentResidentIds = currentResidents.map((res: any) => res.id);
+      const updatedResidentIds = [...currentResidentIds, parseInt(formValues.id)];
+
       // Update apartment assignments via apartment API
       await axios.put(
         `http://localhost:8080/api/v1/apartments/${selectedApartment.addressNumber}`,
         {
-          residents: [parseInt(formValues.id)] // Add this resident to the apartment
+          area: apartmentData.area,
+          status: apartmentData.status,
+          ownerId: apartmentData.owner?.id || null,
+          ownerPhone: apartmentData.ownerPhone || "",
+          residents: updatedResidentIds // Include all existing residents plus the new one
         }
       );
 
@@ -239,6 +255,10 @@ export default function ResidentForm({ resident }: any) {
       await axios.put(
         `http://localhost:8080/api/v1/apartments/${apartmentId}`,
         {
+          area: apartmentData.area,
+          status: apartmentData.status,
+          ownerId: apartmentData.owner?.id || null,
+          ownerPhone: apartmentData.ownerPhone || "",
           residents: updatedResidents
         }
       );
@@ -313,7 +333,8 @@ export default function ResidentForm({ resident }: any) {
       dob: formValues.dob,
       status: formValues.status,
       gender: formValues.gender,
-      cic: formValues.cic
+      cic: formValues.cic,
+      apartments: formValues.apartments // Include apartments to preserve owner-apartment relationships
     };
 
     try {

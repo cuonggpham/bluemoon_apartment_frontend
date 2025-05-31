@@ -34,8 +34,8 @@ const SideBar = () => {
     { path: "/dashboard/apartments", icon: "bx bxs-home", name: "Apartment Management", tooltip: "Apartment Management" },
     { path: "/dashboard/vehicles", icon: "bx bxs-car", name: "Vehicle Management", tooltip: "Vehicle Management" },
     { path: "/dashboard/fee-and-fund", icon: "bx bx-money-withdraw", name: "Fee and Fund", tooltip: "Fee and Fund" },
+    { path: "/dashboard/payment-recording", icon: "bx bx-credit-card", name: "Payment Recording", tooltip: "Payment Recording" },
     { path: "/dashboard/statistics", icon: "bx bx-folder", name: "Statistics", tooltip: "Statistics" },
-    { path: "/dashboard/invoices", icon: "bx bxs-file-plus", name: "Invoices", tooltip: "Invoices" },
     { path: "/dashboard/utility-bills", icon: "bx bxs-bolt", name: "Utility Bills", tooltip: "Utility Bills" },
   ];
 
@@ -43,7 +43,7 @@ const SideBar = () => {
     <div className={extended ? "sidebar active" : "sidebar"}>
       <div className="logo_content">
         <div className="logo">
-          <div className="logo_name">HustCity.</div>
+          <div className="logo_name">TagaApate.</div>
         </div>
         <i
           className="bx bx-menu"

@@ -53,7 +53,7 @@ export default function ApartmentForm({
     area: apartment?.area || "",
     ownerName: apartment?.owner?.name || "",
     ownerPhone: apartment?.ownerPhone || "",
-    ownerId: apartment?.owner?.id || "",
+    ownerId: apartment?.owner?.id ? String(apartment.owner.id) : "",
   });
 
   // Add validation state
@@ -70,21 +70,21 @@ export default function ApartmentForm({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formValues.addressNumber.trim()) {
+    if (!String(formValues.addressNumber).trim()) {
       newErrors.addressNumber = "Room number is required";
     }
     
-    if (!formValues.area.trim()) {
+    if (!String(formValues.area).trim()) {
       newErrors.area = "Room area is required";
     } else if (isNaN(Number(formValues.area)) || Number(formValues.area) <= 0) {
       newErrors.area = "Area must be a positive number";
     }
     
-    if (!formValues.status.trim()) {
+    if (!String(formValues.status).trim()) {
       newErrors.status = "Status is required";
     }
 
-    if (formValues.ownerPhone && !/^\d{10,11}$/.test(formValues.ownerPhone)) {
+    if (formValues.ownerPhone && !/^\d{10,11}$/.test(String(formValues.ownerPhone))) {
       newErrors.ownerPhone = "Phone number must be 10-11 digits";
     }
     
@@ -112,7 +112,7 @@ export default function ApartmentForm({
     setSelectedOwner(owner);
     setFormValues((prevValues) => ({
       ...prevValues,
-      ownerId: owner?.id || "",
+      ownerId: owner?.id ? String(owner.id) : "",
       ownerName: owner?.name || "",
     }));
   };  const handleUpdate = async (e: any) => {
@@ -124,11 +124,16 @@ export default function ApartmentForm({
       return;
     }
 
-    try {      const data = {
+    try {
+      // Get current residents to preserve them during update
+      const currentResidentIds = apartment?.residents?.map((resident: any) => resident.id) || [];
+      
+      const data = {
         area: formValues.area,
         status: formValues.status,
         ownerId: formValues.ownerId || null,
         ownerPhone: formValues.ownerPhone,
+        residents: currentResidentIds, // Include current residents to prevent them from being removed
       };
 
       await axios.put(

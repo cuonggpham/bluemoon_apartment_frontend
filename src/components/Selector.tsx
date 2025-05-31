@@ -2,71 +2,54 @@ import { createContext, useContext, useState } from "react";
 import styled from "styled-components";
 import { capitalize } from "../utils/helpers";
 
-const StyledSelector = styled.div`
-  border: none;
-  background-color: var(--color-grey-0);
-  display: flex;
-  justify-content: space-between;
-  column-gap: 10px;
-  align-items: center;
-  transition: none;
-  padding: 6px 6px 6px 0px;
-  width: 100%;
-`;
-
-const StyledSelectorLabel = styled.label`
-  font-weight: 500;
-  position: relative;
-
-  &.required::after {
-    content: "*";
-    color: red;
-    margin-left: 4px;
-    font-weight: bold;
-  }
-`;
-
-const StyledErrorMessage = styled.div`
-  color: #dc3545;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-  margin-left: 0.5rem;
-`;
-
+// Enhanced styled components with larger fonts and darker colors
 const StyledSelectorContainer = styled.div`
   display: flex;
   flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
 `;
 
-const StyledOptionLabel = styled.label`
-  cursor: pointer;
-  user-select: none;
-  font-size: 0.9rem;
-  color: var(--color-grey-700);
+const StyledSelector = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3); /* Increased gap between options */
+`;
+
+const StyledSelectorLabel = styled.label`
+  font-size: 1.3rem; /* Increased font size */
+  font-weight: 600; /* Increased font weight */
+  color: #1f2937; /* Darker color for better visibility */
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.01em;
   
-  &:hover {
-    color: var(--color-grey-900);
+  &.required::after {
+    content: "*";
+    color: var(--color-red-500);
+    margin-left: var(--space-1);
+    font-weight: 600;
   }
 `;
 
 const StyledOption = styled.div`
-  border: none;
   display: flex;
-  gap: 5px;
   align-items: center;
+  gap: var(--space-3); /* Increased gap between radio and label */
   cursor: pointer;
-  user-select: none;
+  padding: var(--space-2); /* Added padding for better touch target */
+  border-radius: var(--border-radius-md);
+  transition: background-color var(--transition-fast);
   
   &:hover {
-    opacity: 0.8;
+    background-color: var(--color-grey-50);
   }
 `;
 
 const StyledInput = styled.input`
-  width: 24px;
-  height: 24px;
+  width: 28px; /* Increased from 24px */
+  height: 28px; /* Increased from 24px */
   appearance: none;
-  border: 1px solid var(--color-grey-400);
+  border: 2px solid var(--color-grey-400); /* Increased border width */
   border-radius: 50%;
   outline: none;
   cursor: pointer;
@@ -76,12 +59,13 @@ const StyledInput = styled.input`
 
   &:checked {
     background-color: var(--color-green-500);
-    border-color: var(--color-grey-400);
+    border-color: var(--color-green-600); /* Darker border when checked */
   }
+  
   &:checked::after {
     content: '';
-    width: 10px;
-    height: 10px;
+    width: 12px; /* Increased from 10px */
+    height: 12px; /* Increased from 10px */
     border-radius: 50%;
     background-color: white;
     position: absolute;
@@ -92,12 +76,37 @@ const StyledInput = styled.input`
 
   &:hover {
     border-color: var(--color-grey-600);
+    transform: scale(1.05); /* Added hover effect */
   }
 
   &:focus {
     border-color: var(--color-blue-500);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* Increased shadow */
   }
+`;
+
+const StyledOptionLabel = styled.label`
+  font-size: 1.1rem; /* Significantly increased font size for radio options */
+  font-weight: 600; /* Increased font weight */
+  color: #1f2937; /* Darker color for better readability */
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  user-select: none;
+  
+  &:hover {
+    color: #111827; /* Even darker on hover */
+  }
+`;
+
+const StyledErrorMessage = styled.div`
+  color: var(--color-red-600);
+  font-size: 0.9rem; /* Increased error message font size */
+  font-weight: 600; /* Increased font weight */
+  margin-top: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
 `;
 
 // const SelectorContext = createContext();
@@ -162,7 +171,8 @@ export default function Selector({ options, onChange, id, value, label, required
       <StyledSelector id={id}>
         <StyledSelectorLabel className={required ? 'required' : ''}>
           {label}
-        </StyledSelectorLabel>        {options.map((option) => (
+        </StyledSelectorLabel>
+        {options.map((option) => (
           <StyledOption key={option}>
             <StyledInput
               type="radio"

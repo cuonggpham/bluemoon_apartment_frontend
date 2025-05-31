@@ -158,23 +158,28 @@ Content-Type: application/json
 
 #########################################################
 
-# Invoices API
+# Payment Records API
 
-### GET ALL: Lấy thông tin tất cả các hoá đơn (Successful)
-
-GET http://localhost:8080/api/v1/invoices
-
-### GET: Lấy thông tin tất cả cả hoá đơn theo căn hộ
-GET http://localhost:8080/api/v1/invoiceapartment/100
-
-
-### Thanh toán invoice
-PUT http://localhost:8080/api/v1/invoiceapartment/update/100/HD02
+### POST: Record a new payment
+POST http://localhost:8080/api/v1/payment-records
 Content-Type: application/json
 
 {
-    "4": 50000
+    "payerId": 1,
+    "feeId": 2,
+    "paymentDate": "2024-01-15",
+    "amount": 500000,
+    "notes": "Monthly management fee payment"
 }
+
+### GET: Get all payment records
+GET http://localhost:8080/api/v1/payment-records
+
+### GET: Get payment records by payer ID
+GET http://localhost:8080/api/v1/payment-records/payer/1
+
+### GET: Get payment records by fee ID
+GET http://localhost:8080/api/v1/payment-records/fee/2
 
 
 #########################################################
