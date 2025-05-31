@@ -78,7 +78,7 @@ const ApartmentOptionSection = styled.div`
 `;
 
 const ApartmentOptionLabel = styled.label`
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-grey-800);
   margin-bottom: var(--space-3);

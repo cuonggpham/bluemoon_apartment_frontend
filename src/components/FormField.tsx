@@ -12,9 +12,9 @@ const StyledFormField = styled.div`
 `;
 
 const StyledLabel = styled.label`
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--color-grey-700);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1f2937;
   margin-bottom: var(--space-1);
   letter-spacing: -0.01em;
   
@@ -30,15 +30,16 @@ const StyledInput = styled.input`
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-grey-300);
   border-radius: var(--border-radius-lg);
-  font-size: var(--font-size-base);
+  font-size: 1.1rem;
   font-family: inherit;
   background-color: var(--color-grey-0);
-  color: var(--color-grey-900);
+  color: #1f2937;
   transition: all var(--transition-fast);
-  min-height: 44px;
+  min-height: 48px;
+  font-weight: 500;
   
   &::placeholder {
-    color: var(--color-grey-400);
+    color: #6b7280;
     font-weight: 400;
   }
 
@@ -75,13 +76,14 @@ const StyledSelect = styled.select`
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-grey-300);
   border-radius: var(--border-radius-lg);
-  font-size: var(--font-size-base);
+  font-size: 1.1rem;
   font-family: inherit;
   background-color: var(--color-grey-0);
-  color: var(--color-grey-900);
+  color: #1f2937;
   transition: all var(--transition-fast);
-  min-height: 44px;
+  min-height: 48px;
   cursor: pointer;
+  font-weight: 500;
   
   &:focus {
     outline: none;
@@ -113,8 +115,8 @@ const StyledSelect = styled.select`
 
 const StyledErrorMessage = styled.div`
   color: var(--color-red-600);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   margin-top: var(--space-1);
   display: flex;
   align-items: center;
@@ -226,6 +228,8 @@ const Select: React.FC<SelectProps> = ({
       className={`${className || ''} ${error ? 'error' : ''}`}
       required={required}
       disabled={disabled}
+      title={placeholder}
+      aria-label={placeholder}
     >
       <option value="">{placeholder}</option>
       {options.map((option, index) => (

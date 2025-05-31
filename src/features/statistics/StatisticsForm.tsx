@@ -1,214 +1,128 @@
-import { useEffect, useState } from "react";
-import "./form.css";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
-import FormField from "../../components/FormField";
-import styled from "styled-components";
+import "./form.css";
 
-// Modern styled components for statistics form
 const StatisticsWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  max-width: 800px;
-  height: 500px;
-  background: var(--color-grey-0);
-  border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  padding: 2rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 `;
 
 const StatisticsContent = styled.div`
-  overflow-y: auto;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: var(--space-6);
-  
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: var(--color-grey-100);
-    border-radius: var(--border-radius-md);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-grey-300);
-    border-radius: var(--border-radius-md);
-    
-    &:hover {
-      background: var(--color-grey-400);
-    }
-  }
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
-const SectionTitle = styled.p`
-  color: var(--color-grey-800);
-  font-weight: 600;
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--color-grey-200);
+const SectionTitle = styled.h3`
+  color: #1f2937;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.75rem;
 `;
 
 const BillingHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-4);
-  margin-bottom: var(--space-3);
-  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  
-  &.incomplete {
-    background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
-    color: white;
-    box-shadow: var(--shadow-sm);
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #f3f4f6;
   }
 
   &.complete {
-    background: linear-gradient(135deg, var(--color-green-500), var(--color-green-600));
-    color: white;
-    box-shadow: var(--shadow-sm);
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+
+  &.incomplete {
+    background: #fef3c7;
+    border-color: #f59e0b;
   }
 `;
 
-const BillingDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--space-6);
-  background: var(--color-grey-50);
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-lg);
-  margin-bottom: var(--space-4);
-  box-shadow: var(--shadow-sm);
-`;
-
-const StyledTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: var(--space-4);
-  background: var(--color-grey-0);
-  border-radius: var(--border-radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  
-  th {
-    font-weight: 600;
-    background: var(--color-grey-800);
-    color: white;
-    padding: var(--space-4);
-    text-align: center;
-    font-size: var(--font-size-base);
-    
-    &:first-child {
-      border-radius: var(--border-radius-lg) 0 0 0;
-    }
-    
-    &:last-child {
-      border-radius: 0 var(--border-radius-lg) 0 0;
-    }
-  }
-  
-  td {
-    font-weight: 500;
-    font-size: var(--font-size-base);
-    padding: var(--space-4);
-    text-align: center;
-    border-bottom: 1px solid var(--color-grey-200);
-    
-    &:hover {
-      background: var(--color-grey-50);
-    }
-  }
-`;
-
-const TotalDue = styled.div`
-  padding: var(--space-3) var(--space-4);
-  background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
-  color: white;
-  text-align: right;
-  border-radius: var(--border-radius-lg);
+const StatusSpan = styled.span`
   font-weight: 600;
-  font-size: var(--font-size-base);
-  width: fit-content;
-  margin-left: auto;
-  margin-top: var(--space-3);
-  box-shadow: var(--shadow-sm);
+  font-size: 1.3rem;
+  color: #374151;
 `;
 
 const Arrow = styled.span`
-  font-size: var(--font-size-base);
-  transition: transform 0.3s ease;
-  color: white;
-  
+  transition: transform 0.2s;
+  font-size: 1.2rem;
   &.open {
     transform: rotate(180deg);
   }
 `;
 
-const StatusSpan = styled.span`
-  color: white;
-  font-weight: 600;
-  font-size: var(--font-size-base);
+const BillingDetails = styled.div`
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  margin-bottom: 1rem;
 `;
 
-const VoluntaryFundContainer = styled.div`
-  margin: var(--space-4) 0;
-  padding: var(--space-4);
-  background: var(--color-grey-0);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--color-grey-200);
-  
-  label {
-    font-size: var(--font-size-base);
-    font-weight: 500;
-    color: var(--color-grey-700);
-    display: block;
-    margin-bottom: var(--space-2);
-    
-    strong {
-      color: var(--color-brand-600);
-    }
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+
+  th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
   }
-`;
 
-const VoluntaryInput = styled.input`
-  border: 1px solid var(--color-grey-300);
-  margin-left: var(--space-2);
-  border-radius: var(--border-radius-lg);
-  padding: var(--space-3);
-  font-size: var(--font-size-base);
-  width: 200px;
-  transition: all 0.2s ease;
-  
-  &:focus {
-    outline: none;
-    border-color: var(--color-brand-500);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  th {
+    background: #f9fafb;
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: #374151;
+  }
+
+  td {
+    color: #6b7280;
+    font-size: 1.2rem;
   }
 `;
 
 const PayButtonContainer = styled.div`
   display: flex;
-  justify-content: center;
-  margin-top: var(--space-4);
+  justify-content: flex-end;
+  margin-top: 1rem;
+`;
+
+const EmptyMessage = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 1.1rem;
+`;
+
+const StyledLabel = styled.label`
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: #1f2937;
+  letter-spacing: -0.01em;
 `;
 
 interface StatisticsFormProps {
@@ -217,61 +131,70 @@ interface StatisticsFormProps {
   };
 }
 
+interface PaymentRecord {
+  id: number;
+  payerId: number;
+  payerName: string;
+  feeId: number;
+  feeName: string;
+  apartmentId: number;
+  apartmentNumber: string;
+  paymentDate: string;
+  amount: number;
+  notes: string;
+  createdAt: string;
+}
+
+interface UtilityBill {
+  id: number;
+  name: string;
+  paymentStatus: string;
+  electricity: number;
+  water: number;
+  internet: number;
+  apartmentId: number;
+  createdAt: string;
+}
+
 const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
+  // Add null check to prevent destructuring errors
+  if (!statistic) {
+    return <div>Loading...</div>;
+  }
+  
   const { addressNumber } = statistic;
 
-  const [dataInvoice, setDataInvoice] = useState<any[]>([]);
-  const [dataUtility, setDataUtility] = useState<any[]>([]);
-  const [openDropdowns, setOpenDropdowns] = useState<any>({});
-  const [voluntaryFund, setVoluntaryFund] = useState<any>({}); // Lưu số tiền tự nguyện cho từng `Fund 2`
+  const [paymentRecords, setPaymentRecords] = useState<PaymentRecord[]>([]);
+  const [dataUtility, setDataUtility] = useState<UtilityBill[]>([]);
+  const [openDropdowns, setOpenDropdowns] = useState<{[key: string]: boolean}>({});
 
-  const toggleDropdown = (key: any) => {
-    setOpenDropdowns((prevState) => ({
+  const toggleDropdown = (key: string) => {
+    setOpenDropdowns((prevState: {[key: string]: boolean}) => ({
       ...prevState,
       [key]: !prevState[key],
     }));
   };
 
-  const handleVoluntaryFundChange = (invoiceId: string, value: string) => {
-    setVoluntaryFund((prevState: any) => ({
-      ...prevState,
-      [invoiceId]: parseFloat(value) || 0, // Chuyển giá trị nhập sang số
-    }));
-  };
-
-  const apiInvoice = async () => {
+  const apiPaymentRecords = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/v1/invoiceapartment/${addressNumber}`
+        `http://localhost:8080/api/v1/payment-records/apartment/${addressNumber}`
       );
-      setDataInvoice(response.data.data);
+      
+      console.log('Payment Records API response:', response.data); // Debug log
+      
+      // Handle the response structure from ApiResponse
+      if (response.data.code === 200 && response.data.data) {
+        setPaymentRecords(response.data.data || []);
+      } else {
+        console.error('Unexpected API response structure:', response.data);
+        toast.error('Invalid response format for payment records');
+        setPaymentRecords([]);
+      }
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const apiPayInvoice = async (invoiceId: string, feeList: any[]) => {
-    try {
-      // Tạo payload chứa fund ID và số tiền tự nguyện
-      const payload = feeList.reduce((acc: any, fee: any) => {
-        if (fee.feeType === "ContributionFund") {
-          acc[fee.id] = voluntaryFund[invoiceId] || 0; // Lấy số tiền tự nguyện từ `voluntaryFund`
-        }
-        return acc;
-      }, {});
-
-      // Gửi request API
-      const response = await axios.put(
-        `http://localhost:8080/api/v1/invoiceapartment/update/${addressNumber}/${invoiceId}`,
-        payload,
-        { headers: { "Content-Type": "application/json" } }
-      );
-
-      toast.success("Invoice paid successfully!");
-      apiInvoice(); // Reload dữ liệu sau khi thanh toán
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to pay the invoice.");
+      toast.error("Failed to load payment records");
+      setPaymentRecords([]);
     }
   };
 
@@ -280,7 +203,7 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
       const response = await axios.get(
         `http://localhost:8080/api/v1/utilitybills/${addressNumber}`
       );
-      setDataUtility(response.data.data);
+      setDataUtility(response.data.data || []);
     } catch (err) {
       console.error(err);
     }
@@ -288,184 +211,207 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
 
   const apiPayUtility = async (utilityId: string) => {
     try {
-      console.log(dataUtility[0].id);
-      // Đoạn này
-      const response = await axios.post(
+      await axios.post(
         `http://localhost:8080/api/v1/utilitybills/update/${utilityId}`
       );
-      toast.success("Pay Successfull");
+      toast.success("Payment successful!");
       apiUtility();
     } catch (err) {
       console.error(err);
+      toast.error("Payment failed");
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatAmount = (amount: number | undefined | null) => {
+    if (amount === undefined || amount === null || isNaN(amount)) {
+      return '0 VND';
+    }
+    return Number(amount).toLocaleString('vi-VN') + ' VND';
+  };
+
   useEffect(() => {
-    apiInvoice();
+    apiPaymentRecords();
     apiUtility();
   }, []);
+
   return (
     <StatisticsWrapper>
       <StatisticsContent>
-        <SectionTitle>Invoice (Fee and Fund):</SectionTitle>
-        {dataInvoice.map((invoice, index) => (
-          <div key={index}>
-            <BillingHeader
-              className={invoice.paymentStatus === "Unpaid" ? "incomplete" : "complete"}
-              onClick={() => toggleDropdown(invoice.id)}
-            >
-              <StatusSpan>{invoice.name}</StatusSpan>
-              <StatusSpan>
-                {invoice.paymentStatus === "Unpaid" ? "Unpaid" : "Paid"}
-              </StatusSpan>
-              <Arrow className={openDropdowns[invoice.id] ? "open" : ""}>
+        <SectionTitle>Payment Records for Apartment {addressNumber}:</SectionTitle>
+        {paymentRecords.length === 0 ? (
+          <EmptyMessage>No payment records found for this apartment.</EmptyMessage>
+        ) : (
+          <div>
+            <BillingHeader onClick={() => toggleDropdown('payments')}>
+              <StatusSpan>Payment History ({paymentRecords.length} records)</StatusSpan>
+              <Arrow className={openDropdowns['payments'] ? "open" : ""}>
                 &#9662;
               </Arrow>
             </BillingHeader>
-            {openDropdowns[invoice.id] && (
+            {openDropdowns['payments'] && (
               <BillingDetails>
                 <StyledTable>
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>Type</th>
+                      <th>Payer</th>
+                      <th>Fee Item</th>
+                      <th>Apartment</th>
+                      <th>Date</th>
                       <th>Amount</th>
+                      <th>Notes</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {invoice.feeList.map((fee: any, feeIndex: number) => (
-                      <tr key={feeIndex}>
-                        <td>{fee.name}</td>
-                        <td>{fee.feeType}</td>
+                    {paymentRecords.slice(0, 10).map((record) => (
+                      <tr key={record.id}>
                         <td>
-                          {fee.name === "Fund 2"
-                            ? (
-                                fee.amount + (voluntaryFund[invoice.id] || 0)
-                              ).toLocaleString()
-                            : fee.amount.toLocaleString()}{" "}
-                          VND
+                          <div>
+                            <div style={{ fontWeight: '600', fontSize: '1.2rem' }}>{record.payerName}</div>
+                            <div style={{ fontSize: '1.1rem', color: '#9ca3af' }}>ID: {record.payerId}</div>
+                          </div>
                         </td>
+                        <td>
+                          <div>
+                            <div style={{ fontWeight: '600', fontSize: '1.2rem' }}>{record.feeName}</div>
+                            <div style={{ fontSize: '1.1rem', color: '#9ca3af' }}>ID: {record.feeId}</div>
+                          </div>
+                        </td>
+                        <td>
+                          <div>
+                            <div style={{ fontWeight: '600', fontSize: '1.2rem' }}>Apt {record.apartmentNumber}</div>
+                            <div style={{ fontSize: '1.1rem', color: '#9ca3af' }}>ID: {record.apartmentId}</div>
+                          </div>
+                        </td>
+                        <td style={{ fontSize: '1.2rem' }}>{formatDate(record.paymentDate)}</td>
+                        <td style={{ fontWeight: '700', color: '#059669', fontSize: '1.3rem' }}>
+                          {formatAmount(record.amount)}
+                        </td>
+                        <td style={{ fontSize: '1.2rem' }}>{record.notes || 'No notes'}</td>
                       </tr>
                     ))}
                   </tbody>
                 </StyledTable>
-                
-                {/* Voluntary fund input */}
-                {invoice.paymentStatus === "Unpaid" &&
-                  invoice.feeList.map(
-                    (fee: any) =>
-                      fee.feeType === "ContributionFund" && (
-                        <VoluntaryFundContainer key={fee.name}>
-                          <label>
-                            Enter voluntary contribution for{" "}
-                            <strong>{fee.name}</strong>:{" "}
-                            <VoluntaryInput
-                              type="text"
-                              value={voluntaryFund[invoice.id] || ""}
-                              onChange={(e) =>
-                                handleVoluntaryFundChange(
-                                  invoice.id,
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </label>
-                        </VoluntaryFundContainer>
-                      )
-                  )}
-                
-                <TotalDue>
-                  Total amount:{" "}
-                  {invoice.feeList
-                    .reduce((sum: number, fee: any) => {
-                      if (fee.feeType === "DepartmentFee") {
-                        return (
-                          sum + fee.amount + (voluntaryFund[invoice.id] || 0)
-                        );
-                      }
-                      return sum + fee.amount;
-                    }, 0)
-                    .toLocaleString()}{" "}
-                  VND
-                </TotalDue>
-                  {/* Pay button for unpaid invoices */}
-                {invoice.paymentStatus === "Unpaid" && (
-                  <PayButtonContainer>
-                    <Button
-                      onClick={() => apiPayInvoice(invoice.id, invoice.feeList)}
-                      variation="success"
-                      size="compact"
-                    >
-                      Pay 💳
-                    </Button>
-                  </PayButtonContainer>
+                {paymentRecords.length > 10 && (
+                  <p style={{ color: '#6b7280', fontStyle: 'italic', textAlign: 'center', fontSize: '1rem' }}>
+                    Showing first 10 records. View all records in Fee Payment section.
+                  </p>
                 )}
               </BillingDetails>
             )}
           </div>
-        ))}
+        )}
         
-        <SectionTitle>Utility Bill:</SectionTitle>
-        {dataUtility.map((utility, index) => (
-          <div key={index}>
-            <BillingHeader
-              className={utility.paymentStatus === "Unpaid" ? "incomplete" : "complete"}
-              onClick={() => toggleDropdown(utility.id)}
-            >
-              <StatusSpan>{utility.name}</StatusSpan>
-              <StatusSpan>
-                {utility.paymentStatus === "Unpaid" ? "Unpaid" : "Paid"}
-              </StatusSpan>
-              <Arrow className={openDropdowns[utility.id] ? "open" : ""}>
-                &#9662;
-              </Arrow>
-            </BillingHeader>
-            {openDropdowns[utility.id] && (
-              <BillingDetails>
-                <StyledTable>
-                  <thead>
-                    <tr>
-                      <th>Electricity</th>
-                      <th>Water</th>
-                      <th>Internet</th>
-                      <th>Created At</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{utility.electricity.toLocaleString()} VND</td>
-                      <td>{utility.water.toLocaleString()} VND</td>
-                      <td>{utility.internet.toLocaleString()} VND</td>
-                      <td>
-                        {new Date(utility.createdAt).toLocaleDateString()}
-                      </td>
-                      <td>
-                        {(
-                          utility.electricity +
-                          utility.water +
-                          utility.internet
-                        ).toLocaleString()}{" "}
-                        VND
-                      </td>
-                    </tr>
-                  </tbody>
-                </StyledTable>
-                  {utility.paymentStatus === "Unpaid" && (
-                  <PayButtonContainer>
-                    <Button
-                      onClick={() => apiPayUtility(utility.id)}
-                      variation="success"
-                      size="compact"
-                    >
-                      Pay 💳
-                    </Button>
-                  </PayButtonContainer>
+        <SectionTitle>Utility Bills:</SectionTitle>
+        {dataUtility.length === 0 ? (
+          <EmptyMessage>No utility bills found for this apartment.</EmptyMessage>
+        ) : (
+          dataUtility.map((utility, index) => {
+            const totalAmount = utility.electricity + utility.water + utility.internet;
+            return (
+              <div key={index}>
+                <BillingHeader
+                  className={utility.paymentStatus === "Unpaid" ? "incomplete" : "complete"}
+                  onClick={() => toggleDropdown(utility.id.toString())}
+                >
+                  <StatusSpan>{utility.name}</StatusSpan>
+                  <StatusSpan>Total: {formatAmount(totalAmount)}</StatusSpan>
+                  <StatusSpan>
+                    {utility.paymentStatus === "Unpaid" ? "Unpaid" : "Paid"}
+                  </StatusSpan>
+                  <Arrow className={openDropdowns[utility.id.toString()] ? "open" : ""}>
+                    &#9662;
+                  </Arrow>
+                </BillingHeader>
+                {openDropdowns[utility.id.toString()] && (
+                  <BillingDetails>
+                    <StyledTable>
+                      <thead>
+                        <tr>
+                          <th>Service</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Electricity</td>
+                          <td>{formatAmount(utility.electricity)}</td>
+                          <td>
+                            <span style={{ 
+                              color: utility.paymentStatus === "Paid" ? "#059669" : "#dc2626",
+                              fontWeight: "600",
+                              fontSize: '1.2rem'
+                            }}>
+                              {utility.paymentStatus}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Water</td>
+                          <td>{formatAmount(utility.water)}</td>
+                          <td>
+                            <span style={{ 
+                              color: utility.paymentStatus === "Paid" ? "#059669" : "#dc2626",
+                              fontWeight: "600",
+                              fontSize: '1.2rem'
+                            }}>
+                              {utility.paymentStatus}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Internet</td>
+                          <td>{formatAmount(utility.internet)}</td>
+                          <td>
+                            <span style={{ 
+                              color: utility.paymentStatus === "Paid" ? "#059669" : "#dc2626",
+                              fontWeight: "600",
+                              fontSize: '1.2rem'
+                            }}>
+                              {utility.paymentStatus}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr style={{ borderTop: '2px solid #e5e7eb', fontWeight: '700' }}>
+                          <td style={{ fontSize: '1.3rem' }}>Total</td>
+                          <td style={{ color: '#059669', fontSize: '1.35rem', fontWeight: '700' }}>{formatAmount(totalAmount)}</td>
+                          <td>
+                            <span style={{ 
+                              color: utility.paymentStatus === "Paid" ? "#059669" : "#dc2626",
+                              fontWeight: "600",
+                              fontSize: '1.2rem'
+                            }}>
+                              {utility.paymentStatus}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </StyledTable>
+                    {utility.paymentStatus === "Unpaid" && (
+                      <PayButtonContainer>
+                        <Button
+                          onClick={() => apiPayUtility(utility.id.toString())}
+                          variation="success"
+                          size="compact"
+                        >
+                          Pay 💳
+                        </Button>
+                      </PayButtonContainer>
+                    )}
+                  </BillingDetails>
                 )}
-              </BillingDetails>
-            )}
-          </div>
-        ))}
+              </div>
+            );
+          })
+        )}
       </StatisticsContent>
     </StatisticsWrapper>
   );

@@ -68,25 +68,32 @@
 .bill-name-section {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-5);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--color-grey-200);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(229, 231, 235, 0.6);
 }
 
 .bill-name-section label {
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
-  color: var(--color-grey-700);
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: #1f2937;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .bill-name-section input {
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-grey-300);
   border-radius: var(--border-radius-lg);
-  min-width: 300px;
-  font-size: var(--font-size-base);
+  min-width: 320px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1f2937;
   transition: all var(--transition-fast);
+  min-height: 48px;
 }
 
 .bill-name-section input:focus {
@@ -95,17 +102,24 @@
   box-shadow: 0 0 0 3px var(--color-brand-100);
 }
 
+.bill-name-section input::placeholder {
+  color: #6b7280;
+  font-weight: 400;
+}
+
 .save-btn {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-5);
   background: linear-gradient(135deg, var(--color-green-500), var(--color-green-600));
   color: var(--color-grey-0);
   border: none;
   border-radius: var(--border-radius-lg);
   cursor: pointer;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
+  font-weight: 600;
+  font-size: 1.1rem;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-sm);
+  min-height: 48px;
+  letter-spacing: -0.01em;
 }
 
 .save-btn:hover {
@@ -114,15 +128,24 @@
   box-shadow: var(--shadow-md);
 }
 
+.save-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
 .status-badge {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--border-radius-full);
   color: var(--color-grey-0);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: 0.9rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   box-shadow: var(--shadow-xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
 }
 
 .status-badge.paid {
@@ -242,4 +265,161 @@
     border: 1px solid black;
     border-radius: 10px;
     padding: 4px 8px;
+}
+
+/* Enhanced billing table styles */
+.billing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--space-4);
+  background: white;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.billing-table th {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: var(--space-4);
+  text-align: left;
+  font-weight: 700;
+  color: #1f2937;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+}
+
+.billing-table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid #e2e8f0;
+  color: #1f2937;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.billing-table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Enhanced form elements */
+.utility-form-group {
+  margin-bottom: var(--space-5);
+}
+
+.utility-form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: #1f2937;
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.01em;
+}
+
+.utility-form-group input,
+.utility-form-group select,
+.utility-form-group textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-grey-300);
+  border-radius: var(--border-radius-lg);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1f2937;
+  background-color: white;
+  transition: all var(--transition-fast);
+  min-height: 48px;
+}
+
+.utility-form-group input:focus,
+.utility-form-group select:focus,
+.utility-form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 3px var(--color-brand-100);
+}
+
+.utility-form-group input::placeholder,
+.utility-form-group textarea::placeholder {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Enhanced utility bill upload section */
+.utility-upload-section {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px dashed var(--color-grey-300);
+  border-radius: var(--border-radius-xl);
+  padding: var(--space-8);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.utility-upload-section:hover {
+  border-color: var(--color-brand-400);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.utility-upload-section label {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.utility-upload-section input[type="file"] {
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+/* Enhanced utility bill actions */
+.utility-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-grey-200);
+}
+
+.utility-btn {
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  border-radius: var(--border-radius-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 48px;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.utility-btn.primary {
+  background: linear-gradient(135deg, var(--color-brand-500), var(--color-brand-600));
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.utility-btn.primary:hover {
+  background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-700));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.utility-btn.secondary {
+  background: white;
+  color: #374151;
+  border: 1px solid var(--color-grey-300);
+  box-shadow: var(--shadow-xs);
+}
+
+.utility-btn.secondary:hover {
+  background: var(--color-grey-50);
+  border-color: var(--color-grey-400);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }

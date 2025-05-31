@@ -34,7 +34,7 @@ type BodyProps<T> = {
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
   border-radius: var(--border-radius-xl);
-  font-size: var(--font-size-base);
+  font-size: 1.2rem;
   background-color: var(--color-grey-0);
   overflow: hidden;
   text-align: left;
@@ -58,20 +58,20 @@ const StyledHeader = styled(CommonRow)<CommonRowProps>`
   ${(props) =>
     props.size === "small" &&
     css`
-      padding: var(--space-2) var(--space-6);
+      padding: var(--space-3) var(--space-6);
     `}
 
   ${(props) =>
     props.size === "normal" &&
     css`
-      padding: var(--space-4) var(--space-6);
+      padding: var(--space-5) var(--space-6);
     `}
   background: linear-gradient(135deg, var(--color-grey-800), var(--color-grey-900));
   border-bottom: 1px solid var(--color-grey-700);
   letter-spacing: 0.025em;
   font-weight: var(--font-weight-semibold);
   color: var(--color-grey-0);
-  font-size: var(--font-size-sm);
+  font-size: 1.2rem;
   text-transform: uppercase;
   border-top-right-radius: var(--border-radius-xl);
   border-top-left-radius: var(--border-radius-xl);
@@ -85,14 +85,19 @@ const StyledRow = styled(CommonRow)<CommonRowProps>`
   ${(props) =>
     props.size === "small" &&
     css`
-      padding: var(--space-2) var(--space-6);
+      padding: var(--space-3) var(--space-6);
+      font-size: 1.1rem;
     `}
 
   ${(props) =>
     props.size === "normal" &&
     css`
-      padding: var(--space-4) var(--space-6);
+      padding: var(--space-5) var(--space-6);
+      font-size: 1.25rem;
     `}
+
+  color: #1f2937;
+  font-weight: 500;
 
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
@@ -121,15 +126,15 @@ const StyledBody = styled.section`
 
 const Footer = styled.footer`
   background-color: var(--color-grey-50);
-  color: var(--color-grey-700);
+  color: #374151;
   border-top: 1px solid var(--color-grey-200);
   border-bottom-right-radius: var(--border-radius-xl);
   border-bottom-left-radius: var(--border-radius-xl);
   display: flex;
   justify-content: center;
   padding: var(--space-4);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-size: 1.1rem;
+  font-weight: 600;
 
   &:not(:has(*)) {
     display: none;
@@ -137,16 +142,16 @@ const Footer = styled.footer`
 `;
 
 const Empty = styled.p`
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
+  font-size: 1.3rem;
+  font-weight: 600;
   text-align: center;
   margin: var(--space-12) var(--space-6);
-  color: var(--color-grey-500);
+  color: #6b7280;
   
   &::before {
     content: "📋";
     display: block;
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-4xl);
     margin-bottom: var(--space-4);
     opacity: 0.5;
   }

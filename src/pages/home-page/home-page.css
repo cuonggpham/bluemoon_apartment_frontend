@@ -1,11 +1,59 @@
 .home-page {
     min-width: 100%;
-    background-color: #000235;
+    background: linear-gradient(135deg, #000235 0%, #001a3e 30%, #000235 70%, #001122 100%);
     overflow-x: hidden;
+    position: relative;
+}
+
+.home-page::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 122, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .container-tdn {
-    max-width: 1140px;
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Global smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Enhanced scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 2, 53, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #007aff, #00d4ff);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #0056cc, #007aff);
+}
+
+/* Selection styling */
+::selection {
+    background: rgba(0, 122, 255, 0.3);
+    color: #fff;
 }

@@ -64,18 +64,19 @@ thead th:last-child {
 th,
 td {
   text-align: center;
-  padding: 10px;
+  padding: 12px;
 }
 
 th {
-  font-weight: 500;
+  font-weight: 600;
   background-color: #31363f;
   color: white;
+  font-size: 1.2rem;
 }
 
 td {
-  font-weight: 400;
-  font-size: 14px;
+  font-weight: 500;
+  font-size: 1.1rem;
   border: 1px solid black;
 }
 
@@ -142,8 +143,10 @@ td {
 /* Title */
 .popup h2 {
   margin: 0 0 10px;
-  font-size: 20px;
+  font-size: 1.4rem;
   text-align: center;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 /* Form styles */
@@ -155,16 +158,21 @@ td {
   display: block;
   font-weight: bold;
   margin-bottom: 5px;
+  font-size: 1.4rem;
+  color: #1f2937;
 }
 
 .form-group input[type="text"],
 .form-group input[type="date"],
 .form-group select {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1f2937;
+  min-height: 44px;
 }
 
 .form-group input[readonly],
@@ -184,10 +192,12 @@ td {
   background: #ff4d4f;
   color: #fff;
   border: none;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 44px;
 }
 
 .delete-btn:hover {
@@ -198,10 +208,12 @@ td {
   background: #ffc107;
   color: #fff;
   border: none;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 44px;
 }
 
 .update-btn:hover {
@@ -215,7 +227,7 @@ td {
   right: 10px;
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 1.2rem;
   cursor: pointer;
   color: #888;
 }

@@ -53,35 +53,68 @@ const feeData = [
 ];
 
 export default function ApartmentFeeChart() {
-  const [feeData, setFeeData] = useState([]);
+  const [paymentData, setPaymentData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/v1/invoices/total"
+          "http://localhost:8080/api/v1/payment-records"
         );
-        const data = response.data.data.slice(0, 5); // Lấy 5 phần tử đầu tiên
-        setFeeData(data);
+        
+        console.log('Payment Records API response:', response.data); // Debug log
+        
+        // Handle the response structure from ApiResponse
+        let records = [];
+        if (response.data.code === 200 && response.data.data) {
+          records = response.data.data || [];
+        } else {
+          console.error('Unexpected API response structure:', response.data);
+          records = [];
+        }
+        
+        // Group payment records by month and calculate totals
+        const monthlyData = records.reduce((acc: any, record: any) => {
+          const date = new Date(record.paymentDate);
+          const monthKey = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+          
+          if (!acc[monthKey]) {
+            acc[monthKey] = {
+              month: monthKey,
+              totalAmount: 0,
+              recordCount: 0
+            };
+          }
+          
+          acc[monthKey].totalAmount += record.amount;
+          acc[monthKey].recordCount += 1;
+          
+          return acc;
+        }, {});
+        
+        // Convert to array and take last 6 months
+        const chartData = Object.values(monthlyData).slice(-6);
+        setPaymentData(chartData);
       } catch (err) {
-        console.error("Lỗi khi lấy dữ liệu hóa đơn", err);
+        console.error("Error fetching payment records", err);
+        setPaymentData([]);
       }
     };
 
     fetchData();
   }, []);
 
-  //Tính toán max value và chia cho 1 triệu
-  const maxValue = calculateMaxValue(feeData, 1000000); // Làm tròn và chia cho 1 triệu
+  //Calculate max value and divide by 1 million
+  const maxValue = calculateMaxValue(paymentData, 1000000); // Round and divide by 1 million
 
-  // Hàm định dạng giá trị theo triệu
+  // Function to format value in millions
   const formatValue = (value: number) => `${(value / 1000000).toFixed(2)}M`;
   return (
     <ChartBox>
-      <Heading as="h2">Apartment Fee Collection Chart</Heading>
+      <Heading as="h2">Payment Records Chart</Heading>
       <ResponsiveContainer width="100%" height={300}>
         <RechartsBarChart
-          data={feeData}
+          data={paymentData}
           margin={{
             top: 15,
             right: 20,
@@ -91,7 +124,7 @@ export default function ApartmentFeeChart() {
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
           <XAxis 
-            dataKey="name" 
+            dataKey="month" 
             fontSize={12}
             stroke="#64748b"
           />
@@ -129,29 +162,14 @@ export default function ApartmentFeeChart() {
           </Bar>
           <Bar
             yAxisId="left"
-            dataKey="paidAmount"
+            dataKey="recordCount"
             fill="#86efac"
             barSize={40}
             radius={[6, 6, 0, 0]}
           >
             <LabelList
-              dataKey="paidAmount"
+              dataKey="recordCount"
               position="top"
-              formatter={formatValue}
-              fontSize={10}
-            />
-          </Bar>
-          <Bar
-            yAxisId="left"
-            dataKey="contributionAmount"
-            fill="#f97316"
-            barSize={40}
-            radius={[6, 6, 0, 0]}
-          >
-            <LabelList
-              dataKey="contributionAmount"
-              position="top"
-              formatter={formatValue}
               fontSize={10}
             />
           </Bar>
@@ -161,16 +179,14 @@ export default function ApartmentFeeChart() {
   );
 }
 
-// Hàm tính giá trị max và chia cho 1 triệu
+// Function to calculate max value and divide by 1 million
 const calculateMaxValue = (data, roundTo = 1000000) => {
   const maxValue = Math.max(
     ...data.flatMap((item) => [
-      item.totalAmount,
-      item.paidAmount,
-      item.contributionAmount,
+      item.totalAmount || 0
     ])
   );
 
-  // Làm tròn maxValue lên bội số của `roundTo` (1 triệu)
+  // Round maxValue up to multiple of `roundTo` (1 million)
   return Math.ceil(maxValue / roundTo) * roundTo;
 };

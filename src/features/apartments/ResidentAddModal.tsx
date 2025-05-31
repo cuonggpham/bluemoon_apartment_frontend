@@ -24,7 +24,7 @@ const SearchSection = styled.div`
 `;
 
 const SectionTitle = styled.p`
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--color-grey-800);
   margin: 0;
@@ -41,7 +41,7 @@ const SearchInput = styled.input`
   padding: var(--space-4);
   border: 1px solid var(--color-grey-300);
   border-radius: var(--border-radius-lg);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   background: var(--color-grey-0);
   transition: all 0.2s ease;
   
@@ -136,7 +136,7 @@ const SelectedItem = styled.div`
   border-radius: var(--border-radius-md);
   border: 1px solid var(--color-grey-200);
   margin-bottom: var(--space-2);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   color: var(--color-grey-700);
   transition: all 0.2s ease;
   
@@ -175,6 +175,7 @@ const NoSelection = styled.p`
   text-align: center;
   margin: 0;
   padding: var(--space-4);
+  font-size: var(--font-size-lg);
 `;
 
 const ButtonContainer = styled.div`

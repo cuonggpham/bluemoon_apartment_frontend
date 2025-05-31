@@ -64,25 +64,25 @@ const weightStyles = {
 
 const colorStyles = {
   primary: css`
-    color: var(--color-grey-900);
+    color: var(--dashboard-text-primary);
   `,
   secondary: css`
-    color: var(--color-grey-700);
+    color: var(--dashboard-text-secondary);
   `,
   muted: css`
-    color: var(--color-grey-500);
+    color: var(--dashboard-text-muted);
   `,
   brand: css`
-    color: var(--color-brand-600);
+    color: var(--dashboard-primary);
   `,
   success: css`
-    color: var(--color-green-600);
+    color: var(--dashboard-success);
   `,
   warning: css`
-    color: var(--color-orange-600);
+    color: var(--dashboard-warning);
   `,
   danger: css`
-    color: var(--color-red-600);
+    color: var(--dashboard-error);
   `,
 };
 
@@ -100,13 +100,13 @@ const alignStyles = {
 
 const spacingStyles = {
   tight: css`
-    letter-spacing: -0.025em;
+    letter-spacing: var(--letter-spacing-tight);
   `,
   normal: css`
-    letter-spacing: -0.01em;
+    letter-spacing: var(--letter-spacing-normal);
   `,
   relaxed: css`
-    letter-spacing: 0;
+    letter-spacing: var(--letter-spacing-wide);
   `,
 };
 
@@ -133,7 +133,7 @@ const Heading = styled.h1.withConfig({
 })<HeadingProps>`
   margin: 0;
   padding: 0;
-  font-family: var(--font-family-sans);
+  font-family: var(--font-primary);
   
   /* Apply size styles */
   ${(props) => {
@@ -163,7 +163,7 @@ const Heading = styled.h1.withConfig({
   
   /* Apply spacing styles */
   ${(props) => {
-    const spacing = props.spacing || "normal";
+    const spacing = props.spacing || "tight";
     return spacingStyles[spacing];
   }}
   

@@ -1,21 +1,163 @@
+import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import anime from "animejs";
 import Row from "../../../components/Row";
 import Heading from "../../../components/Heading";
 import AddAndSearch from "../../../components/AddAndSearch";
 import StatisticsForm from "../../../features/statistics/StatisticsForm";
 import StatisticsTable from "../../../features/statistics/StatisticsTable";
-import { useState } from "react";
 
-export default function Apartments() {
-   const [keyword, setKeyword] = useState('');
+const PageContainer = styled.div`
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 32px rgba(0, 0, 0, 0.04),
+    0 2px 16px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+  margin: 1rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    margin: 0.5rem;
+  }
+`;
+
+const HeaderSection = styled.div`
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #a855f7, #9333ea);
+    border-radius: 2px;
+  }
+`;
+
+const StyledHeading = styled(Heading)`
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: var(--letter-spacing-tight);
+  margin-bottom: 0.5rem;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+
+  @media (max-width: 768px) {
+    font-size: var(--font-size-2xl);
+  }
+`;
+
+const Description = styled.p`
+  color: var(--dashboard-text-secondary);
+  font-size: var(--font-size-base);
+  margin: 0;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+`;
+
+const TableContainer = styled.div`
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 
+    0 2px 16px rgba(0, 0, 0, 0.03),
+    0 1px 8px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    box-shadow: 
+      0 4px 24px rgba(0, 0, 0, 0.05),
+      0 2px 12px rgba(0, 0, 0, 0.03);
+  }
+`;
+
+export default function Statistics() {
+  const [keyword, setKeyword] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Faster animations
+    anime({
+      targets: containerRef.current,
+      opacity: [0, 1],
+      translateY: [20, 0],
+      duration: 400,
+      easing: 'easeOutCubic',
+      delay: 100
+    });
+
+    anime({
+      targets: headerRef.current,
+      opacity: [0, 1],
+      translateX: [-20, 0],
+      duration: 350,
+      easing: 'easeOutCubic',
+      delay: 200
+    });
+
+    anime({
+      targets: tableRef.current,
+      opacity: [0, 1],
+      translateY: [30, 0],
+      duration: 300,
+      easing: 'easeOutCubic',
+      delay: 300
+    });
+  }, []);
+
   return (
-    <>
-      <Row type="horizontal">
-        <Heading as="h1">Statistics</Heading>
-        <AddAndSearch title="Add Appartment" setKeyword={setKeyword} keyword={keyword}>
-          <StatisticsForm />
-        </AddAndSearch>
-      </Row>
-      <StatisticsTable keyword={keyword}/>
-    </>
+    <PageContainer ref={containerRef}>
+      <HeaderSection ref={headerRef}>
+        <Row type="horizontal" justify="between" gap="lg">
+          <div>
+            <StyledHeading as="h1">Statistics & Reports</StyledHeading>
+            <Description>View detailed statistics and generate reports</Description>
+          </div>
+          <AddAndSearch title="Add Statistics" setKeyword={setKeyword} keyword={keyword}>
+            <StatisticsForm />
+          </AddAndSearch>
+        </Row>
+      </HeaderSection>
+
+      <TableContainer ref={tableRef}>
+        <StatisticsTable keyword={keyword}/>
+      </TableContainer>
+    </PageContainer>
   );
 }

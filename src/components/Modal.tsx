@@ -130,7 +130,7 @@ const Button = styled.button`
 `;
 
 const Title = styled.h2`
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
   color: var(--color-grey-900);
   margin: 0;

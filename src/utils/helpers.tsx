@@ -5,14 +5,11 @@ export function capitalize(input: string): string | null {
 
 export const formatFeeType = (feeType: string) => {
   switch (feeType) {
-    case "DepartmentFee":
-      return "Fee";
-    case "ContributionFund":
-      return "Fund";
-    // Thêm các trường hợp khác nếu cần
-    case "VehicleFee":
-      return "Vehicle Fee";
+    case "Mandatory":
+      return "Mandatory";
+    case "Voluntary":
+      return "Voluntary";
     default:
-      return feeType; // Giữ nguyên nếu không có mapping
+      return feeType; 
   }
 };

@@ -13,21 +13,46 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 const ChartBox = styled.div`
-  /* Box */
-  background-color: var(--color-grey-0);
-  border: 1px solid var(--color-grey-100);
-  border-radius: var(--border-radius-lg);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
   width: 100%;
-  padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition-fast);
+  padding: 1.5rem;
+  box-shadow: 
+    0 4px 32px rgba(0, 0, 0, 0.04),
+    0 2px 16px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: 
+      0 8px 40px rgba(0, 0, 0, 0.06),
+      0 4px 20px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+  }
+
+  &:hover::before {
+    opacity: 1;
   }
 
   & > *:first-child {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   & .recharts-pie-label-text {
@@ -35,11 +60,16 @@ const ChartBox = styled.div`
     font-size: 0.875rem;
   }
 
+  & .recharts-legend-item-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
   @media (max-width: 480px) {
-    padding: 1rem;
+    padding: 1.25rem;
     
     & > *:first-child {
-      margin-bottom: 0.75rem;
+      margin-bottom: 1rem;
     }
   }
 `;
@@ -116,15 +146,15 @@ export default function ResidentsChart() {
   const totalValue = data.reduce((total, entry) => total + entry.value, 0);
   return (
     <ChartBox>
-      <Heading as="h2">Residents Summary</Heading>
-      <ResponsiveContainer width="100%" height={200}>
+      <Heading as="h3">Residents Summary</Heading>
+      <ResponsiveContainer width="100%" height={150}>
         <PieChart>
           <Pie
             data={data}
             cx="35%"
             cy="50%"
-            innerRadius={65}
-            outerRadius={85}
+            innerRadius={50}
+            outerRadius={70}
             fill="#8884d8"
             paddingAngle={3}
             dataKey="value"
@@ -140,7 +170,7 @@ export default function ResidentsChart() {
             <Label
               value={totalValue}
               position="center"
-              fontSize={44}
+              fontSize={28}
               fontWeight="bold"
               fill="#333"
             />
@@ -150,13 +180,14 @@ export default function ResidentsChart() {
             verticalAlign="middle"
             align="right"
             layout="vertical"
-            iconSize={12}
-            width={120}
-            iconType="circle"
-            formatter={(value, entry, index) =>
-              `${entry.payload.status}: ${entry.payload.value}`
-            }
-          />
+            iconSize={10}
+            itemStyle={{ fontSize: '2.75rem' }}
+             width={120}
+             iconType="circle"
+             formatter={(value, entry, index) =>
+               `${entry.payload.status}: ${entry.payload.value}`
+             }
+           />
         </PieChart>
       </ResponsiveContainer>
     </ChartBox>
