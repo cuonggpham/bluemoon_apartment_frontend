@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import anime from "animejs";
+import { animate } from "animejs";
 import Card from "./Card";
 import { PiBuildingApartmentFill } from "react-icons/pi";
 import { MdFamilyRestroom } from "react-icons/md";
@@ -35,19 +35,19 @@ const CardsStyled = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--dashboard-text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, var(--dashboard-primary), var(--dashboard-accent));
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-tight);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 
   @media (max-width: 768px) {
-    font-size: var(--font-size-lg);
+    font-size: 1.25rem;
     margin-bottom: 1rem;
   }
 `;
@@ -107,13 +107,12 @@ export default function Cards() {
 
   useEffect(() => {
     if (!loading && cardsRef.current) {
-      anime({
-        targets: cardsRef.current,
+      animate(cardsRef.current, {
         opacity: [0, 1],
         translateY: [30, 0],
-        duration: 400,
+        duration: 600,
         easing: 'easeOutCubic',
-        delay: 150
+        delay: 400
       });
     }
   }, [loading]);

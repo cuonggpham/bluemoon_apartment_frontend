@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import anime from 'animejs';
+import { animate } from 'animejs';
 import Heading from '../../../components/Heading';
 import PaymentRecordForm from '../../../features/payment-records/PaymentRecordForm';
 import PaymentRecordTable from '../../../features/payment-records/PaymentRecordTable';
@@ -173,42 +173,49 @@ export default function PaymentRecording() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Faster animations
-    anime({
-      targets: containerRef.current,
-      opacity: [0, 1],
-      translateY: [20, 0],
-      duration: 400,
-      easing: 'easeOutCubic',
-      delay: 100
-    });
+    // Container animation
+    if (containerRef.current) {
+      animate(containerRef.current, {
+        translateY: [20, 0],
+        opacity: [0, 1],
+        duration: 400,
+        easing: 'easeOutCubic',
+        delay: 100
+      });
+    }
 
-    anime({
-      targets: headerRef.current,
-      opacity: [0, 1],
-      translateX: [-20, 0],
-      duration: 350,
-      easing: 'easeOutCubic',
-      delay: 200
-    });
+    // Header animation
+    if (headerRef.current) {
+      animate(headerRef.current, {
+        translateX: [-20, 0],
+        opacity: [0, 1],
+        duration: 350,
+        easing: 'easeOutCubic',
+        delay: 200
+      });
+    }
 
-    anime({
-      targets: tabContainerRef.current,
-      opacity: [0, 1],
-      scale: [0.95, 1],
-      duration: 300,
-      easing: 'easeOutCubic',
-      delay: 250
-    });
+    // Tab container animation
+    if (tabContainerRef.current) {
+      animate(tabContainerRef.current, {
+        scale: [0.95, 1],
+        opacity: [0, 1],
+        duration: 300,
+        easing: 'easeOutCubic',
+        delay: 250
+      });
+    }
 
-    anime({
-      targets: contentRef.current,
-      opacity: [0, 1],
-      translateY: [30, 0],
-      duration: 300,
-      easing: 'easeOutCubic',
-      delay: 300
-    });
+    // Content animation
+    if (contentRef.current) {
+      animate(contentRef.current, {
+        translateY: [30, 0],
+        opacity: [0, 1],
+        duration: 300,
+        easing: 'easeOutCubic',
+        delay: 300
+      });
+    }
   }, []);
 
   const handlePaymentSuccess = () => {

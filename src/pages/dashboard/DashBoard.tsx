@@ -6,6 +6,7 @@ import Resident from "./mainContent/Resident";
 import Statistics from "./mainContent/Statistics";
 import Vehicles from "./mainContent/Vehicles";
 import PaymentRecording from "./mainContent/PaymentRecording";
+import MonthlyFeeManagement from "./mainContent/MonthlyFeeManagement";
 import SideBar from "./sideBar/SideBar";
 import { Routes, Route } from "react-router-dom";
 import UtilityBills from "./mainContent/UtilityBills";
@@ -23,6 +24,7 @@ const DashBoard = () => {
           <Route path="/fee-and-fund" element={<FeesAndFunds />}></Route>
           <Route path="/vehicles" element={<Vehicles />}></Route>          
           <Route path="/payment-recording" element={<PaymentRecording />}></Route>
+          <Route path="/monthly-fee" element={<MonthlyFeeManagement />}></Route>
           <Route path="/statistics" element={<Statistics />}></Route>
           <Route path="/utility-bills" element={<UtilityBills />}></Route>
         </Routes>

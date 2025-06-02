@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { assets } from "../../../../assets/assets"
 import './TechMarquee.css'
-import anime from "animejs";
+import { animate, stagger } from "animejs";
 
 const TechMarquee = () => {
     const marqueeRef = useRef<HTMLDivElement>(null);
@@ -9,22 +9,22 @@ const TechMarquee = () => {
 
     useEffect(() => {
         // Title animation
-        anime({
-            targets: titleRef.current,
-            translateY: [30, 0],
-            opacity: [0, 1],
-            duration: 600,
-            easing: 'easeOutCubic',
-            delay: 2000
-        });
+        if (titleRef.current) {
+            animate(titleRef.current, {
+                translateY: [30, 0],
+                opacity: [0, 1],
+                duration: 600,
+                easing: 'easeOutCubic',
+                delay: 2000
+            });
+        }
 
         // Tech items animation
-        anime({
-            targets: '.tech__item',
+        animate('.tech__item', {
             translateY: [40, 0],
             opacity: [0, 1],
             duration: 500,
-            delay: anime.stagger(100, {start: 2200}),
+            delay: stagger(100, {start: 2200}),
             easing: 'easeOutCubic'
         });
 
@@ -32,8 +32,7 @@ const TechMarquee = () => {
         const techItems = document.querySelectorAll('.tech__item');
         techItems.forEach(item => {
             item.addEventListener('mouseenter', () => {
-                anime({
-                    targets: item,
+                animate(item, {
                     scale: 1.05,
                     duration: 200,
                     easing: 'easeOutCubic'
@@ -41,8 +40,7 @@ const TechMarquee = () => {
             });
 
             item.addEventListener('mouseleave', () => {
-                anime({
-                    targets: item,
+                animate(item, {
                     scale: 1,
                     duration: 200,
                     easing: 'easeOutCubic'

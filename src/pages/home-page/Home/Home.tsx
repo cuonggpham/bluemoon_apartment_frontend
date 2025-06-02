@@ -3,7 +3,7 @@ import { assets } from "../../../assets/assets";
 import TechMarquee from "../partials/TechMarquee";
 import "./home.css";
 import Typed from "typed.js";
-import anime from "animejs";
+import { animate, stagger } from "animejs";
 
 const Home = () => {
   const typedElement = useRef(null);
@@ -21,47 +21,46 @@ const Home = () => {
     });
 
     // Hero section entrance animations
-    anime({
-      targets: leftContentRef.current,
-      translateX: [-100, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: 'easeOutCubic',
-      delay: 800
-    });
+    if (leftContentRef.current) {
+      animate(leftContentRef.current, {
+        translateX: [-100, 0],
+        opacity: [0, 1],
+        duration: 1000,
+        easing: 'easeOutCubic',
+        delay: 800
+      });
+    }
 
-    anime({
-      targets: rightContentRef.current,
-      translateX: [100, 0],
-      opacity: [0, 1],
-      duration: 1000,
-      easing: 'easeOutCubic',
-      delay: 1000
-    });
+    if (rightContentRef.current) {
+      animate(rightContentRef.current, {
+        translateX: [100, 0],
+        opacity: [0, 1],
+        duration: 1000,
+        easing: 'easeOutCubic',
+        delay: 1000
+      });
+    }
 
     // Stagger animation for text elements
-    anime({
-      targets: '.left__title, .left__desc',
+    animate('.left__title, .left__desc', {
       translateY: [50, 0],
       opacity: [0, 1],
       duration: 800,
-      delay: anime.stagger(200, {start: 1200}),
+      delay: stagger(200, {start: 1200}),
       easing: 'easeOutCubic'
     });
 
     // Buttons animation
-    anime({
-      targets: '.button',
+    animate('.button', {
       scale: [0.8, 1],
       opacity: [0, 1],
       duration: 600,
-      delay: anime.stagger(150, {start: 1600}),
+      delay: stagger(150, {start: 1600}),
       easing: 'easeOutBack'
     });
 
     // Image floating animation
-    anime({
-      targets: '.right__img img',
+    animate('.right__img img', {
       translateY: [0, -20, 0],
       duration: 4000,
       loop: true,
@@ -72,8 +71,7 @@ const Home = () => {
     const buttons = document.querySelectorAll('.button');
     buttons.forEach(button => {
       button.addEventListener('mouseenter', () => {
-        anime({
-          targets: button,
+        animate(button, {
           scale: 1.05,
           translateY: -3,
           duration: 200,
@@ -82,8 +80,7 @@ const Home = () => {
       });
 
       button.addEventListener('mouseleave', () => {
-        anime({
-          targets: button,
+        animate(button, {
           scale: 1,
           translateY: 0,
           duration: 200,

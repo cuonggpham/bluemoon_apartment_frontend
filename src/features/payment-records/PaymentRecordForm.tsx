@@ -248,7 +248,7 @@ interface PaymentRecordFormProps {
 interface Fee {
   id: number;
   name: string;
-  unitPrice: number;
+  amount: number;
   feeTypeEnum: string;
   apartmentId?: number; // For mandatory fees
 }
@@ -561,7 +561,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
             <option value="">Select a fee item</option>
             {fees.map(fee => (
               <option key={fee.id} value={fee.id}>
-                {fee.name} - {formatCurrency(fee.unitPrice)} ({fee.feeTypeEnum})
+                {fee.name} - {formatCurrency(fee.amount)} ({fee.feeTypeEnum})
               </option>
             ))}
           </Select>
