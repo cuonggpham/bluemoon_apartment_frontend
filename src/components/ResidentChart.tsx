@@ -57,12 +57,25 @@ const ChartBox = styled.div`
 
   & .recharts-pie-label-text {
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 1.5rem;
+    fill: #111827;
   }
 
   & .recharts-legend-item-text {
-    font-size: 0.875rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    fill: #374151 !important;
+  }
+
+  & .recharts-tooltip-wrapper {
+    font-size: 1rem;
     font-weight: 500;
+  }
+
+  & .recharts-legend-item {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
   }
 
   @media (max-width: 480px) {
@@ -70,6 +83,14 @@ const ChartBox = styled.div`
     
     & > *:first-child {
       margin-bottom: 1rem;
+    }
+
+    & .recharts-pie-label-text {
+      font-size: 0.875rem;
+    }
+
+    & .recharts-legend-item-text {
+      font-size: 0.875rem;
     }
   }
 `;
@@ -170,23 +191,41 @@ export default function ResidentsChart() {
             <Label
               value={totalValue}
               position="center"
-              fontSize={28}
+              fontSize={32}
               fontWeight="bold"
-              fill="#333"
+              fill="#111827"
             />
           </Pie>
-          <Tooltip />
+          <Tooltip 
+            contentStyle={{
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              fontWeight: '500',
+              color: '#111827'
+            }}
+          />
           <Legend
             verticalAlign="middle"
             align="right"
             layout="vertical"
-            iconSize={10}
-            itemStyle={{ fontSize: '2.75rem' }}
+            iconSize={12}
+            wrapperStyle={{ 
+              fontSize: '1rem', 
+              fontWeight: '600', 
+              color: '#374151' 
+            }}
              width={120}
              iconType="circle"
-             formatter={(value, entry, index) =>
-               `${entry.payload.status}: ${entry.payload.value}`
-             }
+             formatter={(value: any) => {
+               // Find the data entry that matches this legend value
+               const dataEntry = data.find(item => item.status === value);
+               if (dataEntry) {
+                 return `${value}: ${dataEntry.value}`;
+               }
+               return value;
+             }}
            />
         </PieChart>
       </ResponsiveContainer>

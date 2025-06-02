@@ -11,78 +11,78 @@ interface HeadingProps {
 
 const sizeStyles = {
   xs: css`
-    font-size: var(--font-size-xs);
-    line-height: var(--line-height-tight);
+    font-size: 0.75rem;
+    line-height: 1.2;
   `,
   sm: css`
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-tight);
+    font-size: 0.875rem;
+    line-height: 1.25;
   `,
   base: css`
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-normal);
+    font-size: 1rem;
+    line-height: 1.5;
   `,
   lg: css`
-    font-size: var(--font-size-lg);
-    line-height: var(--line-height-normal);
+    font-size: 1.125rem;
+    line-height: 1.4;
   `,
   xl: css`
-    font-size: var(--font-size-xl);
-    line-height: var(--line-height-tight);
+    font-size: 1.25rem;
+    line-height: 1.3;
   `,
   "2xl": css`
-    font-size: var(--font-size-2xl);
-    line-height: var(--line-height-tight);
+    font-size: 1.5rem;
+    line-height: 1.2;
   `,
   "3xl": css`
-    font-size: var(--font-size-3xl);
-    line-height: var(--line-height-tight);
+    font-size: 1.875rem;
+    line-height: 1.1;
   `,
   "4xl": css`
-    font-size: var(--font-size-4xl);
-    line-height: var(--line-height-tight);
+    font-size: 2.25rem;
+    line-height: 1.1;
   `,
 };
 
 const weightStyles = {
   normal: css`
-    font-weight: var(--font-weight-normal);
+    font-weight: 400;
   `,
   medium: css`
-    font-weight: var(--font-weight-medium);
+    font-weight: 500;
   `,
   semibold: css`
-    font-weight: var(--font-weight-semibold);
+    font-weight: 600;
   `,
   bold: css`
-    font-weight: var(--font-weight-bold);
+    font-weight: 700;
   `,
   extrabold: css`
-    font-weight: var(--font-weight-extrabold);
+    font-weight: 800;
   `,
 };
 
 const colorStyles = {
   primary: css`
-    color: var(--dashboard-text-primary);
+    color: #111827;
   `,
   secondary: css`
-    color: var(--dashboard-text-secondary);
+    color: #374151;
   `,
   muted: css`
-    color: var(--dashboard-text-muted);
+    color: #6b7280;
   `,
   brand: css`
-    color: var(--dashboard-primary);
+    color: #3b82f6;
   `,
   success: css`
-    color: var(--dashboard-success);
+    color: #059669;
   `,
   warning: css`
-    color: var(--dashboard-warning);
+    color: #d97706;
   `,
   danger: css`
-    color: var(--dashboard-error);
+    color: #dc2626;
   `,
 };
 
@@ -100,20 +100,20 @@ const alignStyles = {
 
 const spacingStyles = {
   tight: css`
-    letter-spacing: var(--letter-spacing-tight);
+    letter-spacing: -0.025em;
   `,
   normal: css`
-    letter-spacing: var(--letter-spacing-normal);
+    letter-spacing: 0;
   `,
   relaxed: css`
-    letter-spacing: var(--letter-spacing-wide);
+    letter-spacing: 0.05em;
   `,
 };
 
 const defaultSizesByTag = {
   h1: "2xl",
-  h2: "lg",
-  h3: "base",
+  h2: "xl",
+  h3: "lg",
   h4: "base",
   h5: "sm",
   h6: "xs",
@@ -133,7 +133,7 @@ const Heading = styled.h1.withConfig({
 })<HeadingProps>`
   margin: 0;
   padding: 0;
-  font-family: var(--font-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   
   /* Apply size styles */
   ${(props) => {

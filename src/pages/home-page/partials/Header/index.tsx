@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import anime from 'animejs';
+import { animate, stagger } from 'animejs';
 import './Header.css'
 
 const handleClickLogo = () => {
@@ -16,32 +16,33 @@ const Header = () => {
 
     useEffect(() => {
         // Header entrance animation
-        anime({
-            targets: headerRef.current,
-            translateY: [-50, 0],
-            opacity: [0, 1],
-            duration: 800,
-            easing: 'easeOutCubic',
-            delay: 200
-        });
+        if (headerRef.current) {
+            animate(headerRef.current, {
+                translateY: [-50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                easing: 'easeOutCubic',
+                delay: 200
+            });
+        }
 
         // Logo animation
-        anime({
-            targets: logoRef.current,
-            scale: [0.8, 1],
-            opacity: [0, 1],
-            duration: 600,
-            easing: 'easeOutBack',
-            delay: 400
-        });
+        if (logoRef.current) {
+            animate(logoRef.current, {
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 600,
+                easing: 'easeOutBack',
+                delay: 400
+            });
+        }
 
         // Menu items stagger animation
-        anime({
-            targets: '.item-menu',
+        animate('.item-menu', {
             translateY: [-30, 0],
             opacity: [0, 1],
             duration: 500,
-            delay: anime.stagger(100, {start: 600}),
+            delay: stagger(100, {start: 600}),
             easing: 'easeOutCubic'
         });
 
@@ -49,8 +50,7 @@ const Header = () => {
         const menuItems = document.querySelectorAll('.item-menu');
         menuItems.forEach(item => {
             item.addEventListener('mouseenter', () => {
-                anime({
-                    targets: item,
+                animate(item, {
                     scale: 1.05,
                     duration: 200,
                     easing: 'easeOutCubic'
@@ -58,8 +58,7 @@ const Header = () => {
             });
 
             item.addEventListener('mouseleave', () => {
-                anime({
-                    targets: item,
+                animate(item, {
                     scale: 1,
                     duration: 200,
                     easing: 'easeOutCubic'
@@ -70,23 +69,25 @@ const Header = () => {
         // Logo hover animation
         if (logoRef.current) {
             logoRef.current.addEventListener('mouseenter', () => {
-                anime({
-                    targets: logoRef.current,
-                    rotate: [0, 5],
-                    scale: 1.05,
-                    duration: 300,
-                    easing: 'easeOutCubic'
-                });
+                if (logoRef.current) {
+                    animate(logoRef.current, {
+                        rotate: [0, 5],
+                        scale: 1.05,
+                        duration: 300,
+                        easing: 'easeOutCubic'
+                    });
+                }
             });
 
             logoRef.current.addEventListener('mouseleave', () => {
-                anime({
-                    targets: logoRef.current,
-                    rotate: [5, 0],
-                    scale: 1,
-                    duration: 300,
-                    easing: 'easeOutCubic'
-                });
+                if (logoRef.current) {
+                    animate(logoRef.current, {
+                        rotate: [5, 0],
+                        scale: 1,
+                        duration: 300,
+                        easing: 'easeOutCubic'
+                    });
+                }
             });
         }
     }, []);

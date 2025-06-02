@@ -29,19 +29,25 @@ const DetailsButton = styled.button`
 `;
 
 export default function FeeAndFundRow({ feeOrFund }: any) {
-  const { id, name, description, unitPrice, feeTypeEnum, apartmentId } = feeOrFund;
+  const { id, name, description, amount, feeTypeEnum, apartmentId } = feeOrFund;
 
   const statusStyled = {
     Mandatory: "pink",
     Voluntary: "green",
+    VEHICLE_PARKING: "blue",
+    FLOOR_AREA: "indigo",
+    MANAGEMENT_FEE: "yellow",
+    MAINTENANCE_FEE: "orange",
+    SECURITY_FEE: "red",
+    CLEANING_FEE: "teal",
   };
   return (
     <Table.Row>
       <div>{id}</div>
       <div>{name}</div>
       <div>{description}</div>
-      <div>{unitPrice}</div>
-      <div>{feeTypeEnum === "Mandatory" ? (apartmentId || "N/A") : "-"}</div>
+      <div>{amount}</div>
+      <div>{apartmentId || "N/A"}</div>
       <Tag type={statusStyled[feeTypeEnum as keyof typeof statusStyled] || "gray"}>{formatFeeType(feeTypeEnum)}</Tag>
       <Modal>
         <Modal.Open id="details">

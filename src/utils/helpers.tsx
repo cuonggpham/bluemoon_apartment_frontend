@@ -5,11 +5,19 @@ export function capitalize(input: string): string | null {
 
 export const formatFeeType = (feeType: string) => {
   switch (feeType) {
-    case "Mandatory":
+    case "MANDATORY":
       return "Mandatory";
-    case "Voluntary":
+    case "VOLUNTARY":
       return "Voluntary";
+    case "VEHICLE_PARKING":
+      return "Vehicle Parking";
+    case "FLOOR_AREA":
+      return "Floor Area";
     default:
-      return feeType; 
+      // Convert UPPERCASE_WITH_UNDERSCORE to Title Case
+      return feeType
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
   }
 };

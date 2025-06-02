@@ -217,6 +217,10 @@ export const GlobalStyles = createGlobalStyle`
   --color-indigo-500: #6366f1;
   --color-indigo-700: #4338ca;
 
+  --color-teal-100: #ccfbf1;
+  --color-teal-500: #14b8a6;
+  --color-teal-700: #0f766e;
+
   /* Image filters */
   --image-grayscale: 0;
   --image-opacity: 100%;

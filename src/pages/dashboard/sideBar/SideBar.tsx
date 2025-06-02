@@ -35,6 +35,7 @@ const SideBar = () => {
     { path: "/dashboard/vehicles", icon: "bx bxs-car", name: "Vehicle Management", tooltip: "Vehicle Management" },
     { path: "/dashboard/fee-and-fund", icon: "bx bx-money-withdraw", name: "Fee and Fund", tooltip: "Fee and Fund" },
     { path: "/dashboard/payment-recording", icon: "bx bx-credit-card", name: "Payment Recording", tooltip: "Payment Recording" },
+    { path: "/dashboard/monthly-fee", icon: "bx bx-receipt", name: "Monthly Fee Management", tooltip: "Monthly Fee Management" },
     { path: "/dashboard/statistics", icon: "bx bx-folder", name: "Statistics", tooltip: "Statistics" },
     { path: "/dashboard/utility-bills", icon: "bx bxs-bolt", name: "Utility Bills", tooltip: "Utility Bills" },
   ];

@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import styled from "styled-components";
-import anime from "animejs";
+import { animate } from "animejs";
 import Heading from "../../../components/Heading";
 import { FcCalendar } from "react-icons/fc";
 import Cards from "../../../components/Cards";
@@ -9,21 +9,22 @@ import ApartmentChart from "../../../components/ApartmentChart";
 import ResidentsChart from "../../../components/ResidentChart";
 
 const StyledHeading = styled(Heading)`
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: black;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #111827;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
 
   @media (max-width: 768px) {
-    font-size: var(--font-size-2xl);
+    font-size: 2rem;
   }
 `;
 
 const CalendarStyled = styled.label`
-  font-size: var(--font-size-sm);
+  font-size: 1rem;
+  font-weight: 600;
   padding: 0.75rem 1rem;
   text-align: center;
-  font-weight: var(--font-weight-semibold);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -35,7 +36,7 @@ const CalendarStyled = styled.label`
   gap: 0.5rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: var(--dashboard-text-primary);
+  color: #1f2937;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
@@ -54,9 +55,10 @@ const CalendarStyled = styled.label`
 
   &:hover {
     background: rgba(255, 255, 255, 0.95);
-    border-color: var(--dashboard-border-focus);
+    border-color: #3b82f6;
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+    color: #111827;
   }
 
   &:hover::before {
@@ -64,14 +66,14 @@ const CalendarStyled = styled.label`
   }
 
   @media (max-width: 480px) {
-    font-size: var(--font-size-xs);
+    font-size: 0.875rem;
     padding: 0.5rem 0.75rem;
     gap: 0.25rem;
   }
 `;
 
 const WelcomeCard = styled.div`
-  background: linear-gradient(135deg, var(--dashboard-primary), var(--dashboard-primary-dark));
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   padding: 2rem;
   border-radius: 16px;
@@ -93,31 +95,34 @@ const WelcomeCard = styled.div`
   }
 
   h2 {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
+    font-size: 2.375rem;
+    font-weight: 700;
     margin-bottom: 0.5rem;
     position: relative;
     z-index: 1;
-    line-height: var(--line-height-tight);
+    line-height: 1.2;
+    color:white;
   }
 
   p {
-    font-size: var(--font-size-base);
-    opacity: 0.9;
+    font-size: 1.525rem;
+    font-weight: 500;
+    opacity: 0.95;
     position: relative;
     z-index: 1;
-    line-height: var(--line-height-normal);
+    line-height: 1.4;
+    color:white;
   }
 
   @media (max-width: 768px) {
     padding: 1.5rem;
     
     h2 {
-      font-size: var(--font-size-xl);
+      font-size: 1.5rem;
     }
     
     p {
-      font-size: var(--font-size-sm);
+      font-size: 1rem;
     }
   }
 `;
@@ -232,44 +237,48 @@ export default function Overview() {
 
   useEffect(() => {
     // Faster container entrance animation
-    anime({
-      targets: containerRef.current,
-      opacity: [0, 1],
-      translateY: [20, 0],
-      duration: 400,
-      easing: 'easeOutCubic',
-      delay: 100
-    });
+    if (containerRef.current) {
+      animate(containerRef.current, {
+        opacity: [0, 1],
+        translateY: [20, 0],
+        duration: 400,
+        easing: 'easeOutCubic',
+        delay: 100
+      });
+    }
 
     // Faster welcome card animation
-    anime({
-      targets: welcomeRef.current,
-      opacity: [0, 1],
-      translateX: [-30, 0],
-      duration: 350,
-      easing: 'easeOutCubic',
-      delay: 200
-    });
+    if (welcomeRef.current) {
+      animate(welcomeRef.current, {
+        opacity: [0, 1],
+        translateX: [-30, 0],
+        duration: 350,
+        easing: 'easeOutCubic',
+        delay: 200
+      });
+    }
 
     // Faster cards section animation
-    anime({
-      targets: cardsRef.current,
-      opacity: [0, 1],
-      translateY: [30, 0],
-      duration: 300,
-      easing: 'easeOutCubic',
-      delay: 250
-    });
+    if (cardsRef.current) {
+      animate(cardsRef.current, {
+        opacity: [0, 1],
+        translateY: [30, 0],
+        duration: 300,
+        easing: 'easeOutCubic',
+        delay: 250
+      });
+    }
 
     // Faster charts section animation
-    anime({
-      targets: chartsRef.current,
-      opacity: [0, 1],
-      translateY: [40, 0],
-      duration: 300,
-      easing: 'easeOutCubic',
-      delay: 300
-    });
+    if (chartsRef.current) {
+      animate(chartsRef.current, {
+        opacity: [0, 1],
+        translateY: [40, 0],
+        duration: 300,
+        easing: 'easeOutCubic',
+        delay: 300
+      });
+    }
   }, []);
 
   return (

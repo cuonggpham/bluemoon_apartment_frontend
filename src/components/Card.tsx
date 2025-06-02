@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 import styled from "styled-components";
-import anime from "animejs";
+import { animate, utils } from "animejs";
 
 const CardStyled = styled.div`
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  color: var(--dashboard-text-primary);
+  color: #111827;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   padding: 1.5rem;
@@ -182,47 +182,47 @@ const Icon = styled.div<{ color: string }>`
 `;
 
 const Title = styled.p`
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--dashboard-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
   margin: 0;
   grid-column: 1;
   grid-row: 1;
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  line-height: var(--line-height-tight);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
 
   @media (max-width: 480px) {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 `;
 
 const Value = styled.div`
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-extrabold);
-  line-height: var(--line-height-tight);
-  color: var(--dashboard-text-primary);
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #111827;
   margin: 0;
   grid-column: 1;
   grid-row: 2;
   display: flex;
   align-items: center;
-  letter-spacing: var(--letter-spacing-tight);
+  letter-spacing: -0.025em;
 
   @media (max-width: 480px) {
-    font-size: var(--font-size-2xl);
+    font-size: 1.875rem;
   }
 `;
 
 const Description = styled.span`
   display: block;
   font-size: 0.6rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--dashboard-text-muted);
+  font-weight: 500;
+  color: #6b7280;
   text-align: center;
   margin-top: 0.375rem;
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-wide);
+  line-height: 1.2;
+  letter-spacing: 0.05em;
 
   @media (max-width: 480px) {
     font-size: 0.55rem;
@@ -289,14 +289,13 @@ export default function Card({
 
   useEffect(() => {
     if (cardRef.current) {
-      anime({
-        targets: cardRef.current,
+      animate(cardRef.current, {
         opacity: [0, 1],
         translateY: [20, 0],
         scale: [0.95, 1],
         duration: 400,
         easing: 'easeOutCubic',
-        delay: anime.random(0, 200)
+        delay: utils.random(0, 200)
       });
     }
   }, []);

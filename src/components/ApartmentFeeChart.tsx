@@ -15,45 +15,63 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 const ChartBox = styled.div`
-  background-color: var(--color-grey-0);
-  border: 1px solid var(--color-grey-100);
-  border-radius: var(--border-radius-lg);
-  padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition-fast);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  width: 100%;
+  padding: 1.5rem;
+  box-shadow: 
+    0 4px 32px rgba(0, 0, 0, 0.04),
+    0 2px 16px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: 
+      0 8px 40px rgba(0, 0, 0, 0.06),
+      0 4px 20px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+  }
+
+  &:hover::before {
+    opacity: 1;
   }
 
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   margin: 1rem 0;
 
   @media (max-width: 480px) {
-    padding: 1rem;
-    gap: 0.75rem;
+    padding: 1.25rem;
+    gap: 1rem;
   }
 `;
 
-const feeData = [
-  { month: "January", fees_due: 5641.87, fees_collected: 6356.75 },
-  { month: "February", fees_due: 5020.84, fees_collected: 6901.61 },
-  { month: "March", fees_due: 6029.0, fees_collected: 4459.96 },
-  { month: "April", fees_due: 9475.39, fees_collected: 5120.06 },
-  { month: "May", fees_due: 6834.72, fees_collected: 4426.51 },
-  { month: "June", fees_due: 5634.86, fees_collected: 7829.25 },
-  // { month: "July", fees_due: 6739.51, fees_collected: 8653.55 },
-  // { month: "August", fees_due: 5400.8, fees_collected: 8930.17 },
-  // { month: "September", fees_due: 9009.9, fees_collected: 6848.28 },
-  // { month: "October", fees_due: 5958.21, fees_collected: 5051.16 },
-  // { month: "November", fees_due: 9963.78, fees_collected: 4151.07 },
-  // { month: "December", fees_due: 6525.44, fees_collected: 4271.92 },
-];
+interface PaymentRecord {
+  month: string;
+  totalAmount: number;
+  recordCount: number;
+}
 
 export default function ApartmentFeeChart() {
-  const [paymentData, setPaymentData] = useState([]);
+  const [paymentData, setPaymentData] = useState<PaymentRecord[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,7 +92,7 @@ export default function ApartmentFeeChart() {
         }
         
         // Group payment records by month and calculate totals
-        const monthlyData = records.reduce((acc: any, record: any) => {
+        const monthlyData = records.reduce((acc: Record<string, PaymentRecord>, record: any) => {
           const date = new Date(record.paymentDate);
           const monthKey = date.toLocaleString('default', { month: 'long', year: 'numeric' });
           
@@ -93,7 +111,7 @@ export default function ApartmentFeeChart() {
         }, {});
         
         // Convert to array and take last 6 months
-        const chartData = Object.values(monthlyData).slice(-6);
+        const chartData = Object.values(monthlyData).slice(-6) as PaymentRecord[];
         setPaymentData(chartData);
       } catch (err) {
         console.error("Error fetching payment records", err);
@@ -108,7 +126,10 @@ export default function ApartmentFeeChart() {
   const maxValue = calculateMaxValue(paymentData, 1000000); // Round and divide by 1 million
 
   // Function to format value in millions
-  const formatValue = (value: number) => `${(value / 1000000).toFixed(2)}M`;
+  const formatValue = (value: number | string) => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    return `${(numValue / 1000000).toFixed(2)}M`;
+  };
   return (
     <ChartBox>
       <Heading as="h2">Payment Records Chart</Heading>
@@ -122,11 +143,12 @@ export default function ApartmentFeeChart() {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis 
             dataKey="month" 
-            fontSize={12}
-            stroke="#64748b"
+            fontSize={14}
+            fontWeight={500}
+            stroke="#374151"
           />
           <YAxis
             yAxisId="left"
@@ -134,18 +156,27 @@ export default function ApartmentFeeChart() {
             stroke="#c084fc"
             domain={[0, maxValue]}
             tickFormatter={formatValue}
-            fontSize={12}
+            fontSize={14}
+            fontWeight={500}
           />
           <Tooltip 
-            formatter={(value) => formatValue(value)}
+            formatter={(value: any) => formatValue(value)}
             contentStyle={{
-              backgroundColor: 'var(--color-grey-0)',
-              border: '1px solid var(--color-grey-200)',
-              borderRadius: 'var(--border-radius-md)',
-              fontSize: '0.875rem'
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              fontWeight: '500',
+              color: '#111827'
             }}
           />
-          <Legend fontSize={12} />
+          <Legend 
+            fontSize={14}
+            wrapperStyle={{ 
+              fontWeight: '600', 
+              color: '#374151' 
+            }}
+          />
           <Bar
             yAxisId="left"
             dataKey="totalAmount"
@@ -157,7 +188,9 @@ export default function ApartmentFeeChart() {
               dataKey="totalAmount"
               position="top"
               formatter={formatValue}
-              fontSize={10}
+              fontSize={12}
+              fontWeight={600}
+              fill="#374151"
             />
           </Bar>
           <Bar
@@ -170,7 +203,9 @@ export default function ApartmentFeeChart() {
             <LabelList
               dataKey="recordCount"
               position="top"
-              fontSize={10}
+              fontSize={12}
+              fontWeight={600}
+              fill="#374151"
             />
           </Bar>
         </RechartsBarChart>
@@ -180,9 +215,9 @@ export default function ApartmentFeeChart() {
 }
 
 // Function to calculate max value and divide by 1 million
-const calculateMaxValue = (data, roundTo = 1000000) => {
+const calculateMaxValue = (data: PaymentRecord[], roundTo = 1000000) => {
   const maxValue = Math.max(
-    ...data.flatMap((item) => [
+    ...data.flatMap((item: PaymentRecord) => [
       item.totalAmount || 0
     ])
   );

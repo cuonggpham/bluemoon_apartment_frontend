@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import anime from 'animejs';
+import { animate, stagger } from 'animejs';
 import PaymentRecordForm from '../../../features/payment-records/PaymentRecordForm';
 import PaymentRecordTable from '../../../features/payment-records/PaymentRecordTable';
 
@@ -162,32 +162,35 @@ export default function FeePayment() {
 
   useEffect(() => {
     // Faster animations
-    anime({
-      targets: containerRef.current,
-      opacity: [0, 1],
-      translateY: [20, 0],
-      duration: 400,
-      easing: 'easeOutCubic',
-      delay: 100
-    });
+    if (containerRef.current) {
+      animate(containerRef.current, {
+        opacity: [0, 1],
+        translateY: [20, 0],
+        duration: 400,
+        easing: 'easeOutCubic',
+        delay: 100
+      });
+    }
 
-    anime({
-      targets: headerRef.current,
-      opacity: [0, 1],
-      translateX: [-20, 0],
-      duration: 350,
-      easing: 'easeOutCubic',
-      delay: 200
-    });
+    if (headerRef.current) {
+      animate(headerRef.current, {
+        opacity: [0, 1],
+        translateX: [-20, 0],
+        duration: 350,
+        easing: 'easeOutCubic',
+        delay: 200
+      });
+    }
 
-    anime({
-      targets: tabContainerRef.current,
-      opacity: [0, 1],
-      translateY: [30, 0],
-      duration: 300,
-      easing: 'easeOutCubic',
-      delay: 300
-    });
+    if (tabContainerRef.current) {
+      animate(tabContainerRef.current, {
+        opacity: [0, 1],
+        translateY: [30, 0],
+        duration: 300,
+        easing: 'easeOutCubic',
+        delay: 300
+      });
+    }
   }, []);
 
   const handlePaymentSuccess = () => {

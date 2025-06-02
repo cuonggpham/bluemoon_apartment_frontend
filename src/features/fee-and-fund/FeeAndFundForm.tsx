@@ -12,8 +12,8 @@ import { toast } from "react-toastify";
 export default function FeeAndFundForm({ feeOrFund }: any) {  const [formValues, setFormValues] = useState({
     id: feeOrFund?.id || "",
     name: feeOrFund?.name || "",
-    unitPrice: feeOrFund?.unitPrice || "",
     description: feeOrFund?.description || "",
+    amount: feeOrFund?.amount || "",
     feeTypeEnum: feeOrFund?.feeTypeEnum || "",
     apartmentId: feeOrFund?.apartmentId || "",
     createdAt: feeOrFund?.createdAt || "",
@@ -48,8 +48,8 @@ export default function FeeAndFundForm({ feeOrFund }: any) {  const [formValues,
     e.preventDefault();    const data = {
       id: feeOrFund.id,
       name: formValues.name,
-      unitPrice: formValues.unitPrice,
       description: formValues.description,
+      amount: formValues.amount,
       feeTypeEnum: formValues.feeTypeEnum,
       apartmentId: formValues.feeTypeEnum === "Mandatory" ? formValues.apartmentId : null,
     };
@@ -88,8 +88,8 @@ export default function FeeAndFundForm({ feeOrFund }: any) {  const [formValues,
     e.preventDefault();
       const data = {
       name: formValues.name,
-      unitPrice: formValues.unitPrice,
       description: formValues.description,
+      amount: formValues.amount,
       feeTypeEnum: formValues.feeTypeEnum,
       apartmentId: formValues.feeTypeEnum === "Mandatory" ? formValues.apartmentId : null,
     };
@@ -140,11 +140,11 @@ export default function FeeAndFundForm({ feeOrFund }: any) {  const [formValues,
       </FormField>
 
       <FormField>
-        <FormField.Label label={"Unit Price"} />
+        <FormField.Label label={"Amount"} />
         <FormField.Input
-          id="unitPrice"
-          type="text"
-          value={formValues.unitPrice}
+          id="amount"
+          type="number"
+          value={formValues.amount}
           onChange={handleChange}
         />
       </FormField>
