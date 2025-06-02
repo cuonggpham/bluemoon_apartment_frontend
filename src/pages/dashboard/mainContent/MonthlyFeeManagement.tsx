@@ -150,7 +150,7 @@ const Label = styled.label`
   margin-bottom: 0.5rem;
   font-weight: 600;
   color: #111827;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
 `;
 
 const Input = styled.input`
@@ -158,7 +158,7 @@ const Input = styled.input`
   padding: 0.75rem 1rem;
   border: 1px solid rgba(229, 231, 235, 0.8);
   border-radius: 8px;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
@@ -181,7 +181,7 @@ const Select = styled.select`
   padding: 0.75rem 1rem;
   border: 1px solid rgba(229, 231, 235, 0.8);
   border-radius: 8px;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   cursor: pointer;
@@ -247,14 +247,30 @@ const Button = styled.button`
   }
 `;
 
+// Standardized table components that match other pages
+const TableContainer = styled.div`
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 
+    0 2px 16px rgba(0, 0, 0, 0.03),
+    0 1px 8px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 1.5rem;
+
+  &:hover {
+    box-shadow: 
+      0 4px 24px rgba(0, 0, 0, 0.05),
+      0 2px 12px rgba(0, 0, 0, 0.03);
+  }
+`;
+
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.02);
 `;
 
 const Th = styled.th`
@@ -265,6 +281,12 @@ const Th = styled.th`
   font-weight: 600;
   color: #111827;
   font-size: var(--font-size-sm);
+  line-height: 1.4;
+
+  @media (max-width: 768px) {
+    padding: 0.75rem 0.5rem;
+    font-size: var(--font-size-xs);
+  }
 `;
 
 const Td = styled.td`
@@ -272,12 +294,57 @@ const Td = styled.td`
   border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   font-size: var(--font-size-sm);
   color: #1f2937;
+  line-height: 1.4;
+  vertical-align: middle;
+
+  @media (max-width: 768px) {
+    padding: 0.75rem 0.5rem;
+    font-size: var(--font-size-xs);
+  }
+`;
+
+// Standardized action button for tables
+const ActionButton = styled.button<{ variant?: 'danger' | 'warning' | 'success' }>`
+  background: ${props => {
+    switch (props.variant) {
+      case 'danger': return 'linear-gradient(135deg, #ef4444, #dc2626)';
+      case 'warning': return 'linear-gradient(135deg, #f59e0b, #d97706)';
+      case 'success': return 'linear-gradient(135deg, #10b981, #059669)';
+      default: return 'linear-gradient(135deg, #6366f1, #4f46e5)';
+    }
+  }};
+  color: white;
+  border: none;
+  padding: 0.5rem 0.875rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.7rem;
+  }
 `;
 
 const StatusBadge = styled.span<{ status: 'active' | 'inactive' }>`
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   background: ${props => props.status === 'active' ? 
     'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(21, 128, 61, 0.1))' : 
@@ -285,6 +352,12 @@ const StatusBadge = styled.span<{ status: 'active' | 'inactive' }>`
   color: ${props => props.status === 'active' ? '#15803d' : '#b91c1c'};
   border: 1px solid ${props => props.status === 'active' ? 
     'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
 `;
 
 const SectionTitle = styled.h3`
@@ -348,6 +421,105 @@ const ActionButtonGroup = styled.div`
   }
 `;
 
+const EmptyState = styled.div`
+  text-align: center;
+  color: #6b7280;
+  padding: 3rem 2rem;
+  font-size: var(--font-size-sm);
+  
+  @media (max-width: 768px) {
+    padding: 2rem 1rem;
+  }
+`;
+
+const ConfigFormContainer = styled.div`
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+
+// Styled button for forms with variant support
+const FormButton = styled.button<{ variant?: 'primary' | 'secondary' | 'success' | 'danger' }>`
+  background: ${props => {
+    switch (props.variant) {
+      case 'secondary': return 'linear-gradient(135deg, #6b7280, #4b5563)';
+      case 'success': return 'linear-gradient(135deg, #10b981, #059669)';
+      case 'danger': return 'linear-gradient(135deg, #ef4444, #dc2626)';
+      default: return 'linear-gradient(135deg, #6366f1, #4f46e5)';
+    }
+  }};
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: ${props => {
+      switch (props.variant) {
+        case 'secondary': return 'linear-gradient(135deg, #4b5563, #374151)';
+        case 'success': return 'linear-gradient(135deg, #059669, #047857)';
+        case 'danger': return 'linear-gradient(135deg, #dc2626, #b91c1c)';
+        default: return 'linear-gradient(135deg, #4f46e5, #4338ca)';
+      }
+    }};
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:disabled {
+    background: var(--dashboard-text-muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &:disabled::before {
+    display: none;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+`;
+
+const FormButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+`;
+
 type TabType = 'generation' | 'fees' | 'payments' | 'parking-config' | 'floor-area-config';
 
 const MonthlyFeeManagement: React.FC = () => {
@@ -399,7 +571,7 @@ const MonthlyFeeManagement: React.FC = () => {
       animate(containerRef.current, {
         opacity: [0, 1],
         translateY: [20, 0],
-        duration: 400,
+        duration: 600,
         easing: 'easeOutCubic',
         delay: 100
       });
@@ -409,7 +581,7 @@ const MonthlyFeeManagement: React.FC = () => {
       animate(headerRef.current, {
         opacity: [0, 1],
         translateX: [-20, 0],
-        duration: 350,
+        duration: 500,
         easing: 'easeOutCubic',
         delay: 200
       });
@@ -419,12 +591,12 @@ const MonthlyFeeManagement: React.FC = () => {
       animate(tabContentRef.current, {
         opacity: [0, 1],
         translateY: [30, 0],
-        duration: 300,
+        duration: 400,
         easing: 'easeOutCubic',
         delay: 300
       });
     }
-  }, []);
+  }, [activeTab]);
 
   // Re-animate tab content when switching tabs
   useEffect(() => {
@@ -669,16 +841,6 @@ const MonthlyFeeManagement: React.FC = () => {
     loading: boolean;
   }
 
-  const ConfigFormContainer = styled.div`
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    border-radius: 16px;
-    padding: 2rem;
-    margin: 1.5rem 0;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  `;
-
   const FloorAreaConfigForm: React.FC<FloorAreaConfigFormProps> = ({ 
     config, 
     onSave, 
@@ -785,7 +947,7 @@ const MonthlyFeeManagement: React.FC = () => {
                 padding: '0.75rem',
                 border: '1px solid #d1d5db',
                 borderRadius: '8px',
-                fontSize: '0.875rem',
+                fontSize: 'var(--font-size-base)',
                 resize: 'vertical',
                 minHeight: '80px'
               }}
@@ -797,7 +959,7 @@ const MonthlyFeeManagement: React.FC = () => {
           </FormGroup>
 
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', margin: '1.5rem 0' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: 'var(--font-size-sm)' }}>
               <input
                 type="checkbox"
                 checked={formData.isActive}
@@ -806,7 +968,7 @@ const MonthlyFeeManagement: React.FC = () => {
               Active
             </label>
             
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: 'var(--font-size-sm)' }}>
               <input
                 type="checkbox"
                 checked={formData.isAutoGenerated}
@@ -859,26 +1021,22 @@ const MonthlyFeeManagement: React.FC = () => {
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-            <Button 
+          <FormButtonGroup>
+            <FormButton 
               type="button"
               onClick={onCancel}
-              style={{ 
-                background: 'linear-gradient(135deg, #6b7280, #4b5563)',
-              }}
+              variant="secondary"
             >
               Cancel
-            </Button>
-            <Button 
+            </FormButton>
+            <FormButton 
               type="submit"
               disabled={loading}
-              style={{ 
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-              }}
+              variant="success"
             >
               {loading ? 'Saving...' : (config ? 'Update Configuration' : 'Create Configuration')}
-            </Button>
-          </div>
+            </FormButton>
+          </FormButtonGroup>
         </form>
       </ConfigFormContainer>
     );
@@ -1028,60 +1186,58 @@ const MonthlyFeeManagement: React.FC = () => {
             </ActionButtonGroup>
 
             {fees.length > 0 && (
-              <Table>
-                <thead>
-                  <tr>
-                    <Th>Fee Name</Th>
-                    <Th>Fee Type</Th>
-                    <Th>Apartment</Th>
-                    <Th>Amount</Th>
-                    <Th>Unit Price</Th>
-                    <Th>Status</Th>
-                    <Th>Actions</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fees.map((fee) => (
-                    <tr key={fee.id}>
-                      <Td>{fee.name}</Td>
-                      <Td>{fee.feeTypeEnum}</Td>
-                      <Td>{fee.apartmentId || 'Common'}</Td>
-                      <Td>{formatCurrency(fee.amount)}</Td>
-                      <Td>
-                        {fee.unitPrice ? 
-                          `${formatCurrency(fee.unitPrice)}/${FeeHelpers.getUnitDescription(fee)}` : 
-                          'N/A'
-                        }
-                      </Td>
-                      <Td>
-                        <StatusBadge status={fee.isActive ? 'active' : 'inactive'}>
-                          {fee.isActive ? 'Active' : 'Deactivated'}
-                        </StatusBadge>
-                      </Td>
-                      <Td>
-                        {fee.isActive && (
-                          <Button 
-                            onClick={() => handleDeactivateFee(fee.id)}
-                            style={{ 
-                              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                              padding: '0.5rem 1rem',
-                              fontSize: '0.75rem'
-                            }}
-                          >
-                            Deactivate
-                          </Button>
-                        )}
-                      </Td>
+              <TableContainer>
+                <Table>
+                  <thead>
+                    <tr>
+                      <Th>Fee Name</Th>
+                      <Th>Fee Type</Th>
+                      <Th>Apartment</Th>
+                      <Th>Amount</Th>
+                      <Th>Unit Price</Th>
+                      <Th>Status</Th>
+                      <Th>Actions</Th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {fees.map((fee) => (
+                      <tr key={fee.id}>
+                        <Td>{fee.name}</Td>
+                        <Td>{fee.feeTypeEnum}</Td>
+                        <Td>{fee.apartmentId || 'Common'}</Td>
+                        <Td>{formatCurrency(fee.amount)}</Td>
+                        <Td>
+                          {fee.unitPrice ? 
+                            `${formatCurrency(fee.unitPrice)}/${FeeHelpers.getUnitDescription(fee)}` : 
+                            'N/A'
+                          }
+                        </Td>
+                        <Td>
+                          <StatusBadge status={fee.isActive ? 'active' : 'inactive'}>
+                            {fee.isActive ? 'Active' : 'Deactivated'}
+                          </StatusBadge>
+                        </Td>
+                        <Td>
+                          {fee.isActive && (
+                            <ActionButton 
+                              onClick={() => handleDeactivateFee(fee.id)}
+                              variant="danger"
+                            >
+                              Deactivate
+                            </ActionButton>
+                          )}
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </TableContainer>
             )}
 
             {fees.length === 0 && selectedMonth && !loading && (
-              <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
+              <EmptyState>
                 No fees found for {selectedMonth}
-              </p>
+              </EmptyState>
             )}
           </div>
         )}
@@ -1095,36 +1251,38 @@ const MonthlyFeeManagement: React.FC = () => {
             </ActionButtonGroup>
 
             {payments.length > 0 && (
-              <Table>
-                <thead>
-                  <tr>
-                    <Th>Payment Date</Th>
-                    <Th>Payer Name</Th>
-                    <Th>Fee Name</Th>
-                    <Th>Apartment</Th>
-                    <Th>Amount</Th>
-                    <Th>Notes</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map((payment) => (
-                    <tr key={payment.id}>
-                      <Td>{formatDate(payment.paymentDate)}</Td>
-                      <Td>{payment.payerName || 'N/A'}</Td>
-                      <Td>{payment.feeName || 'N/A'}</Td>
-                      <Td>{payment.apartmentNumber || 'N/A'}</Td>
-                      <Td>{formatCurrency(payment.amount)}</Td>
-                      <Td>{payment.notes || 'N/A'}</Td>
+              <TableContainer>
+                <Table>
+                  <thead>
+                    <tr>
+                      <Th>Payment Date</Th>
+                      <Th>Payer Name</Th>
+                      <Th>Fee Name</Th>
+                      <Th>Apartment</Th>
+                      <Th>Amount</Th>
+                      <Th>Notes</Th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {payments.map((payment) => (
+                      <tr key={payment.id}>
+                        <Td>{formatDate(payment.paymentDate)}</Td>
+                        <Td>{payment.payerName || 'N/A'}</Td>
+                        <Td>{payment.feeName || 'N/A'}</Td>
+                        <Td>{payment.apartmentNumber || 'N/A'}</Td>
+                        <Td>{formatCurrency(payment.amount)}</Td>
+                        <Td>{payment.notes || 'N/A'}</Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </TableContainer>
             )}
 
             {payments.length === 0 && !loading && (
-              <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
+              <EmptyState>
                 No payment history available
-              </p>
+              </EmptyState>
             )}
           </div>
         )}
@@ -1196,13 +1354,14 @@ const MonthlyFeeManagement: React.FC = () => {
               </ul>
             </InfoCard>
 
-            <Button 
+            <FormButton 
               onClick={handleSaveParkingPrices} 
               disabled={loading}
+              variant="success"
               style={{ marginTop: '2rem' }}
             >
               {loading ? 'Saving...' : 'Save Parking Price Configuration'}
-            </Button>
+            </FormButton>
           </div>
         )}
 
@@ -1217,14 +1376,12 @@ const MonthlyFeeManagement: React.FC = () => {
               <Button onClick={handleLoadFloorAreaConfigs} disabled={loading}>
                 {loading ? 'Loading...' : 'Refresh Configurations'}
               </Button>
-              <Button 
+              <FormButton 
                 onClick={() => setShowConfigForm(true)}
-                style={{ 
-                  background: 'linear-gradient(135deg, #10b981, #059669)',
-                }}
+                variant="success"
               >
                 Add New Configuration
-              </Button>
+              </FormButton>
             </ActionButtonGroup>
 
             {/* Configuration Form */}
@@ -1253,88 +1410,82 @@ const MonthlyFeeManagement: React.FC = () => {
               console.log('   should show table:', !!(floorAreaConfigs && Array.isArray(floorAreaConfigs) && floorAreaConfigs.length > 0));
               
               return (floorAreaConfigs && Array.isArray(floorAreaConfigs) && floorAreaConfigs.length > 0) ? (
-                <Table style={{ marginTop: '2rem' }}>
-                  <thead>
-                    <tr>
-                      <Th>Fee Name</Th>
-                      <Th>Type</Th>
-                      <Th>Unit Price</Th>
-                      <Th>Auto Generate</Th>
-                      <Th>Schedule</Th>
-                      <Th>Status</Th>
-                      <Th>Actions</Th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {floorAreaConfigs.map((config) => (
-                      <tr key={config.id}>
-                        <Td>
-                          <div>
-                            <strong>{config.feeName}</strong>
-                            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.25rem' }}>
-                              {config.description}
-                            </div>
-                          </div>
-                        </Td>
-                        <Td>{floorAreaFeeConfigApi.getFeeTypeDisplayName(config.feeTypeEnum)}</Td>
-                        <Td>
-                          {new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND',
-                          }).format(config.unitPricePerSqm)}/m²
-                        </Td>
-                        <Td>
-                          <StatusBadge status={config.isAutoGenerated ? 'active' : 'inactive'}>
-                            {config.isAutoGenerated ? 'Yes' : 'No'}
-                          </StatusBadge>
-                        </Td>
-                        <Td>
-                          <small style={{ color: '#6b7280' }}>
-                            {floorAreaFeeConfigApi.formatScheduleDisplay(config)}
-                          </small>
-                        </Td>
-                        <Td>
-                          <StatusBadge status={config.isActive ? 'active' : 'inactive'}>
-                            {config.isActive ? 'Active' : 'Inactive'}
-                          </StatusBadge>
-                        </Td>
-                        <Td>
-                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                            <Button 
-                              onClick={() => setEditingConfig(config)}
-                              style={{ 
-                                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                                padding: '0.5rem 0.75rem',
-                                fontSize: '0.75rem'
-                              }}
-                            >
-                              Edit
-                            </Button>
-                            {config.isActive && (
-                              <Button 
-                                onClick={() => handleDeactivateFloorAreaConfig(config.id!)}
-                                style={{ 
-                                  background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                                  padding: '0.5rem 0.75rem',
-                                  fontSize: '0.75rem'
-                                }}
-                              >
-                                Deactivate
-                              </Button>
-                            )}
-                          </div>
-                        </Td>
+                <TableContainer>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <Th>Fee Name</Th>
+                        <Th>Type</Th>
+                        <Th>Unit Price</Th>
+                        <Th>Auto Generate</Th>
+                        <Th>Schedule</Th>
+                        <Th>Status</Th>
+                        <Th>Actions</Th>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {floorAreaConfigs.map((config) => (
+                        <tr key={config.id}>
+                          <Td>
+                            <div>
+                              <strong>{config.feeName}</strong>
+                              <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                                {config.description}
+                              </div>
+                            </div>
+                          </Td>
+                          <Td>{floorAreaFeeConfigApi.getFeeTypeDisplayName(config.feeTypeEnum)}</Td>
+                          <Td>
+                            {new Intl.NumberFormat('vi-VN', {
+                              style: 'currency',
+                              currency: 'VND',
+                            }).format(config.unitPricePerSqm)}/m²
+                          </Td>
+                          <Td>
+                            <StatusBadge status={config.isAutoGenerated ? 'active' : 'inactive'}>
+                              {config.isAutoGenerated ? 'Yes' : 'No'}
+                            </StatusBadge>
+                          </Td>
+                          <Td>
+                            <div style={{ color: '#6b7280', fontSize: 'var(--font-size-sm)' }}>
+                              {floorAreaFeeConfigApi.formatScheduleDisplay(config)}
+                            </div>
+                          </Td>
+                          <Td>
+                            <StatusBadge status={config.isActive ? 'active' : 'inactive'}>
+                              {config.isActive ? 'Active' : 'Inactive'}
+                            </StatusBadge>
+                          </Td>
+                          <Td>
+                            <ActionButtons>
+                              <ActionButton 
+                                onClick={() => setEditingConfig(config)}
+                                variant="warning"
+                              >
+                                Edit
+                              </ActionButton>
+                              {config.isActive && (
+                                <ActionButton 
+                                  onClick={() => handleDeactivateFloorAreaConfig(config.id!)}
+                                  variant="danger"
+                                >
+                                  Deactivate
+                                </ActionButton>
+                              )}
+                            </ActionButtons>
+                          </Td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </TableContainer>
               ) : null;
             })()}
 
             {(!floorAreaConfigs || !Array.isArray(floorAreaConfigs) || floorAreaConfigs.length === 0) && !loading && (
-              <p style={{ textAlign: 'center', color: '#6b7280', padding: '2rem' }}>
+              <EmptyState>
                 No floor area fee configurations found. Create your first configuration to get started.
-              </p>
+              </EmptyState>
             )}
 
             <InfoCard style={{ marginTop: '2rem' }}>
