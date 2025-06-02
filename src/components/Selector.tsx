@@ -20,6 +20,7 @@ const StyledSelectorLabel = styled.label`
   font-size: 1.3rem; /* Increased font size */
   font-weight: 600; /* Increased font weight */
   color: #1f2937; /* Darker color for better visibility */
+  margin-top: 1.5rem;
   margin-bottom: var(--space-2);
   letter-spacing: -0.01em;
   
@@ -28,6 +29,10 @@ const StyledSelectorLabel = styled.label`
     color: var(--color-red-500);
     margin-left: var(--space-1);
     font-weight: 600;
+  }
+  
+  &:first-child {
+    margin-top: 0;
   }
 `;
 

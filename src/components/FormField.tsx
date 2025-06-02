@@ -15,6 +15,7 @@ const StyledLabel = styled.label`
   font-size: 1.3rem;
   font-weight: 600;
   color: #1f2937;
+  margin-top: 1.5rem;
   margin-bottom: var(--space-1);
   letter-spacing: -0.01em;
   
@@ -23,6 +24,10 @@ const StyledLabel = styled.label`
     color: var(--color-red-500);
     margin-left: var(--space-1);
     font-weight: 600;
+  }
+  
+  &:first-child {
+    margin-top: 0;
   }
 `;
 
