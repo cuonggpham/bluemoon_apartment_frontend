@@ -15,59 +15,78 @@ const InputContainer = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  padding: var(--space-2-5) var(--space-3);
-  padding-right: var(--space-10);
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-lg);
-  font-size: var(--font-size-sm);
-  background-color: var(--color-grey-0);
-  transition: all var(--transition-normal);
-  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.25rem;
+  padding-right: 3rem;
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 48px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   
   &:focus {
     outline: none;
-    border-color: var(--color-brand-500);
-    box-shadow: 0 0 0 3px var(--color-brand-100);
+    border-color: #6366f1;
+    box-shadow: 
+      0 0 0 3px rgba(99, 102, 241, 0.1),
+      0 2px 8px rgba(99, 102, 241, 0.1);
+    background: white;
+    transform: translateY(-1px);
   }
   
   &:hover {
-    border-color: var(--color-brand-300);
-    box-shadow: var(--shadow-md);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
   }
   
   &.dropdown-open {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    border-bottom-color: var(--color-brand-500);
+    border-bottom-color: #6366f1;
+    border-color: #6366f1;
+    box-shadow: 
+      0 0 0 3px rgba(99, 102, 241, 0.1),
+      0 2px 8px rgba(99, 102, 241, 0.1);
   }
 
   &::placeholder {
-    color: var(--color-grey-400);
-    font-size: var(--font-size-sm);
+    color: #9ca3af;
+    font-weight: 400;
   }
 `;
 
 const ClearButton = styled.button`
   position: absolute;
-  right: var(--space-2);
+  right: 0.75rem;
   background: none;
   border: none;
-  color: var(--color-grey-400);
+  color: #9ca3af;
   cursor: pointer;
-  padding: var(--space-1);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-sm);
-  transition: all var(--transition-fast);
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   
   &:hover {
-    color: var(--color-grey-700);
-    background-color: var(--color-grey-100);
+    color: #374151;
+    background-color: rgba(243, 244, 246, 0.8);
     transform: scale(1.1);
   }
   
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--color-brand-100);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
   }
 `;
 
@@ -76,31 +95,34 @@ const DropdownList = styled.ul`
   top: 100%;
   left: 0;
   right: 0;
-  background: var(--color-grey-0);
-  border: 1px solid var(--color-brand-500);
+  background: white;
+  border: 1px solid #6366f1;
   border-top: none;
-  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+  border-radius: 0 0 12px 12px;
   max-height: 200px;
   overflow-y: auto;
-  list-style: none;
+  
   margin: 0;
-  padding: var(--space-1) 0;
+  padding: 0.25rem 0;
   z-index: 1000;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1);
   
   ${props => props.hidden && `display: none;`}
 `;
 
 const DropdownItem = styled.li`
-  padding: var(--space-2-5) var(--space-3);
+  padding: 0.75rem 1rem;
   cursor: pointer;
-  border-bottom: 1px solid var(--color-grey-100);
-  transition: all var(--transition-fast);
-  font-size: var(--font-size-sm);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  color: #374151;
   
   &:hover {
-    background-color: var(--color-brand-50);
-    color: var(--color-brand-700);
+    background-color: rgba(99, 102, 241, 0.05);
+    color: #4f46e5;
   }
   
   &:last-child {
@@ -109,17 +131,17 @@ const DropdownItem = styled.li`
 `;
 
 const NoResults = styled.div`
-  padding: var(--space-3);
-  color: var(--color-grey-500);
+  padding: 0.75rem 1rem;
+  color: #6b7280;
   text-align: center;
   font-style: italic;
-  font-size: var(--font-size-sm);
+  font-size: 0.875rem;
 `;
 
 const ResidentInfo = styled.div`
-  font-size: var(--font-size-xs);
-  color: var(--color-grey-600);
-  margin-top: var(--space-1);
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
 `;
 
 interface Resident {

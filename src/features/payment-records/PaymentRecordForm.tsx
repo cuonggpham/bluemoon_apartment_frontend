@@ -55,6 +55,11 @@ const Label = styled.label`
   color: #1f2937;
   font-size: 1.5rem;
   letter-spacing: -0.01em;
+  margin-top: 1.5rem;
+  
+  &:first-child {
+    margin-top: 0;
+  }
 `;
 
 const Select = styled.select`

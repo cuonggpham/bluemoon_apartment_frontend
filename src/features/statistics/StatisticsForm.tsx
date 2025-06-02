@@ -118,11 +118,16 @@ const EmptyMessage = styled.div`
 
 const StyledLabel = styled.label`
   display: block;
+  margin-top: 1.5rem;
   margin-bottom: 8px;
   font-weight: 600;
   font-size: 1.4rem;
   color: #1f2937;
   letter-spacing: -0.01em;
+  
+  &:first-child {
+    margin-top: 0;
+  }
 `;
 
 interface StatisticsFormProps {

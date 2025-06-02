@@ -3,14 +3,33 @@ import Form from "../../components/Form";
 import FormField from "../../components/FormField";
 import Button from "../../components/Button";
 import Selector from "../../components/Selector";
-import { HiOutlinePlusCircle, HiArrowLeft, HiArrowRight, HiExclamationTriangle } from "react-icons/hi2";
+import { HiOutlinePlusCircle, HiArrowLeft, HiArrowRight, HiExclamationTriangle, HiUser, HiHome, HiIdentification, HiBuildingOffice2 } from "react-icons/hi2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 
-// Modern styled components for MultiStepResidentForm
-const StepIndicator = styled.div`
-  margin-bottom: var(--space-6);
+// Enhanced styled components with modern glass morphism design
+const FormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 0;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+`;
+
+const StepIndicatorContainer = styled.div`
+  background: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.02);
   text-align: center;
 `;
 
@@ -18,178 +37,289 @@ const StepFlex = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: var(--space-3);
+  gap: 1rem;
+  margin-bottom: 1rem;
 `;
 
-const StepCircle = styled.div<{ $active: boolean }>`
-  width: 36px;
-  height: 36px;
+const StepCircle = styled.div<{ $active: boolean; $completed: boolean }>`
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  border: 2px solid;
-  transition: all var(--transition-fast);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 2;
   
-  ${(props) => props.$active ? `
-    background: linear-gradient(135deg, var(--color-brand-500), var(--color-brand-600));
-    color: var(--color-grey-0);
-    border-color: var(--color-brand-500);
-    box-shadow: var(--shadow-sm);
-  ` : `
-    background-color: var(--color-grey-100);
-    color: var(--color-grey-400);
-    border-color: var(--color-grey-200);
-  `}
+  ${(props) => {
+    if (props.$active) {
+      return `
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        box-shadow: 
+          0 8px 20px rgba(99, 102, 241, 0.3),
+          0 4px 10px rgba(99, 102, 241, 0.2);
+        transform: scale(1.1);
+      `;
+    } else if (props.$completed) {
+      return `
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 
+          0 6px 16px rgba(16, 185, 129, 0.3),
+          0 3px 8px rgba(16, 185, 129, 0.2);
+      `;
+    } else {
+      return `
+        background: rgba(241, 245, 249, 0.8);
+        color: #9ca3af;
+        border: 2px solid rgba(203, 213, 225, 0.6);
+      `;
+    }
+  }}
 `;
 
 const StepLine = styled.div<{ $active: boolean }>`
-  width: 60px;
-  height: 3px;
-  border-radius: var(--border-radius-full);
-  transition: all var(--transition-fast);
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+  transition: all 0.3s ease;
   
   ${(props) => props.$active ? `
-    background: linear-gradient(90deg, var(--color-brand-500), var(--color-brand-600));
+    background: linear-gradient(90deg, #10b981, #059669);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   ` : `
-    background-color: var(--color-grey-200);
+    background: rgba(203, 213, 225, 0.6);
   `}
 `;
 
-const StepTitle = styled.div`
-  margin-top: var(--space-4);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-grey-800);
+const StepLabel = styled.div<{ $active: boolean }>`
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  
+  ${(props) => props.$active ? `
+    color: #4f46e5;
+  ` : `
+    color: #6b7280;
+  `}
+`;
+
+const SectionCard = styled.div`
+  background: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:hover {
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.06),
+      0 6px 20px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+  }
+`;
+
+const SectionHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #4f46e5);
+    border-radius: 2px;
+  }
 `;
 
 const SectionTitle = styled.h3`
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-grey-900);
-  margin-bottom: var(--space-4);
-  margin-top: 0;
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1f2937, #374151);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 `;
 
-const ApartmentOptionSection = styled.div`
-  margin-bottom: var(--space-6);
+const SectionIcon = styled.div`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 `;
 
-const ApartmentOptionLabel = styled.label`
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-grey-800);
-  margin-bottom: var(--space-3);
+const OptionSection = styled.div`
+  margin-bottom: 2rem;
+`;
+
+const OptionLabel = styled.label`
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
   display: block;
 `;
 
-const ApartmentOptionButtons = styled.div`
+const OptionButtons = styled.div`
   display: flex;
-  gap: var(--space-4);
-  margin-bottom: var(--space-5);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
 `;
 
-const ApartmentOptionButton = styled.button<{ $selected: boolean }>`
-  padding: var(--space-3) var(--space-5);
+const OptionButton = styled.button<{ $selected: boolean }>`
+  flex: 1;
+  padding: 1rem 1.5rem;
   border: 2px solid;
-  border-radius: var(--border-radius-lg);
+  border-radius: 16px;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  font-size: 1rem;
   position: relative;
   overflow: hidden;
   
   ${(props) => props.$selected ? `
-    border-color: var(--color-brand-500);
-    background: linear-gradient(135deg, var(--color-brand-50), var(--color-brand-100));
-    color: var(--color-brand-700);
-    box-shadow: var(--shadow-sm);
-    transform: translateY(-1px);
+    border-color: #6366f1;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.05));
+    color: #4f46e5;
+    box-shadow: 
+      0 8px 20px rgba(99, 102, 241, 0.15),
+      0 4px 10px rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
   ` : `
-    border-color: var(--color-grey-300);
-    background-color: var(--color-grey-0);
-    color: var(--color-grey-700);
+    border-color: rgba(203, 213, 225, 0.8);
+    background: rgba(248, 250, 252, 0.8);
+    color: #6b7280;
     
     &:hover {
-      border-color: var(--color-grey-400);
-      background-color: var(--color-grey-50);
+      border-color: rgba(156, 163, 175, 0.8);
+      background: rgba(241, 245, 249, 0.9);
       transform: translateY(-1px);
-      box-shadow: var(--shadow-xs);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
   `}
 `;
 
+const SearchSection = styled.div`
+  background: rgba(241, 245, 249, 0.8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(203, 213, 225, 0.6);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.03),
+    0 2px 10px rgba(0, 0, 0, 0.02);
+`;
+
 const LoadingIndicator = styled.div`
-  padding: var(--space-3);
+  padding: 1rem;
   text-align: center;
-  color: var(--color-grey-600);
-  font-size: var(--font-size-sm);
+  color: #6b7280;
+  font-size: 0.875rem;
   font-style: italic;
+  background: rgba(249, 250, 251, 0.8);
+  border-radius: 12px;
+  margin-top: 0.5rem;
 `;
 
 const NoResultsContainer = styled.div`
-  padding: var(--space-4);
-  background: linear-gradient(135deg, var(--color-red-50), var(--color-red-100));
-  border: 1px solid var(--color-red-200);
-  border-radius: var(--border-radius-lg);
-  margin-top: var(--space-3);
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.03));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 16px;
+  margin-top: 1rem;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.75rem;
 `;
 
 const NoResultsIcon = styled(HiExclamationTriangle)`
-  color: var(--color-red-600);
-  font-size: var(--font-size-lg);
+  color: #dc2626;
+  font-size: 1.25rem;
   flex-shrink: 0;
 `;
 
 const NoResultsText = styled.span`
-  color: var(--color-red-700);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  color: #b91c1c;
+  font-size: 0.875rem;
+  font-weight: 500;
 `;
 
 const SuggestionsContainer = styled.div`
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-lg);
-  max-height: 240px;
+  border: 1px solid rgba(203, 213, 225, 0.6);
+  border-radius: 16px;
+  max-height: 280px;
   overflow-y: auto;
-  margin-top: var(--space-2);
-  background: var(--color-grey-0);
-  box-shadow: var(--shadow-sm);
-  
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: var(--color-grey-100);
-    border-radius: var(--border-radius-md);
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-grey-300);
-    border-radius: var(--border-radius-md);
-    
-    &:hover {
-      background: var(--color-grey-400);
-    }
-  }
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 
+    0 6px 24px rgba(0, 0, 0, 0.04),
+    0 3px 12px rgba(0, 0, 0, 0.03);
 `;
 
 const SuggestionItem = styled.div`
-  padding: var(--space-3);
+  padding: 1rem 1.5rem;
   cursor: pointer;
-  border-bottom: 1px solid var(--color-grey-100);
-  transition: all var(--transition-fast);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  transition: all 0.3s ease;
   
   &:hover {
-    background: linear-gradient(135deg, var(--color-brand-50), var(--color-brand-100));
-    border-color: var(--color-brand-200);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(79, 70, 229, 0.03));
+    border-color: rgba(99, 102, 241, 0.2);
   }
   
   &:last-child {
@@ -198,44 +328,67 @@ const SuggestionItem = styled.div`
 `;
 
 const SuggestionTitle = styled.div`
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-grey-800);
-  margin-bottom: var(--space-1);
+  font-weight: 600;
+  color: #374151;
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
 `;
 
 const SuggestionDetails = styled.div`
-  font-size: var(--font-size-sm);
-  color: var(--color-grey-600);
+  font-size: 1.75rem;
+  color: #6b7280;
 `;
 
 const NewApartmentTitle = styled.h4`
-  margin-bottom: var(--space-4);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-grey-800);
-  margin-top: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, #10b981, #059669);
+    border-radius: 1px;
+  }
 `;
 
 const InfoNote = styled.div`
-  padding: var(--space-4);
-  background: linear-gradient(135deg, var(--color-blue-50), var(--color-blue-100));
-  border: 1px solid var(--color-blue-200);
-  border-radius: var(--border-radius-lg);
-  margin-top: var(--space-4);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.03));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1.5rem;
 `;
 
 const InfoText = styled.p`
   margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-blue-700);
-  font-weight: var(--font-weight-medium);
+  color: #1e40af;
+  font-size: 1.55rem;
+  font-weight: 500;
 `;
 
 const ErrorMessage = styled.span`
-  color: var(--color-red-600);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  margin-left: var(--space-2);
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  margin-top: 2rem;
 `;
 
 interface ResidentData {
@@ -519,40 +672,47 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
   };
 
   return (
-    <Form width="500px">      {/* Step Indicator */}
-      <StepIndicator>
+    <FormContainer>
+      {/* Step Indicator */}
+      <StepIndicatorContainer>
         <StepFlex>
-          <StepCircle $active={currentStep >= 1}>
+          <StepCircle $active={currentStep >= 1} $completed={currentStep > 1}>
             1
           </StepCircle>
           <StepLine $active={currentStep >= 2} />
-          <StepCircle $active={currentStep >= 2}>
+          <StepCircle $active={currentStep >= 2} $completed={currentStep > 2}>
             2
           </StepCircle>
         </StepFlex>
-        <StepTitle>
+        <StepLabel $active={currentStep >= 1}>
           {currentStep === 1 ? "Personal Information" : "Apartment Selection"}
-        </StepTitle>
-      </StepIndicator>
+        </StepLabel>
+      </StepIndicatorContainer>
 
       {/* Step 1: Personal Information */}
       {currentStep === 1 && (
-        <div>
-          <SectionTitle>Step 1: Personal Information</SectionTitle>          
+        <SectionCard>
+          <SectionHeader>
+            <SectionIcon>
+              <HiUser />
+            </SectionIcon>
+            <SectionTitle>Step 1: Personal Information</SectionTitle>
+          </SectionHeader>
+          
           <Form.Fields>
             <FormField>
-              <FormField.Label label="Full Name" required />
+              <FormField.Label label="Name" required />
               <FormField.Input
                 id="name"
                 type="text"
                 value={residentData.name}
                 onChange={handleResidentChange}
-                placeholder="Enter full name"
                 required
                 error={errors.name}
+                placeholder="Enter full name"
               />
             </FormField>
-            
+
             <FormField>
               <FormField.Label label="Date of Birth" required />
               <FormField.Input
@@ -564,7 +724,7 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                 error={errors.dob}
               />
             </FormField>
-            
+
             <FormField>
               <FormField.Label label="CCCD" required />
               <FormField.Input
@@ -572,12 +732,14 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                 type="text"
                 value={residentData.id}
                 onChange={handleResidentChange}
-                placeholder="Enter citizen ID"
                 required
                 error={errors.id}
+                placeholder="Enter 12-digit CCCD number"
               />
             </FormField>
+          </Form.Fields>
 
+          <Form.Fields type="horizontal">
             <FormField>
               <FormField.Label label="CIC Number" />
               <FormField.Input
@@ -585,53 +747,63 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                 type="text"
                 value={residentData.cic}
                 onChange={handleResidentChange}
-                placeholder="Enter CIC number"
+                error={errors.cic}
+                placeholder="Enter CIC number (optional)"
               />
             </FormField>
-            
+
             <Selector
+              id="gender"
               value={residentData.gender}
               onChange={handleResidentChange}
-              id="gender"
               options={genderOptions}
               label="Gender"
               required
               error={errors.gender}
             />
-            
-            <Selector
-              value={residentData.status}
-              onChange={handleResidentChange}
-              id="status"
-              options={statusOptions}
-              label="Status"
-              required
-              error={errors.status}
-            />          </Form.Fields>
-        </div>
+          </Form.Fields>
+
+          <Selector
+            id="status"
+            value={residentData.status}
+            onChange={handleResidentChange}
+            options={statusOptions}
+            label="Status"
+            required
+            error={errors.status}
+          />
+        </SectionCard>
       )}
 
-      {/* Step 2: Apartment Selection */}
+      {/* Step 2: Apartment Assignment */}
       {currentStep === 2 && (
-        <div>
-          <SectionTitle>Step 2: Apartment Assignment</SectionTitle>
-            {/* Apartment Option Selection */}
-          <ApartmentOptionSection>            <ApartmentOptionLabel>
+        <SectionCard>
+          <SectionHeader>
+            <SectionIcon>
+              <HiHome />
+            </SectionIcon>
+            <SectionTitle>Step 2: Apartment Assignment</SectionTitle>
+          </SectionHeader>
+          
+          {/* Apartment Option Selection */}
+          <OptionSection>
+            <OptionLabel>
               Choose an option: {errors.apartmentOption && <ErrorMessage>{errors.apartmentOption}</ErrorMessage>}
-            </ApartmentOptionLabel>
-            <ApartmentOptionButtons>
-              <ApartmentOptionButton
+            </OptionLabel>
+            <OptionButtons>
+              <OptionButton
                 type="button"
                 onClick={() => {
                   setApartmentOption("existing");
                   if (errors.apartmentOption) {
                     setErrors(prev => ({ ...prev, apartmentOption: "" }));
-                  }                }}
+                  }
+                }}
                 $selected={apartmentOption === "existing"}
               >
                 Find Existing Apartment
-              </ApartmentOptionButton>
-              <ApartmentOptionButton
+              </OptionButton>
+              <OptionButton
                 type="button"
                 onClick={() => {
                   setApartmentOption("new");
@@ -642,60 +814,61 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                 $selected={apartmentOption === "new"}
               >
                 Create New Apartment
-              </ApartmentOptionButton>
-            </ApartmentOptionButtons>
-          </ApartmentOptionSection>          {/* Existing Apartment Search */}
+              </OptionButton>
+            </OptionButtons>
+          </OptionSection>
+          
+          {/* Existing Apartment Search */}
           {apartmentOption === "existing" && (
-            <div>
+            <SearchSection>
               <FormField>
                 <FormField.Label label="Search Apartment by Number" required />
                 <FormField.Input
                   type="text"
                   value={searchValue}
                   onChange={handleApartmentSearch}
-                  placeholder="Enter apartment number"
-                  required
-                  error={errors.selectedApartmentId}
+                  placeholder="Enter apartment number..."
+                  error={errors.selectedApartment}
                 />
               </FormField>
-              
-              {/* Loading indicator */}
+
               {isSearching && (
-                <LoadingIndicator>
-                  Searching...
-                </LoadingIndicator>
+                <LoadingIndicator>Searching apartments...</LoadingIndicator>
               )}
-                {/* No results message */}
-              {noResultsFound && searchValue.trim() !== "" && !isSearching && (
+
+              {!isSearching && searchValue && apartmentSuggestions.length === 0 && (
                 <NoResultsContainer>
                   <NoResultsIcon />
                   <NoResultsText>
-                    No apartment found with number "{searchValue}". Please check the number or create a new apartment.
+                    No apartments found with number "{searchValue}"
                   </NoResultsText>
                 </NoResultsContainer>
               )}
-              
-              {/* Apartment Suggestions */}
+
               {apartmentSuggestions.length > 0 && !isSearching && (
                 <SuggestionsContainer>
-                  {apartmentSuggestions.map((apartment) => (                    <SuggestionItem
+                  {apartmentSuggestions.map((apartment) => (
+                    <SuggestionItem
                       key={apartment.addressNumber}
                       onClick={() => selectApartment(apartment)}
                     >
                       <SuggestionTitle>Apartment {apartment.addressNumber}</SuggestionTitle>
                       <SuggestionDetails>
-                        Owner: {apartment.owner?.name || "N/A"} | Status: {apartment.status}
+                        Area: {apartment.area}m² | Status: {apartment.status}
+                        {apartment.ownerPhone && ` | Phone: ${apartment.ownerPhone}`}
                       </SuggestionDetails>
                     </SuggestionItem>
                   ))}
                 </SuggestionsContainer>
               )}
-            </div>
-          )}          
-          {/* New Apartment Form */}          {apartmentOption === "new" && (
+            </SearchSection>
+          )}
+          
+          {/* New Apartment Form */}
+          {apartmentOption === "new" && (
             <div>
               <NewApartmentTitle>Create New Apartment</NewApartmentTitle>
-              <Form.Fields>
+              <Form.Fields type="horizontal">
                 <FormField>
                   <FormField.Label label="Apartment Number" required />
                   <FormField.Input
@@ -703,12 +876,12 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                     type="text"
                     value={apartmentData.addressNumber}
                     onChange={handleApartmentChange}
-                    placeholder="Enter apartment number"
                     required
                     error={errors.addressNumber}
+                    placeholder="e.g., 101, 202A"
                   />
                 </FormField>
-                
+
                 <FormField>
                   <FormField.Label label="Area (m²)" required />
                   <FormField.Input
@@ -716,12 +889,24 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                     type="number"
                     value={apartmentData.area}
                     onChange={handleApartmentChange}
-                    placeholder="Enter area in square meters"
                     required
                     error={errors.area}
+                    placeholder="e.g., 50"
                   />
                 </FormField>
-                
+              </Form.Fields>
+
+              <Form.Fields type="horizontal">
+                <Selector
+                  id="status"
+                  value={apartmentData.status}
+                  onChange={handleApartmentChange}
+                  options={apartmentStatusOptions}
+                  label="Status"
+                  required
+                  error={errors.apartmentStatus}
+                />
+
                 <FormField>
                   <FormField.Label label="Owner Phone" />
                   <FormField.Input
@@ -729,67 +914,60 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                     type="text"
                     value={apartmentData.ownerPhone}
                     onChange={handleApartmentChange}
-                    placeholder="Enter owner phone number"
                     error={errors.ownerPhone}
+                    placeholder="Optional"
                   />
                 </FormField>
-                
-                <Selector
-                  value={apartmentData.status}
-                  onChange={handleApartmentChange}
-                  id="status"
-                  options={apartmentStatusOptions}
-                  label="Apartment Type"
-                  required
-                  error={errors.status}
-                />
-              </Form.Fields>              
+              </Form.Fields>
+              
               <InfoNote>
                 <InfoText>
-                  <strong>Note:</strong> {residentData.name} will be set as the owner of this new apartment.
+                  💡 Creating a new apartment will automatically assign the resident as the owner.
                 </InfoText>
               </InfoNote>
             </div>
           )}
-        </div>
-      )}      {/* Navigation Buttons */}
-      <Form.Buttons>
+        </SectionCard>
+      )}
+
+      {/* Navigation Buttons */}
+      <ButtonGroup>
         {currentStep > 1 && (
           <Button
             type="button"
-            onClick={prevStep}
             variation="secondary"
             size="compact"
+            onClick={prevStep}
           >
             <HiArrowLeft />
             Previous
           </Button>
         )}
-        
-        {currentStep < 2 && (
-          <Button
-            type="button"
-            onClick={nextStep}
-            variation="primary"
-            size="compact"
-          >
-            Next
-            <HiArrowRight />
-          </Button>
-        )}
-        
-        {currentStep === 2 && apartmentOption && (
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            variation="primary"
-            size="compact"
-          >
-            Create Resident
-            <HiOutlinePlusCircle />
-          </Button>
-        )}
-      </Form.Buttons>
-    </Form>
+
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '1rem' }}>
+          {currentStep < 2 ? (
+            <Button
+              type="button"
+              variation="primary"
+              size="compact"
+              onClick={nextStep}
+            >
+              Next
+              <HiArrowRight />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variation="primary"
+              size="compact"
+              onClick={handleSubmit}
+            >
+              <HiOutlinePlusCircle />
+              Add Resident
+            </Button>
+          )}
+        </div>
+      </ButtonGroup>
+    </FormContainer>
   );
 }

@@ -2,67 +2,194 @@
 .utility-upload-container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-  padding: var(--space-5) 0;
+  gap: 1.5rem;
+  padding: 0;
+  width: 100%;
 }
 
 .upload-section {
-  background-color: var(--color-grey-0);
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-xl);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
+  background: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.03),
+    0 2px 10px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:hover {
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.05),
+      0 4px 16px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+  }
 }
 
 .upload-section h3 {
-  margin-bottom: var(--space-4);
-  color: var(--color-grey-800);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &::before {
+    content: '';
+    width: 4px;
+    height: 1.5rem;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 2px;
+  }
 }
 
 .upload-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  background: linear-gradient(135deg, var(--color-brand-500), var(--color-brand-600));
-  color: var(--color-grey-0);
-  border-radius: var(--border-radius-lg);
+  gap: 0.75rem;
+  padding: 1rem 1.75rem;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
+  font-weight: 600;
+  font-size: 1rem;
   border: none;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm);
-}
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 16px rgba(59, 130, 246, 0.2),
+    0 2px 8px rgba(59, 130, 246, 0.1);
+  position: relative;
+  overflow: hidden;
 
-.upload-btn:hover {
-  background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-700));
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 8px 24px rgba(59, 130, 246, 0.3),
+      0 4px 12px rgba(59, 130, 246, 0.15);
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  i {
+    font-size: 1.125rem;
+  }
 }
 
 .file-selected {
-  margin-top: var(--space-3);
-  color: var(--color-green-700);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
+  margin-top: 1rem;
+  color: #059669;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '✓';
+    color: #059669;
+    font-weight: 700;
+  }
 }
 
 .preview-section {
-  background-color: var(--color-grey-0);
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-xl);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
+  background: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.03),
+    0 2px 10px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
 }
 
 .preview-section h3 {
-  margin-bottom: var(--space-4);
-  color: var(--color-grey-800);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &::before {
+    content: '';
+    width: 4px;
+    height: 1.5rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 2px;
+  }
 }
 
 .bill-name-section {
@@ -303,15 +430,15 @@
 
 /* Enhanced form elements */
 .utility-form-group {
-  margin-bottom: var(--space-5);
+  margin-bottom: 1.5rem;
 }
 
 .utility-form-group label {
   display: block;
   font-weight: 600;
-  font-size: 1.3rem;
+  font-size: 1.125rem;
   color: #1f2937;
-  margin-bottom: var(--space-2);
+  margin-bottom: 0.75rem;
   letter-spacing: -0.01em;
 }
 
@@ -319,29 +446,185 @@
 .utility-form-group select,
 .utility-form-group textarea {
   width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-grey-300);
-  border-radius: var(--border-radius-lg);
-  font-size: 1.1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 500;
   color: #1f2937;
-  background-color: white;
-  transition: all var(--transition-fast);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 48px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .utility-form-group input:focus,
 .utility-form-group select:focus,
 .utility-form-group textarea:focus {
   outline: none;
-  border-color: var(--color-brand-500);
-  box-shadow: 0 0 0 3px var(--color-brand-100);
+  border-color: #3b82f6;
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 2px 8px rgba(59, 130, 246, 0.1);
+  background: white;
+  transform: translateY(-1px);
 }
 
 .utility-form-group input::placeholder,
 .utility-form-group textarea::placeholder {
-  color: #6b7280;
+  color: #9ca3af;
   font-weight: 400;
+}
+
+/* Bill Name Input Section */
+.inputName {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(241, 245, 249, 0.6);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.inputName label {
+  display: block;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+#billName {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+  background: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#billName:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 2px 8px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+#billName::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Save Button */
+.save-btn,
+.saveBtn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 16px rgba(16, 185, 129, 0.2),
+    0 2px 8px rgba(16, 185, 129, 0.1);
+  position: relative;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  align-self: center;
+}
+
+.save-btn::before,
+.saveBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #059669, #047857);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.save-btn:hover,
+.saveBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(16, 185, 129, 0.3),
+    0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.save-btn:hover::before,
+.saveBtn:hover::before {
+  opacity: 1;
+}
+
+.save-btn:active,
+.saveBtn:active {
+  transform: translateY(-1px);
+}
+
+.save-btn > *,
+.saveBtn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.status-badge {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--border-radius-full);
+  color: var(--color-grey-0);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+}
+
+.status-badge.paid {
+  background: linear-gradient(135deg, var(--color-green-500), var(--color-green-600));
+  border: 1px solid var(--color-green-400);
+}
+
+.status-badge.unpaid {
+  background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
+  border: 1px solid var(--color-orange-400);
+}
+
+.mark-paid-btn {
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(135deg, var(--color-blue-500), var(--color-blue-600));
+  color: var(--color-grey-0);
+  border: none;
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.mark-paid-btn:hover {
+  background: linear-gradient(135deg, var(--color-blue-600), var(--color-blue-700));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Enhanced utility bill upload section */

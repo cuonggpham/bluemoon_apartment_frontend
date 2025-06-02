@@ -4,82 +4,295 @@ import FormField from "../../components/FormField";
 import Button from "../../components/Button";
 import Selector from "../../components/Selector";
 import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
-import { HiOutlinePlusCircle, HiPencil, HiTrash, HiPlus, HiMinus } from "react-icons/hi2";
+import { HiOutlinePlusCircle, HiPencil, HiTrash, HiPlus, HiMinus, HiHome, HiUser, HiIdentification } from "react-icons/hi2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 
-// Styled Components
-const ApartmentHeader = styled.div`
+// Enhanced Styled Components with modern glass morphism design
+const FormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 0;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+`;
+
+const SectionCard = styled.div`
+  background: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &:hover {
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.06),
+      0 6px 20px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+  }
+`;
+
+const SectionHeader = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--color-grey-200);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #4f46e5);
+    border-radius: 2px;
+  }
+`;
+
+const SectionTitle = styled.h3`
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1f2937, #374151);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const SectionIcon = styled.div`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 `;
 
 const ApartmentSearchSection = styled.div`
-  background: linear-gradient(135deg, var(--color-grey-50) 0%, var(--color-grey-25) 100%);
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  margin: var(--spacing-md) 0;
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-sm);
+  background: rgba(241, 245, 249, 0.8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(203, 213, 225, 0.6);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.03),
+    0 2px 10px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
 `;
 
 const ApartmentSearchButtons = styled.div`
   display: flex;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
+  gap: 1rem;
+  margin-top: 1.5rem;
   justify-content: flex-end;
 `;
 
 const ApartmentsContainer = styled.div`
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-md);
-  padding: var(--spacing-sm);
-  background: linear-gradient(135deg, var(--color-grey-25) 0%, white 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 16px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   min-height: 3rem;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 0.75rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
 `;
 
 const ApartmentItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-grey-200);
-  border-radius: var(--border-radius-md);
-  background: white;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-xs);
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.03),
+    0 1px 4px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.03), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
-    border-color: var(--color-primary-300);
-    box-shadow: var(--shadow-sm);
-    transform: translateY(-1px);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 
+      0 6px 20px rgba(0, 0, 0, 0.05),
+      0 3px 10px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+  }
+
+  &:hover::before {
+    opacity: 1;
   }
 
   span {
-    font-weight: 500;
-    color: var(--color-grey-700);
-    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1rem;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+      content: '🏠';
+      font-size: 1.125rem;
+    }
   }
 `;
 
 const NoApartmentsMessage = styled.div`
   text-align: center;
-  color: var(--color-grey-500);
+  color: #6b7280;
   font-style: italic;
-  padding: var(--spacing-lg);
-  font-size: var(--font-size-sm);
-  background: var(--color-grey-50);
-  border-radius: var(--border-radius-md);
-  border: 2px dashed var(--color-grey-300);
+  padding: 2rem;
+  font-size: 1rem;
+  background: rgba(248, 250, 252, 0.8);
+  border-radius: 12px;
+  border: 2px dashed rgba(203, 213, 225, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '📭';
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  margin-top: 1.5rem;
+`;
+
+const AddApartmentButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 16px rgba(16, 185, 129, 0.2),
+    0 2px 8px rgba(16, 185, 129, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #059669, #047857);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 8px 24px rgba(16, 185, 129, 0.3),
+      0 4px 12px rgba(16, 185, 129, 0.15);
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
 `;
 
 export default function ResidentForm({ resident }: any) {
@@ -199,46 +412,32 @@ export default function ResidentForm({ resident }: any) {
         {
           area: apartmentData.area,
           status: apartmentData.status,
-          ownerId: apartmentData.owner?.id || null,
-          ownerPhone: apartmentData.ownerPhone || "",
-          residents: updatedResidentIds // Include all existing residents plus the new one
+          residentIds: updatedResidentIds
         }
       );
 
       // Update local state
-      const newApartment = {
-        addressNumber: selectedApartment.addressNumber,
-        area: selectedApartment.area,
-        status: selectedApartment.status
-      };
-
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        apartments: [...prevValues.apartments, newApartment],
+      setFormValues(prev => ({
+        ...prev,
+        apartments: [...prev.apartments, selectedApartment]
       }));
 
       setSelectedApartment(null);
       setShowApartmentSearch(false);
       toast.success("Apartment added successfully!");
-
-    } catch (err: any) {
-      console.error("Error adding apartment:", err);
-      toast.error("Failed to add apartment. Please try again.");
+      
+    } catch (error: any) {
+      console.error("Error adding apartment:", error);
+      toast.error(error.response?.data?.message || "Error adding apartment");
     } finally {
       setIsUpdatingApartments(false);
     }
   };
 
   const handleRemoveApartment = async (apartmentId: number) => {
-    if (!resident) {
-      toast.error("Cannot remove apartment - resident not found");
-      return;
-    }
-
     setIsUpdatingApartments(true);
-
     try {
-      // Get current residents of this apartment
+      // Get current apartment data
       const apartmentResponse = await axios.get(
         `http://localhost:8080/api/v1/apartments/${apartmentId}`
       );
@@ -247,35 +446,31 @@ export default function ResidentForm({ resident }: any) {
       const currentResidents = apartmentData.residents || [];
       
       // Remove this resident from the apartment's resident list
-      const updatedResidents = currentResidents
+      const updatedResidentIds = currentResidents
         .filter((res: any) => res.id !== parseInt(formValues.id))
         .map((res: any) => res.id);
 
-      // Update apartment with new resident list
+      // Update apartment via API
       await axios.put(
         `http://localhost:8080/api/v1/apartments/${apartmentId}`,
         {
           area: apartmentData.area,
           status: apartmentData.status,
-          ownerId: apartmentData.owner?.id || null,
-          ownerPhone: apartmentData.ownerPhone || "",
-          residents: updatedResidents
+          residentIds: updatedResidentIds
         }
       );
 
       // Update local state
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        apartments: prevValues.apartments.filter(
-          (apt: any) => apt.addressNumber !== apartmentId
-        ),
+      setFormValues(prev => ({
+        ...prev,
+        apartments: prev.apartments.filter((apt: any) => apt.addressNumber !== apartmentId)
       }));
 
       toast.success("Apartment removed successfully!");
-
-    } catch (err: any) {
-      console.error("Error removing apartment:", err);
-      toast.error("Failed to remove apartment. Please try again.");
+      
+    } catch (error: any) {
+      console.error("Error removing apartment:", error);
+      toast.error(error.response?.data?.message || "Error removing apartment");
     } finally {
       setIsUpdatingApartments(false);
     }
@@ -371,12 +566,19 @@ export default function ResidentForm({ resident }: any) {
   };
 
   return (
-    <Form width="400px">
-      <div>
-        <label>Information:</label>        
+    <FormContainer>
+      {/* Personal Information Section */}
+      <SectionCard>
+        <SectionHeader>
+          <SectionIcon>
+            <HiUser />
+          </SectionIcon>
+          <SectionTitle>Personal Information</SectionTitle>
+        </SectionHeader>
+        
         <Form.Fields>          
           <FormField>
-            <FormField.Label label={"Name"} required />
+            <FormField.Label label="Full Name" required />
             <FormField.Input
               id="name"
               type="text"
@@ -384,10 +586,11 @@ export default function ResidentForm({ resident }: any) {
               onChange={handleChange}
               required
               error={errors.name}
+              placeholder="Enter full name"
             />
           </FormField>
           <FormField>
-            <FormField.Label label={"DOB"} required />
+            <FormField.Label label="Date of Birth" required />
             <FormField.Input
               id="dob"
               type="date"
@@ -398,7 +601,7 @@ export default function ResidentForm({ resident }: any) {
             />
           </FormField>
           <FormField>
-            <FormField.Label label={"CCCD"} required />
+            <FormField.Label label="CCCD" required />
             <FormField.Input
               id="id"
               type="text"
@@ -407,16 +610,18 @@ export default function ResidentForm({ resident }: any) {
               required
               error={errors.id}
               readOnly={!!resident} // Only CCCD is read-only when editing existing resident
+              placeholder="Enter 12-digit CCCD number"
             />
           </FormField>
           <FormField>
-            <FormField.Label label={"CIC Number"} />
+            <FormField.Label label="CIC Number" />
             <FormField.Input
               id="cic"
               type="text"
               value={formValues.cic}
               onChange={handleChange}
               error={errors.cic}
+              placeholder="Enter CIC number (optional)"
             />
           </FormField>
           <Selector
@@ -424,16 +629,31 @@ export default function ResidentForm({ resident }: any) {
             onChange={handleChange}
             id="gender"
             options={genderOptions}
-            label={"Gender:"}
+            label="Gender"
             required
             error={errors.gender}
           />
+          <Selector
+            value={formValues.status}
+            onChange={handleChange}
+            id="status"
+            options={statusOptions}
+            label="Status"
+            required
+            error={errors.status}
+          />
         </Form.Fields>
-      </div>      
-        <div>
-        <ApartmentHeader>
-          <label>Apartments:</label>          {resident && (
-            <Button 
+      </SectionCard>
+
+      {/* Apartments Section */}
+      <SectionCard>
+        <SectionHeader>
+          <SectionIcon>
+            <HiHome />
+          </SectionIcon>
+          <SectionTitle>Apartments</SectionTitle>
+          {resident && (
+            <AddApartmentButton 
               type="button" 
               size="compact" 
               variation="primary"
@@ -442,9 +662,9 @@ export default function ResidentForm({ resident }: any) {
             >
               <HiPlus />
               Add Apartment
-            </Button>
+            </AddApartmentButton>
           )}
-        </ApartmentHeader>
+        </SectionHeader>
         
         {/* Apartment Search Section - Only show for existing residents */}
         {resident && showApartmentSearch && (
@@ -455,7 +675,9 @@ export default function ResidentForm({ resident }: any) {
                 value={selectedApartment?.addressNumber?.toString() || ""}
                 onChange={handleApartmentSelect}
                 placeholder="Search by apartment number..."
-              />            </FormField>            <ApartmentSearchButtons>
+              />            
+            </FormField>            
+            <ApartmentSearchButtons>
               <Button 
                 type="button" 
                 size="compact" 
@@ -480,85 +702,66 @@ export default function ResidentForm({ resident }: any) {
           </ApartmentSearchSection>
         )}
         
-        <Form.Fields>          
+        {/* Current Apartments Display */}
+        {formValues.apartments && formValues.apartments.length > 0 ? (
           <div>
-            {formValues.apartments && formValues.apartments.length > 0 ? (
-              <div>
-                <FormField.Label label="Current Apartments" className="apartments-label" />
-                <div className="apartments-container">
-                  {formValues.apartments.map((apartment: any, index: number) => (
-                    <div 
-                      key={apartment.addressNumber || index}
-                      className="apartment-item"
+            <FormField.Label label="Current Apartments" />
+            <ApartmentsContainer>
+              {formValues.apartments.map((apartment: any, index: number) => (
+                <ApartmentItem 
+                  key={apartment.addressNumber || index}
+                >
+                  <span>
+                    Apartment {apartment.addressNumber} 
+                    ({apartment.area}m² - {apartment.status})
+                  </span>                      
+                  {resident && (
+                    <Button 
+                      type="button" 
+                      size="compact" 
+                      variation="danger"
+                      onClick={() => handleRemoveApartment(apartment.addressNumber)}
+                      disabled={isUpdatingApartments}
                     >
-                      <span>
-                        Apartment {apartment.addressNumber} 
-                        ({apartment.area}m² - {apartment.status})
-                      </span>                      {resident && (
-                        <Button 
-                          type="button" 
-                          size="compact" 
-                          variation="danger"
-                          onClick={() => handleRemoveApartment(apartment.addressNumber)}
-                          disabled={isUpdatingApartments}
-                          className="remove-apartment-btn"
-                        >
-                          <HiMinus />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="no-apartments-message">
-                No apartments assigned
-              </div>
-            )}
-          </div>          
-          <FormField>
-            <FormField.Label label={"Status"} required />
-            <FormField.Select
-              id="status"
-              options={statusOptions}
-              value={formValues.status}
-              onChange={handleChange}
-              required
-              error={errors.status}
-            />
-          </FormField>
-        </Form.Fields>
-      </div>
+                      <HiMinus />
+                    </Button>
+                  )}
+                </ApartmentItem>
+              ))}
+            </ApartmentsContainer>
+          </div>
+        ) : (
+          <NoApartmentsMessage>
+            No apartments assigned
+          </NoApartmentsMessage>
+        )}
+      </SectionCard>
+
+      {/* Action Buttons */}
+      <ButtonGroup>
         {resident ? (
-        <Form.Buttons>
-          <Button type="button" onClick={handleDelete} variation="danger" size="compact">
-            Delete
-            <span>
+          <>
+            <Button type="button" onClick={handleDelete} variation="danger" size="compact">
               <HiTrash />
-            </span>
-          </Button>
-          <Button type="button" onClick={handleUpdate} variation="secondary" size="compact">
-            Update
-            <span>
+              Delete
+            </Button>
+            <Button type="button" onClick={handleUpdate} variation="secondary" size="compact">
               <HiPencil />
-            </span>
-          </Button>
-        </Form.Buttons>
-      ) : (
-        <Form.Buttons>
+              Update
+            </Button>
+          </>
+        ) : (
           <Button
             onClick={handleAddResident}
             size="compact"
             variation="primary"
             type="submit"
           >
-            Add
-            <span>
-              <HiOutlinePlusCircle />
-            </span>
+            <HiOutlinePlusCircle />
+            Add Resident
           </Button>
-        </Form.Buttons>
-      )}
-    </Form>
+        )}
+      </ButtonGroup>
+    </FormContainer>
   );
 }
