@@ -516,7 +516,15 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
   const handleApartmentSearch = (e: any) => {
     const value = e.target.value;
     setSearchValue(value);
-    setSelectedApartmentId(value);
+    
+    // Only update selectedApartmentId if user is actually typing
+    // Don't auto-set it to the search value
+    if (value.trim() === "") {
+      setSelectedApartmentId("");
+      setApartmentSuggestions([]);
+      setNoResultsFound(false);
+      setIsSearching(false);
+    }
     
     // Clear error when user starts typing
     if (errors.selectedApartmentId) {
@@ -525,13 +533,9 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
         selectedApartmentId: "",
       }));
     }
-    
-    if (value.trim() === "") {
-      setApartmentSuggestions([]);
-      setNoResultsFound(false);
-      setIsSearching(false);
-    }
-  };const selectApartment = (apartment: any) => {
+  };
+
+  const selectApartment = (apartment: any) => {
     setSelectedApartmentId(apartment.addressNumber.toString());
     setSearchValue(apartment.addressNumber.toString());
     setApartmentSuggestions([]);
@@ -828,15 +832,59 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
                   value={searchValue}
                   onChange={handleApartmentSearch}
                   placeholder="Enter apartment number..."
-                  error={errors.selectedApartment}
+                  error={errors.selectedApartmentId}
                 />
               </FormField>
+
+              {selectedApartmentId && (
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05))',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: '8px',
+                  marginTop: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ color: '#16a34a', fontSize: '0.875rem' }}>✓</span>
+                    <span style={{ color: '#16a34a', fontWeight: '600', fontSize: '0.875rem' }}>
+                      Selected: Apartment {selectedApartmentId}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedApartmentId("");
+                      setSearchValue("");
+                      setApartmentSuggestions([]);
+                      setNoResultsFound(false);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#16a34a',
+                      cursor: 'pointer',
+                      padding: '0.25rem',
+                      borderRadius: '4px',
+                      fontSize: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Clear selection"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
 
               {isSearching && (
                 <LoadingIndicator>Searching apartments...</LoadingIndicator>
               )}
 
-              {!isSearching && searchValue && apartmentSuggestions.length === 0 && (
+              {!isSearching && searchValue && apartmentSuggestions.length === 0 && !selectedApartmentId && (
                 <NoResultsContainer>
                   <NoResultsIcon />
                   <NoResultsText>
