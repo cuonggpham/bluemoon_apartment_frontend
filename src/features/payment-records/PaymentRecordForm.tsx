@@ -447,7 +447,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
     }
     
     // Check apartment requirement for voluntary fees
-    if (selectedFee && selectedFee.feeTypeEnum === 'Voluntary' && !formData.apartmentId) {
+    if (selectedFee && selectedFee.feeTypeEnum === 'VOLUNTARY' && !formData.apartmentId) {
       newErrors.apartmentId = 'Please select an apartment for voluntary fee';
     }
     
@@ -482,7 +482,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       };
       
       // Only include apartmentId for voluntary fees
-      if (selectedFee && selectedFee.feeTypeEnum === 'Voluntary' && formData.apartmentId) {
+      if (selectedFee && selectedFee.feeTypeEnum === 'VOLUNTARY' && formData.apartmentId) {
         payload.apartmentId = parseInt(formData.apartmentId);
       }
       
@@ -574,7 +574,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         </FormGroup>
 
         {/* Show apartment selection only for voluntary fees */}
-        {selectedFee && selectedFee.feeTypeEnum === 'Voluntary' && (
+        {selectedFee && selectedFee.feeTypeEnum === 'VOLUNTARY' && (
           <FormGroup>
             <Label htmlFor="apartmentId">Apartment *</Label>
             <Select

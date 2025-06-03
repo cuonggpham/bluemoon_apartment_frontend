@@ -189,7 +189,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
   const [selectedApartment, setSelectedApartment] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  const typeOptions = ["Mandatory", "Voluntary"];
+  const typeOptions = ["MANDATORY", "VOLUNTARY"];
 
   // Set initial apartment if editing existing fee
   useEffect(() => {
@@ -281,7 +281,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/v1/fee-and-fund", data);
+      await axios.post("http://localhost:8080/api/v1/fees", data);
       toast.success("Fee/Fund added successfully!");
       
       setTimeout(() => {
@@ -310,7 +310,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
     };
 
     try {
-      await axios.put(`http://localhost:8080/api/v1/fee-and-fund/${formValues.id}`, data);
+      await axios.put(`http://localhost:8080/api/v1/fees/${formValues.id}`, data);
       toast.success("Fee/Fund updated successfully!");
       
       setTimeout(() => {
@@ -324,7 +324,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/v1/fee-and-fund/${formValues.id}`);
+      await axios.delete(`http://localhost:8080/api/v1/fees/${formValues.id}`);
       toast.success("Fee/Fund deleted successfully!");
       
       setTimeout(() => {

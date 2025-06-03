@@ -6,13 +6,13 @@ export function capitalize(input: string): string | null {
 export const formatFeeType = (feeType: string) => {
   switch (feeType) {
     case "MANDATORY":
-      return "Mandatory";
+      return "MANDATORY";
     case "VOLUNTARY":
-      return "Voluntary";
+      return "VOLUNTARY";
     case "VEHICLE_PARKING":
-      return "Vehicle Parking";
+      return "VEHICLE_PARKING";
     case "FLOOR_AREA":
-      return "Floor Area";
+      return "FLOOR_AREA";
     default:
       // Convert UPPERCASE_WITH_UNDERSCORE to Title Case
       return feeType
