@@ -217,7 +217,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
     }
     
     // For mandatory fees, apartment selection is required
-    if (formValues.feeTypeEnum === "Mandatory" && !formValues.apartmentId) {
+    if (formValues.feeTypeEnum === "MANDATORY" && !formValues.apartmentId) {
       newErrors.apartmentId = "Apartment is required for mandatory fees";
     }
     
@@ -277,7 +277,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
       description: formValues.description,
       amount: parseFloat(formValues.amount),
       feeTypeEnum: formValues.feeTypeEnum,
-      apartmentId: formValues.feeTypeEnum === "Mandatory" ? parseInt(formValues.apartmentId) : null,
+      apartmentId: formValues.feeTypeEnum === "MANDATORY" ? parseInt(formValues.apartmentId) : null,
     };
 
     try {
@@ -306,7 +306,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
       description: formValues.description,
       amount: parseFloat(formValues.amount),
       feeTypeEnum: formValues.feeTypeEnum,
-      apartmentId: formValues.feeTypeEnum === "Mandatory" ? parseInt(formValues.apartmentId) : null,
+      apartmentId: formValues.feeTypeEnum === "MANDATORY" ? parseInt(formValues.apartmentId) : null,
     };
 
     try {
@@ -358,7 +358,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
         />
 
         {/* Apartment Selection - Only show for Mandatory fees */}
-        {formValues.feeTypeEnum === "Mandatory" && (
+        {formValues.feeTypeEnum === "MANDATORY" && (
           <ApartmentSection>
             <FormField>
               <FormField.Label label="Apartment" required />
