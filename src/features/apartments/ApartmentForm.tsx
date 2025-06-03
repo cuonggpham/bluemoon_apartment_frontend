@@ -315,13 +315,34 @@ export default function ApartmentForm({
       return;
     }
 
+    // APPROACH 1: Always include current residents (safer, explicit)
+    // Get current residents to preserve them during update
+    let currentResidentIds = formValues.residents?.map((resident: any) => resident.id) || [];
+    
+    // If a new owner is selected, ensure they are in the residents list
+    if (selectedOwner?.id && !currentResidentIds.includes(selectedOwner.id)) {
+      currentResidentIds.push(selectedOwner.id);
+    }
+
     const data = {
       addressNumber: parseInt(formValues.addressNumber),
       area: parseFloat(formValues.area),
       status: formValues.status,
       ownerId: selectedOwner?.id || null,
       ownerPhone: formValues.ownerPhone || "",
+      residents: currentResidentIds, // Include current residents to prevent them from being lost
     };
+
+    // APPROACH 2: Simpler approach - let backend handle residents preservation
+    // Uncomment below if you prefer to rely on backend logic for residents preservation
+    // const data = {
+    //   addressNumber: parseInt(formValues.addressNumber),
+    //   area: parseFloat(formValues.area),
+    //   status: formValues.status,
+    //   ownerId: selectedOwner?.id || null,
+    //   ownerPhone: formValues.ownerPhone || "",
+    //   // residents field omitted - backend will preserve existing residents
+    // };
 
     try {
       await axios.put(

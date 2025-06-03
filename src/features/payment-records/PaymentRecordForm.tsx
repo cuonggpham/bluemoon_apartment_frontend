@@ -284,6 +284,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
   const [fees, setFees] = useState<Fee[]>([]);
   const [residents, setResidents] = useState<Resident[]>([]);
   const [apartments, setApartments] = useState<Apartment[]>([]);
+  const [paymentRecords, setPaymentRecords] = useState<any[]>([]);
   const [filteredResidents, setFilteredResidents] = useState<Resident[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPayer, setSelectedPayer] = useState<Resident | null>(null);
@@ -292,11 +293,12 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Fetch fees, residents, and apartments on component mount
+  // Fetch fees, residents, apartments and payment records on component mount
   useEffect(() => {
     fetchFees();
     fetchResidents();
     fetchApartments();
+    fetchPaymentRecords();
   }, []);
 
   // Handle click outside to close search results
@@ -341,16 +343,18 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
 
   const fetchFees = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/fees');
+      const response = await fetch('http://localhost:8080/api/v1/fees/all');
       const data = await response.json();
       console.log('Fees API response:', data); // Debug log
       
       // Check if response is successful and has data
-      if (data.data && data.data.result) {
-        setFees(data.data.result);
-        console.log('Fees loaded:', data.data.result); // Debug log
-      } else if (data.data && Array.isArray(data.data)) {
+      if (data.code === 200 && data.data && Array.isArray(data.data)) {
         setFees(data.data);
+        console.log('Fees loaded:', data.data); // Debug log
+      } else if (data && Array.isArray(data)) {
+        // Fallback for direct array response
+        setFees(data);
+        console.log('Fees loaded (fallback):', data); // Debug log
       } else {
         console.error('Unexpected API response structure:', data);
         toast.error('Invalid response format for fee items');
@@ -405,6 +409,70 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
     }
   };
 
+  const fetchPaymentRecords = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/payment-records');
+      const data = await response.json();
+      console.log('Payment Records API response:', data); // Debug log
+      
+      // Check if response is successful and has data
+      if (data.data && Array.isArray(data.data)) {
+        setPaymentRecords(data.data);
+        console.log('Payment Records loaded:', data.data); // Debug log
+      } else if (data.code === 200 && data.data && Array.isArray(data.data)) {
+        setPaymentRecords(data.data);
+      } else {
+        console.error('Unexpected API response structure:', data);
+        toast.error('Invalid response format for payment records');
+      }
+    } catch (error) {
+      console.error('Error fetching payment records:', error);
+      toast.error('Failed to load payment records');
+    }
+  };
+
+  // Helper function to check if a fee has been paid
+  const isFeeAlreadyPaid = (feeId: number) => {
+    return paymentRecords.some(record => record.feeId === feeId);
+  };
+
+  // Helper function to check if apartment has paid for voluntary fee
+  const hasApartmentPaidVoluntaryFee = (feeId: number, apartmentId: number) => {
+    return paymentRecords.some(record => 
+      record.feeId === feeId && record.apartmentId === apartmentId
+    );
+  };
+
+  // Get filtered fees based on payment history
+  const getAvailableFees = () => {
+    return fees.filter(fee => {
+      // For mandatory fees (gắn cụ thể với 1 hộ), hide if already paid
+      if (fee.feeTypeEnum === 'MANDATORY' || 
+          fee.feeTypeEnum === 'VEHICLE_PARKING' || 
+          fee.feeTypeEnum === 'FLOOR_AREA' ||
+          fee.feeTypeEnum === 'Mandatory' ||
+          fee.feeTypeEnum === 'Vehicle Parking' ||
+          fee.feeTypeEnum === 'Floor Area') {
+        return !isFeeAlreadyPaid(fee.id);
+      }
+      // For voluntary fees, always show (filtering will be done on apartment level)
+      return true;
+    });
+  };
+
+  // Get filtered apartments for voluntary fees
+  const getAvailableApartments = () => {
+    if (!selectedFee || 
+        (selectedFee.feeTypeEnum !== 'VOLUNTARY' && selectedFee.feeTypeEnum !== 'Voluntary')) {
+      return apartments;
+    }
+    
+    // For voluntary fees, hide apartments that have already paid
+    return apartments.filter(apartment => 
+      !hasApartmentPaidVoluntaryFee(selectedFee.id, apartment.addressNumber)
+    );
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -418,7 +486,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       setSelectedFee(fee || null);
       
       // If mandatory fee, auto-clear apartment selection
-      if (fee && fee.feeTypeEnum === 'Mandatory') {
+      if (fee && (fee.feeTypeEnum === 'Mandatory' || fee.feeTypeEnum === 'MANDATORY')) {
         setFormData(prev => ({
           ...prev,
           apartmentId: ''
@@ -447,7 +515,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
     }
     
     // Check apartment requirement for voluntary fees
-    if (selectedFee && selectedFee.feeTypeEnum === 'VOLUNTARY' && !formData.apartmentId) {
+    if (selectedFee && (selectedFee.feeTypeEnum === 'VOLUNTARY' || selectedFee.feeTypeEnum === 'Voluntary') && !formData.apartmentId) {
       newErrors.apartmentId = 'Please select an apartment for voluntary fee';
     }
     
@@ -482,7 +550,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       };
       
       // Only include apartmentId for voluntary fees
-      if (selectedFee && selectedFee.feeTypeEnum === 'VOLUNTARY' && formData.apartmentId) {
+      if (selectedFee && (selectedFee.feeTypeEnum === 'VOLUNTARY' || selectedFee.feeTypeEnum === 'Voluntary') && formData.apartmentId) {
         payload.apartmentId = parseInt(formData.apartmentId);
       }
       
@@ -512,6 +580,8 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         setSelectedPayer(null);
         setSelectedFee(null);
         setSearchTerm('');
+        // Refresh payment records to update available fees/apartments
+        fetchPaymentRecords();
         onSuccess?.();
       } else {
         const errorMessage = result.message || 'Failed to add payment';
@@ -564,7 +634,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
             title="Select fee item"
           >
             <option value="">Select a fee item</option>
-            {fees.map(fee => (
+            {getAvailableFees().map(fee => (
               <option key={fee.id} value={fee.id}>
                 {fee.name} - {formatCurrency(fee.amount)} ({fee.feeTypeEnum})
               </option>
@@ -574,7 +644,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         </FormGroup>
 
         {/* Show apartment selection only for voluntary fees */}
-        {selectedFee && selectedFee.feeTypeEnum === 'VOLUNTARY' && (
+        {selectedFee && (selectedFee.feeTypeEnum === 'VOLUNTARY' || selectedFee.feeTypeEnum === 'Voluntary') && (
           <FormGroup>
             <Label htmlFor="apartmentId">Apartment *</Label>
             <Select
@@ -583,9 +653,10 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
               value={formData.apartmentId}
               onChange={handleInputChange}
               aria-label="Select apartment for voluntary fee"
+              title="Select apartment for voluntary fee"
             >
               <option value="">Select an apartment</option>
-              {apartments.map(apartment => (
+              {getAvailableApartments().map(apartment => (
                 <option key={apartment.addressNumber} value={apartment.addressNumber}>
                   Apartment {apartment.addressNumber} - {apartment.area}m² ({apartment.status})
                 </option>
@@ -596,7 +667,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         )}
 
         {/* Show apartment info for mandatory fees */}
-        {selectedFee && selectedFee.feeTypeEnum === 'Mandatory' && selectedFee.apartmentId && (
+        {selectedFee && (selectedFee.feeTypeEnum === 'Mandatory' || selectedFee.feeTypeEnum === 'MANDATORY') && selectedFee.apartmentId && (
           <FormGroup>
             <Label>Apartment (Auto-assigned)</Label>
             <div style={{ 
