@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { animate } from 'animejs';
+import { HiOutlinePlusCircle } from "react-icons/hi2";
 import Heading from '../../../components/Heading';
+import Button from '../../../components/Button';
+import Modal from '../../../components/Modal';
 import PaymentRecordForm from '../../../features/payment-records/PaymentRecordForm';
 import PaymentRecordTable from '../../../features/payment-records/PaymentRecordTable';
 
@@ -47,6 +50,9 @@ const HeaderSection = styled.div`
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(229, 231, 235, 0.6);
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 
   &::after {
     content: '';
@@ -58,6 +64,17 @@ const HeaderSection = styled.div`
     background: linear-gradient(90deg, #22c55e, #16a34a);
     border-radius: 2px;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+`;
+
+const HeaderContent = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 const StyledHeading = styled(Heading)`
@@ -84,60 +101,14 @@ const Description = styled.p`
   line-height: var(--line-height-normal);
 `;
 
-const TabContainer = styled.div`
+const AddButton = styled(Button)`
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
-  background: rgba(248, 250, 252, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 12px 12px 0 0;
-  padding: 0.5rem;
-`;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
 
-const Tab = styled.button<{ active: boolean }>`
-  padding: 0.75rem 1.5rem;
-  border: none;
-  background: ${props => props.active 
-    ? 'linear-gradient(135deg, #22c55e, #16a34a)'
-    : 'transparent'};
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: ${props => props.active ? 'white' : '#6b7280'};
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  &:hover {
-    color: ${props => props.active ? 'white' : '#22c55e'};
-    background: ${props => props.active 
-      ? 'linear-gradient(135deg, #16a34a, #15803d)'
-      : 'rgba(34, 197, 94, 0.05)'};
-    transform: translateY(-1px);
-  }
-
-  &:hover::before {
-    opacity: 1;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.5rem 1rem;
-    font-size: var(--font-size-sm);
+  @media (max-width: 768px) {
+    align-self: flex-end;
   }
 `;
 
@@ -165,11 +136,9 @@ const ContentSection = styled.div`
 `;
 
 export default function PaymentRecording() {
-  const [activeTab, setActiveTab] = useState<'record' | 'history'>('record');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const tabContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -195,17 +164,6 @@ export default function PaymentRecording() {
       });
     }
 
-    // Tab container animation
-    if (tabContainerRef.current) {
-      animate(tabContainerRef.current, {
-        scale: [0.95, 1],
-        opacity: [0, 1],
-        duration: 300,
-        easing: 'easeOutCubic',
-        delay: 250
-      });
-    }
-
     // Content animation
     if (contentRef.current) {
       animate(contentRef.current, {
@@ -220,37 +178,32 @@ export default function PaymentRecording() {
 
   const handlePaymentSuccess = () => {
     setRefreshTrigger(prev => prev + 1);
-    setActiveTab('history');
   };
 
   return (
     <PageContainer ref={containerRef}>
       <HeaderSection ref={headerRef}>
-        <StyledHeading as="h1">Payment Recording</StyledHeading>
-        <Description>Record and manage fee payments from residents</Description>
+        <HeaderContent>
+          <StyledHeading as="h1">Payment Recording</StyledHeading>
+          <Description>Record and manage fee payments from residents</Description>
+        </HeaderContent>
+        
+        <Modal>
+          <Modal.Open id="add-payment">
+            <AddButton variation="primary" size="medium">
+              <HiOutlinePlusCircle />
+              Add Payment
+            </AddButton>
+          </Modal.Open>
+
+          <Modal.Window id="add-payment" name="Record New Payment">
+            <PaymentRecordForm onSuccess={handlePaymentSuccess} />
+          </Modal.Window>
+        </Modal>
       </HeaderSection>
 
-      <TabContainer ref={tabContainerRef}>
-        <Tab 
-          active={activeTab === 'record'} 
-          onClick={() => setActiveTab('record')}
-        >
-          Record Payment
-        </Tab>
-        <Tab 
-          active={activeTab === 'history'} 
-          onClick={() => setActiveTab('history')}
-        >
-          Payment History
-        </Tab>
-      </TabContainer>
-
       <ContentSection ref={contentRef}>
-        {activeTab === 'record' ? (
-          <PaymentRecordForm onSuccess={handlePaymentSuccess} />
-        ) : (
-          <PaymentRecordTable refreshTrigger={refreshTrigger} />
-        )}
+        <PaymentRecordTable refreshTrigger={refreshTrigger} />
       </ContentSection>
     </PageContainer>
   );
