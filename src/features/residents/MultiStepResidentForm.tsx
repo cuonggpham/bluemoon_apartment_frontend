@@ -828,6 +828,7 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
               <FormField>
                 <FormField.Label label="Search Apartment by Number" required />
                 <FormField.Input
+                  id="apartmentSearch"
                   type="text"
                   value={searchValue}
                   onChange={handleApartmentSearch}

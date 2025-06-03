@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
+import ApartmentSearchDropdown from '../../components/ApartmentSearchDropdown';
 
 // Custom debounce function
 const debounce = (func: Function, wait: number) => {
@@ -288,6 +289,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
   const [filteredResidents, setFilteredResidents] = useState<Resident[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPayer, setSelectedPayer] = useState<Resident | null>(null);
+  const [selectedApartment, setSelectedApartment] = useState<Apartment | null>(null);
   const [selectedFee, setSelectedFee] = useState<Fee | null>(null);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -431,46 +433,42 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
     }
   };
 
-  // Helper function to check if a fee has been paid
-  const isFeeAlreadyPaid = (feeId: number) => {
-    return paymentRecords.some(record => record.feeId === feeId);
-  };
-
-  // Helper function to check if apartment has paid for voluntary fee
-  const hasApartmentPaidVoluntaryFee = (feeId: number, apartmentId: number) => {
+  // Helper function to check if apartment has paid for a specific fee
+  const hasApartmentPaidFee = (feeId: number, apartmentId: number) => {
     return paymentRecords.some(record => 
       record.feeId === feeId && record.apartmentId === apartmentId
     );
   };
 
-  // Get filtered fees based on payment history
-  const getAvailableFees = () => {
+  // Get fees available for the selected apartment
+  const getAvailableFeesForApartment = () => {
+    if (!selectedApartment) {
+      return [];
+    }
+
     return fees.filter(fee => {
-      // For mandatory fees (gắn cụ thể với 1 hộ), hide if already paid
-      if (fee.feeTypeEnum === 'MANDATORY' || 
-          fee.feeTypeEnum === 'VEHICLE_PARKING' || 
-          fee.feeTypeEnum === 'FLOOR_AREA' ||
-          fee.feeTypeEnum === 'Mandatory' ||
-          fee.feeTypeEnum === 'Vehicle Parking' ||
-          fee.feeTypeEnum === 'Floor Area') {
-        return !isFeeAlreadyPaid(fee.id);
+      // Check if this apartment has already paid for this fee
+      const alreadyPaid = hasApartmentPaidFee(fee.id, selectedApartment.addressNumber);
+      
+      if (alreadyPaid) {
+        return false; // Don't show fees already paid by this apartment
       }
-      // For voluntary fees, always show (filtering will be done on apartment level)
+
+      // For mandatory fees, check if they belong to this apartment
+      if (fee.feeTypeEnum === 'MANDATORY' || fee.feeTypeEnum === 'Mandatory' ||
+          fee.feeTypeEnum === 'VEHICLE_PARKING' || fee.feeTypeEnum === 'Vehicle Parking' ||
+          fee.feeTypeEnum === 'FLOOR_AREA' || fee.feeTypeEnum === 'Floor Area') {
+        return fee.apartmentId === selectedApartment.addressNumber;
+      }
+      
+      // For voluntary fees, show all that haven't been paid by this apartment
+      if (fee.feeTypeEnum === 'VOLUNTARY' || fee.feeTypeEnum === 'Voluntary') {
+        return true;
+      }
+      
+      // For other fee types, show if not paid
       return true;
     });
-  };
-
-  // Get filtered apartments for voluntary fees
-  const getAvailableApartments = () => {
-    if (!selectedFee || 
-        (selectedFee.feeTypeEnum !== 'VOLUNTARY' && selectedFee.feeTypeEnum !== 'Voluntary')) {
-      return apartments;
-    }
-    
-    // For voluntary fees, hide apartments that have already paid
-    return apartments.filter(apartment => 
-      !hasApartmentPaidVoluntaryFee(selectedFee.id, apartment.addressNumber)
-    );
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -485,11 +483,11 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       const fee = fees.find(f => f.id === parseInt(value));
       setSelectedFee(fee || null);
       
-      // If mandatory fee, auto-clear apartment selection
-      if (fee && (fee.feeTypeEnum === 'Mandatory' || fee.feeTypeEnum === 'MANDATORY')) {
+      // Auto-fill amount from fee
+      if (fee) {
         setFormData(prev => ({
           ...prev,
-          apartmentId: ''
+          amount: fee.amount.toString()
         }));
       }
     }
@@ -503,6 +501,35 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
     }
   };
 
+  // Handle apartment selection from dropdown
+  const handleApartmentSelect = (apartment: any) => {
+    if (apartment) {
+      setSelectedApartment(apartment);
+      setFormData(prev => ({
+        ...prev,
+        apartmentId: apartment.addressNumber.toString(),
+        feeId: '' // Clear fee selection when apartment changes
+      }));
+      setSelectedFee(null);
+    } else {
+      setSelectedApartment(null);
+      setFormData(prev => ({
+        ...prev,
+        apartmentId: '',
+        feeId: ''
+      }));
+      setSelectedFee(null);
+    }
+    
+    // Clear apartment error when selection is made
+    if (errors.apartmentId) {
+      setErrors(prev => ({
+        ...prev,
+        apartmentId: ''
+      }));
+    }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
@@ -510,17 +537,16 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       newErrors.payerId = 'Please select a payer';
     }
     
+    if (!formData.apartmentId) {
+      newErrors.apartmentId = 'Please select an apartment';
+    }
+    
     if (!formData.feeId) {
       newErrors.feeId = 'Please select a fee item';
     }
     
-    // Check apartment requirement for voluntary fees
-    if (selectedFee && (selectedFee.feeTypeEnum === 'VOLUNTARY' || selectedFee.feeTypeEnum === 'Voluntary') && !formData.apartmentId) {
-      newErrors.apartmentId = 'Please select an apartment for voluntary fee';
-    }
-    
     if (!formData.paymentDate) {
-      newErrors.paymentDate = 'Please select a payment date';
+      newErrors.paymentDate = 'Please select payment date';
     }
     
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
@@ -541,33 +567,31 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
     setLoading(true);
     
     try {
-      const payload: any = {
+      const submitData = {
         payerId: selectedPayer!.id,
         feeId: parseInt(formData.feeId),
+        apartmentId: parseInt(formData.apartmentId),
         paymentDate: formData.paymentDate,
         amount: parseFloat(formData.amount),
-        notes: formData.notes
+        notes: formData.notes || null
       };
       
-      // Only include apartmentId for voluntary fees
-      if (selectedFee && (selectedFee.feeTypeEnum === 'VOLUNTARY' || selectedFee.feeTypeEnum === 'Voluntary') && formData.apartmentId) {
-        payload.apartmentId = parseInt(formData.apartmentId);
-      }
+      console.log('Submitting payment:', submitData);
       
       const response = await fetch('http://localhost:8080/api/v1/payment-records', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(submitData),
       });
       
-      const result = await response.json();
-      console.log('Payment API response:', result); // Debug log
+      const responseData = await response.json();
+      console.log('Payment response:', responseData);
       
-      // Handle the response structure from ApiResponse
-      if (result.code === 200 && result.data) {
-        toast.success(result.message || 'Payment added successfully');
+      if (response.ok) {
+        toast.success('Payment recorded successfully!');
+        
         // Reset form
         setFormData({
           payerId: '',
@@ -578,18 +602,24 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
           notes: ''
         });
         setSelectedPayer(null);
+        setSelectedApartment(null);
         setSelectedFee(null);
         setSearchTerm('');
-        // Refresh payment records to update available fees/apartments
-        fetchPaymentRecords();
-        onSuccess?.();
+        setErrors({});
+        
+        // Refresh payment records
+        await fetchPaymentRecords();
+        
+        // Call success callback to refresh parent component
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
-        const errorMessage = result.message || 'Failed to add payment';
-        toast.error(errorMessage);
+        throw new Error(responseData.message || 'Failed to record payment');
       }
-    } catch (error) {
-      console.error('Error creating payment record:', error);
-      toast.error('An error occurred while processing the payment');
+    } catch (error: any) {
+      console.error('Error recording payment:', error);
+      toast.error(error.message || 'Failed to record payment. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -623,66 +653,55 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       </h2>
       
       <PaymentForm onSubmit={handleSubmit}>
+        {/* Step 1: Select Apartment */}
         <FormGroup>
-          <Label htmlFor="feeId">Fee Item *</Label>
-          <Select
-            id="feeId"
-            name="feeId"
-            value={formData.feeId}
-            onChange={handleInputChange}
-            aria-label="Select fee item"
-            title="Select fee item"
-          >
-            <option value="">Select a fee item</option>
-            {getAvailableFees().map(fee => (
-              <option key={fee.id} value={fee.id}>
-                {fee.name} - {formatCurrency(fee.amount)} ({fee.feeTypeEnum})
-              </option>
-            ))}
-          </Select>
-          {errors.feeId && <ErrorMessage>{errors.feeId}</ErrorMessage>}
+          <Label htmlFor="apartmentId">Apartment *</Label>
+          <ApartmentSearchDropdown
+            value={formData.apartmentId}
+            onChange={handleApartmentSelect}
+            placeholder="Search for apartment by number..."
+          />
+          {errors.apartmentId && <ErrorMessage>{errors.apartmentId}</ErrorMessage>}
         </FormGroup>
 
-        {/* Show apartment selection only for voluntary fees */}
-        {selectedFee && (selectedFee.feeTypeEnum === 'VOLUNTARY' || selectedFee.feeTypeEnum === 'Voluntary') && (
+        {/* Step 2: Show fees for selected apartment */}
+        {selectedApartment && (
           <FormGroup>
-            <Label htmlFor="apartmentId">Apartment *</Label>
-            <Select
-              id="apartmentId"
-              name="apartmentId"
-              value={formData.apartmentId}
-              onChange={handleInputChange}
-              aria-label="Select apartment for voluntary fee"
-              title="Select apartment for voluntary fee"
-            >
-              <option value="">Select an apartment</option>
-              {getAvailableApartments().map(apartment => (
-                <option key={apartment.addressNumber} value={apartment.addressNumber}>
-                  Apartment {apartment.addressNumber} - {apartment.area}m² ({apartment.status})
-                </option>
-              ))}
-            </Select>
-            {errors.apartmentId && <ErrorMessage>{errors.apartmentId}</ErrorMessage>}
+            <Label htmlFor="feeId" id="feeId-label">Fee Item for Apartment {selectedApartment.addressNumber} *</Label>
+            {getAvailableFeesForApartment().length > 0 ? (
+              <Select
+                id="feeId"
+                name="feeId"
+                value={formData.feeId}
+                onChange={handleInputChange}
+                aria-labelledby="feeId-label"
+                aria-label="Select fee item for apartment"
+                title="Select fee item for apartment"
+              >
+                <option value="">Select a fee item</option>
+                {getAvailableFeesForApartment().map(fee => (
+                  <option key={fee.id} value={fee.id}>
+                    {fee.name} - {formatCurrency(fee.amount)} ({fee.feeTypeEnum})
+                  </option>
+                ))}
+              </Select>
+            ) : (
+              <div style={{ 
+                padding: '0.85rem', 
+                background: '#fef3c7', 
+                border: '1px solid #f59e0b', 
+                borderRadius: '8px',
+                color: '#92400e',
+                fontWeight: '500'
+              }}>
+                No unpaid fees available for this apartment
+              </div>
+            )}
+            {errors.feeId && <ErrorMessage>{errors.feeId}</ErrorMessage>}
           </FormGroup>
         )}
 
-        {/* Show apartment info for mandatory fees */}
-        {selectedFee && (selectedFee.feeTypeEnum === 'Mandatory' || selectedFee.feeTypeEnum === 'MANDATORY') && selectedFee.apartmentId && (
-          <FormGroup>
-            <Label>Apartment (Auto-assigned)</Label>
-            <div style={{ 
-              padding: '0.75rem', 
-              background: '#f0f9ff', 
-              border: '1px solid #0ea5e9', 
-              borderRadius: '8px',
-              color: '#0369a1',
-              fontWeight: '500'
-            }}>
-              Apartment {selectedFee.apartmentId} (Mandatory Fee)
-            </div>
-          </FormGroup>
-        )}
-
+        {/* Step 3: Select Payer */}
         <FormGroup>
           <Label htmlFor="payerId">Payer *</Label>
           <SearchContainer data-search-container>
@@ -769,6 +788,15 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
             min="0"
             step="0.01"
           />
+          {selectedFee && (
+            <div style={{ 
+              fontSize: '0.75rem', 
+              color: '#6b7280', 
+              marginTop: '0.25rem' 
+            }}>
+              Suggested amount: {formatCurrency(selectedFee.amount)}
+            </div>
+          )}
           {errors.amount && <ErrorMessage>{errors.amount}</ErrorMessage>}
         </FormGroup>
 

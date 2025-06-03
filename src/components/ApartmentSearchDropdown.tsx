@@ -25,7 +25,7 @@ const Input = styled.input`
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   min-height: 48px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   
@@ -71,7 +71,7 @@ const ClearButton = styled.button`
   padding: 0.5rem;
   border-radius: 8px;
   font-size: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,7 +90,7 @@ const ClearButton = styled.button`
   }
 `;
 
-const DropdownList = styled.ul`
+const DropdownList = styled.ul<{ hidden: boolean }>`
   position: absolute;
   top: 100%;
   left: 0;
@@ -109,7 +109,7 @@ const DropdownList = styled.ul`
     0 8px 25px rgba(0, 0, 0, 0.15),
     0 4px 12px rgba(0, 0, 0, 0.1);
   
-  ${props => props.hidden && `display: none;`}
+  ${({ hidden }) => hidden && `display: none;`}
 `;
 
 const DropdownItem = styled.li`
@@ -168,10 +168,10 @@ export default function ApartmentSearchDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [allApartments, setAllApartments] = useState<Apartment[]>([]);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout>();
-  // Fetch all apartments on component mount
+
   useEffect(() => {
     const fetchApartments = async () => {
       try {
@@ -191,12 +191,10 @@ export default function ApartmentSearchDropdown({
     fetchApartments();
   }, []);
 
-  // Update searchValue when value prop changes
   useEffect(() => {
     setSearchValue(String(value || ""));
   }, [value]);
 
-  // Debounced search function
   const debouncedSearch = (searchTerm: string) => {
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
@@ -224,6 +222,7 @@ export default function ApartmentSearchDropdown({
     setSearchValue(newValue);
     debouncedSearch(newValue);
   };
+
   const handleInputClick = () => {
     const searchStr = String(searchValue || "");
     if (searchStr.trim() !== "" && !isOpen) {
@@ -249,6 +248,9 @@ export default function ApartmentSearchDropdown({
   };
 
   const handleSelectApartment = (apartment: Apartment) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
     setSearchValue(apartment.addressNumber.toString());
     setIsOpen(false);
     setSuggestions([]);
@@ -256,13 +258,15 @@ export default function ApartmentSearchDropdown({
   };
 
   const handleClearSelection = () => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
     setSearchValue("");
     setIsOpen(false);
     setSuggestions([]);
     onChange(null);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -278,11 +282,6 @@ export default function ApartmentSearchDropdown({
       }
     };
   }, []);
-
-  // Update search value when value prop changes
-  useEffect(() => {
-    setSearchValue(value);
-  }, [value]);
 
   return (
     <DropdownContainer ref={containerRef}>
@@ -324,7 +323,8 @@ export default function ApartmentSearchDropdown({
                 </ApartmentInfo>
               </div>
             </DropdownItem>
-          ))        ) : String(searchValue || "").trim() !== "" ? (
+          ))
+        ) : String(searchValue || "").trim() !== "" ? (
           <NoResults>Không tìm thấy căn hộ phù hợp</NoResults>
         ) : null}
       </DropdownList>
