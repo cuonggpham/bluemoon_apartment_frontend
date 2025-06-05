@@ -234,24 +234,22 @@
 /* Forms */
 .auth-forms {
   position: relative;
-  min-height: 400px;
+  margin-bottom: 32px;
 }
 
 .auth-form {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   opacity: 0;
   transform: translateX(20px);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
+  display: none;
 }
 
 .auth-form.active {
   opacity: 1;
   transform: translateX(0);
   pointer-events: all;
+  display: block;
 }
 
 .form-group {
@@ -452,7 +450,7 @@
   justify-content: center;
   gap: 12px;
   font-family: inherit;
-  margin-bottom: 32px;
+  margin-bottom: 48px;
 }
 
 .google-btn:hover {
