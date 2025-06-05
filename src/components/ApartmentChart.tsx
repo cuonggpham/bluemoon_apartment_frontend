@@ -111,7 +111,6 @@ interface ProcessedData {
 const startData: ProcessedData[] = [
   { status: "Business", value: 0 },
   { status: "Residential", value: 0 },
-  { status: "Vacant", value: 0 },
 ];
 
 async function prepareData(): Promise<ProcessedData[]> {
@@ -144,7 +143,6 @@ async function prepareData(): Promise<ProcessedData[]> {
       const status = cur.status;
       if (status === "Business") return incArrayValue(arr, "Business");
       if (status === "Residential") return incArrayValue(arr, "Residential");
-      if (status === "Vacant") return incArrayValue(arr, "Vacant");
       return arr;
     }, startData)
     .filter((obj) => obj.value > 0); // Lọc ra các nhóm có giá trị lớn hơn 0

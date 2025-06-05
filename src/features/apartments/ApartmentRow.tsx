@@ -32,13 +32,12 @@ interface ApartmentProps {
   apartment: {
     addressNumber: string;
     owner: {
-      id: number;
-      name: string;
+      id: number;    name: string;
       // Add other properties if necessary
     };
     ownerPhone: string;
     numberOfMembers: number;
-    status: "Business" | "Residential" | "Vacant"; // Adjust the status types if needed
+    status: "Business" | "Residential"; // Adjust the status types if needed
   };
 }
 
@@ -46,7 +45,6 @@ export default function ApartmentRow({ apartment }: ApartmentProps) {
   const { addressNumber, owner, ownerPhone, numberOfMembers, status } = apartment;
 
   const statusStyled = {
-    Vacant: "red",
     Business: "blue",
     Residential: "green",
   };

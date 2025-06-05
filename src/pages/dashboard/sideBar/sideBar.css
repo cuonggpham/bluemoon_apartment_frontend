@@ -259,9 +259,27 @@
   padding: 0.75rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  position: relative;
+}
+
+.sidebar .profile-icon-collapsed {
+  font-size: 1.5rem;
+  color: #4b5563;
+  opacity: 1;
+  pointer-events: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.active .profile_content .profile {
+  justify-content: space-between;
+}
+
+.sidebar.active .profile-icon-collapsed {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebar .profile_content .profile:hover {
@@ -323,10 +341,14 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(239, 68, 68, 0.2);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebar.active .profile #log_out {
   min-width: 40px;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .profile #log_out:hover {
