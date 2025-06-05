@@ -1,5 +1,4 @@
 export enum VehicleEnum {
-  Bicycle = 'Bicycle',
   Motorbike = 'Motorbike',
   Car = 'Car',
 }
@@ -17,7 +16,6 @@ export interface Vehicle {
 
 export interface VehicleCountSummary {
   apartmentId: number;
-  bicycleCount: number;
   motorbikeCount: number;
   carCount: number;
   totalCount: number;

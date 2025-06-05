@@ -281,15 +281,32 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
     };
 
     try {
-      await axios.post("http://localhost:8080/api/v1/fees", data);
-      toast.success("Fee/Fund added successfully!");
+      // Use different endpoints based on fee type
+      if (formValues.feeTypeEnum === "VOLUNTARY") {
+        // Use bulk creation endpoint for voluntary fees
+        const response = await axios.post("http://localhost:8080/api/v1/fees/voluntary/create-for-all", data);
+        
+        // Extract the number of created fees from response
+        const createdCount = response.data.data?.length || 0;
+        toast.success(`Voluntary fee created successfully for ${createdCount} apartments!`);
+      } else {
+        // Use single creation endpoint for other fee types
+        await axios.post("http://localhost:8080/api/v1/fees", data);
+        toast.success("Fee/Fund added successfully!");
+      }
       
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (err: any) {
       console.error("Error adding fee/fund:", err);
-      toast.error(err.response?.data?.message || "Error adding fee/fund");
+      
+      // Provide more specific error messages
+      if (formValues.feeTypeEnum === "VOLUNTARY") {
+        toast.error(err.response?.data?.message || "Error creating voluntary fee for apartments");
+      } else {
+        toast.error(err.response?.data?.message || "Error adding fee/fund");
+      }
     }
   };
 
@@ -356,6 +373,22 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
           required
           error={errors.feeTypeEnum}
         />
+
+        {/* Info message for VOLUNTARY fees */}
+        {formValues.feeTypeEnum === "VOLUNTARY" && (
+          <div style={{ 
+            backgroundColor: '#dbeafe', 
+            borderLeft: '4px solid #3b82f6', 
+            padding: '12px 16px', 
+            marginTop: '8px',
+            borderRadius: '4px',
+            fontSize: '0.875rem',
+            color: '#1e40af'
+          }}>
+            <strong>ℹ️ Note:</strong> Voluntary fees will be automatically created for all apartments in the system. 
+            Each apartment will get a separate fee record with the same amount.
+          </div>
+        )}
 
         {/* Apartment Selection - Only show for Mandatory fees */}
         {formValues.feeTypeEnum === "MANDATORY" && (
@@ -468,7 +501,10 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
             variation="primary"
           >
             <HiOutlinePlusCircle />
-            Add Fee/Fund
+            {formValues.feeTypeEnum === "VOLUNTARY" 
+              ? "Create Fee for All Apartments" 
+              : "Add Fee/Fund"
+            }
           </Button>
         )}
       </ButtonGroup>

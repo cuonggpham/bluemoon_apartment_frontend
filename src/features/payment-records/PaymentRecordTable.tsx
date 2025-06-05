@@ -78,6 +78,48 @@ const SearchInput = styled.input`
   }
 `;
 
+const DebtStatus = styled.span<{ $isDebt: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 1.275rem;
+  font-weight: 600;
+  background: ${props => props.$isDebt ? '#fef2f2' : '#f0fdf4'};
+  color: ${props => props.$isDebt ? '#dc2626' : '#16a34a'};
+  border: 1px solid ${props => props.$isDebt ? '#fecaca' : '#bbf7d0'};
+`;
+
+const UpdateButton = styled.button`
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 1.275rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  
+  &:hover {
+    background: #d97706;
+  }
+  
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+`;
+
+const ActionCell = styled(TableCell)`
+  min-width: 120px;
+  text-align: center;
+`;
+
 interface PaymentRecord {
   id: number;
   payerId: number;
@@ -90,6 +132,8 @@ interface PaymentRecord {
   amount: number;
   notes: string;
   createdAt: string;
+  isFullyPaid: boolean;
+  remainingAmount: number;
 }
 
 interface PaymentRecordTableProps {
@@ -100,6 +144,8 @@ export default function PaymentRecordTable({ refreshTrigger }: PaymentRecordTabl
   const [paymentRecords, setPaymentRecords] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [updateMode, setUpdateMode] = useState<{ recordId: number; currentAmount: number } | null>(null);
+  const [updateAmount, setUpdateAmount] = useState('');
 
   useEffect(() => {
     fetchPaymentRecords();
@@ -132,6 +178,52 @@ export default function PaymentRecordTable({ refreshTrigger }: PaymentRecordTabl
       setPaymentRecords([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdatePayment = (record: PaymentRecord) => {
+    setUpdateMode({ recordId: record.id, currentAmount: record.amount });
+    setUpdateAmount(record.amount.toString());
+  };
+
+  const handleCancelUpdate = () => {
+    setUpdateMode(null);
+    setUpdateAmount('');
+  };
+
+  const handleSaveUpdate = async () => {
+    if (!updateMode) return;
+    
+    try {
+      const record = paymentRecords.find(r => r.id === updateMode.recordId);
+      if (!record) return;
+
+      const response = await fetch(`http://localhost:8080/api/v1/payment-records/${updateMode.recordId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payerId: record.payerId,
+          feeId: record.feeId,
+          paymentDate: record.paymentDate,
+          amount: parseFloat(updateAmount),
+          notes: record.notes
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update payment');
+      }
+
+      toast.success('Payment updated successfully!');
+      setUpdateMode(null);
+      setUpdateAmount('');
+      await fetchPaymentRecords(); // Refresh data
+    } catch (error: any) {
+      console.error('Error updating payment:', error);
+      toast.error(error.message || 'Failed to update payment');
     }
   };
 
@@ -190,46 +282,101 @@ export default function PaymentRecordTable({ refreshTrigger }: PaymentRecordTabl
               <TableHeader>Apartment</TableHeader>
               <TableHeader>Payment Date</TableHeader>
               <TableHeader>Amount</TableHeader>
+              <TableHeader>Status</TableHeader>
               <TableHeader>Notes</TableHeader>
-              <TableHeader>Created</TableHeader>
+              <TableHeader>Actions</TableHeader>
             </tr>
           </thead>
           <tbody>
             {filteredRecords.map((record) => (
               <TableRow key={record.id}>
                 <TableCell>{record.id}</TableCell>
-                <TableCell>
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '1.3rem' }}>{record.payerName}</div>
-                    <div style={{ fontSize: '1.2rem', color: '#6b7280' }}>ID: {record.payerId}</div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '1.3rem' }}>{record.feeName}</div>
-                    <div style={{ fontSize: '1.2rem', color: '#6b7280' }}>ID: {record.feeId}</div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '1.3rem' }}>Apt {record.apartmentNumber}</div>
-                    <div style={{ fontSize: '1.2rem', color: '#6b7280' }}>ID: {record.apartmentId}</div>
-                  </div>
-                </TableCell>
+                <TableCell>{record.payerName}</TableCell>
+                <TableCell>{record.feeName}</TableCell>
+                <TableCell>#{record.apartmentNumber}</TableCell>
                 <TableCell>{formatDate(record.paymentDate)}</TableCell>
-                <TableCell style={{ fontWeight: '700', color: '#059669', fontSize: '1.4rem' }}>
-                  {formatAmount(record.amount)}
-                </TableCell>
                 <TableCell>
-                  {record.notes ? (
-                    <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {record.notes}
+                  {updateMode?.recordId === record.id ? (
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <input
+                        type="number"
+                        value={updateAmount}
+                        onChange={(e) => setUpdateAmount(e.target.value)}
+                        placeholder="Enter amount"
+                        title="Update payment amount"
+                        style={{
+                          padding: '0.5rem 0.75rem',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          fontSize: '0.875rem',
+                          width: '120px'
+                        }}
+                        min="0"
+                        step="0.01"
+                      />
+                      <button
+                        onClick={handleSaveUpdate}
+                        style={{
+                          background: '#10b981',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '6px',
+                          fontSize: '0.875rem',
+                          cursor: 'pointer',
+                          fontWeight: '600'
+                        }}
+                      >
+                        ✓
+                      </button>
+                      <button
+                        onClick={handleCancelUpdate}
+                        style={{
+                          background: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '6px',
+                          fontSize: '0.875rem',
+                          cursor: 'pointer',
+                          fontWeight: '600'
+                        }}
+                      >
+                        ✕
+                      </button>
                     </div>
                   ) : (
-                    <span style={{ color: '#9ca3af', fontStyle: 'italic', fontSize: '1.2rem' }}>No notes</span>
+                    formatAmount(record.amount)
                   )}
                 </TableCell>
-                <TableCell>{formatDate(record.createdAt)}</TableCell>
+                <TableCell>
+                  <DebtStatus $isDebt={!record.isFullyPaid}>
+                    {record.isFullyPaid ? (
+                      <>✅ Paid</>
+                    ) : (
+                      <>⚠️ Debt: {formatAmount(record.remainingAmount)}</>
+                    )}
+                  </DebtStatus>
+                </TableCell>
+                <TableCell>{record.notes || '-'}</TableCell>
+                <ActionCell>
+                  {!record.isFullyPaid ? (
+                    <UpdateButton 
+                      onClick={() => handleUpdatePayment(record)}
+                      title="Update payment amount"
+                    >
+                      💰 Update
+                    </UpdateButton>
+                  ) : (
+                    <span style={{ 
+                      color: '#10b981', 
+                      fontSize: '1.275rem', 
+                      fontWeight: '600' 
+                    }}>
+                      ✅ Completed
+                    </span>
+                  )}
+                </ActionCell>
               </TableRow>
             ))}
           </tbody>

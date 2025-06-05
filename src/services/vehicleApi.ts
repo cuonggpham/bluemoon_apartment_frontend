@@ -79,7 +79,6 @@ export const vehicleApi = {
   async getVehicleCountsByAllTypes(apartmentId: number) {
     const summary = await this.getVehicleCountSummary(apartmentId);
     return {
-      [VehicleEnum.Bicycle]: summary.bicycleCount,
       [VehicleEnum.Motorbike]: summary.motorbikeCount,
       [VehicleEnum.Car]: summary.carCount,
       total: summary.totalCount,
