@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="inner-footer">
           <div className="footer__left">
             <i className="bx bx-copyright"></i>
-            2024 Department Web
+            2025 Department Web
           </div>
           <div className="footer__right">Privacy Policy • Refund Policy</div>
         </div>
