@@ -3,9 +3,11 @@ import Form from "../../components/Form";
 import FormField from "../../components/FormField";
 import Selector from "../../components/Selector";
 import Button from "../../components/Button";
-import { HiOutlinePlusCircle, HiPencil, HiTrash, HiHome, HiUser, HiPhone } from "react-icons/hi2";
+import Modal from "../../components/Modal";
+import { HiOutlinePlusCircle, HiPencil, HiTrash, HiHome, HiUser, HiPhone, HiUserPlus } from "react-icons/hi2";
 import Table from "../../components/Table";
 import ResidentSearchDropdown from "../../components/ResidentSearchDropdown";
+import MultiStepResidentForm from "../residents/MultiStepResidentForm";
 import axios from "axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
@@ -163,6 +165,20 @@ const ButtonGroup = styled.div`
   padding-top: 1.5rem;
   border-top: 1px solid rgba(226, 232, 240, 0.6);
   margin-top: 1.5rem;
+`;
+
+const AddResidentButton = styled(Button)`
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const ResidentsHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 `;
 
 interface Resident {
@@ -465,7 +481,24 @@ export default function ApartmentForm({
         <SectionCard>
           <ResidentsTable>
             <TableHeader>
-              <TableTitle>Current Residents</TableTitle>
+              <ResidentsHeader>
+                <TableTitle>Current Residents</TableTitle>
+                <Modal>
+                  <Modal.Open id="add-resident">
+                    <AddResidentButton
+                      type="button"
+                      variation="primary"
+                      size="compact"
+                    >
+                      <HiUserPlus />
+                      Add Resident
+                    </AddResidentButton>
+                  </Modal.Open>
+                  <Modal.Window id="add-resident" name="Add Resident to Apartment">
+                    <MultiStepResidentForm apartmentId={apartment.addressNumber} />
+                  </Modal.Window>
+                </Modal>
+              </ResidentsHeader>
             </TableHeader>
             
             {formValues.residents.length > 0 ? (
