@@ -407,9 +407,12 @@ interface ApartmentData {
   ownerPhone: string;
 }
 
-export default function MultiStepResidentForm({ onCloseModal }: any) {
+export default function MultiStepResidentForm({ onCloseModal, apartmentId }: any) {
+  // If apartmentId is provided, start at step 1 and skip apartment selection
   const [currentStep, setCurrentStep] = useState(1);
-  const [apartmentOption, setApartmentOption] = useState<"existing" | "new" | null>(null);
+  const [apartmentOption, setApartmentOption] = useState<"existing" | "new" | null>(
+    apartmentId ? "existing" : null
+  );
   
   // Add validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -431,10 +434,11 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
     status: "Residential",
     ownerPhone: "",
   });
-  // For existing apartment selection
-  const [selectedApartmentId, setSelectedApartmentId] = useState("");
+  
+  // For existing apartment selection - pre-select if apartmentId provided
+  const [selectedApartmentId, setSelectedApartmentId] = useState(apartmentId || "");
   const [apartmentSuggestions, setApartmentSuggestions] = useState<any[]>([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(apartmentId || "");
   const [isSearching, setIsSearching] = useState(false);
   const [noResultsFound, setNoResultsFound] = useState(false);
 
@@ -614,6 +618,12 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
         toast.error("Please fill in all required fields correctly");
         return;
       }
+      
+      // If apartmentId is provided, skip to submission since apartment is pre-selected
+      if (apartmentId) {
+        handleSubmit();
+        return;
+      }
     } else if (currentStep === 2) {
       // Validate step 2
       if (!validateStep2()) {
@@ -643,11 +653,13 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
         gender: residentData.gender,
         status: residentData.status,
         
-        // Apartment option
-        apartmentOption: apartmentOption,
+        // Apartment option - use pre-selected apartment if provided
+        apartmentOption: apartmentId ? "existing" : apartmentOption,
         
-        // For existing apartment
-        ...(apartmentOption === "existing" && {
+        // For existing apartment - use apartmentId if provided
+        ...(apartmentId ? {
+          existingApartmentId: parseInt(apartmentId)
+        } : apartmentOption === "existing" && {
           existingApartmentId: parseInt(selectedApartmentId)
         }),
         
@@ -665,6 +677,11 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
 
       toast.success("Resident created successfully!");
       
+      // Close modal if onCloseModal function is provided (for apartment-specific form)
+      if (onCloseModal && apartmentId) {
+        onCloseModal();
+      }
+      
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -677,20 +694,32 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
 
   return (
     <FormContainer>
-      {/* Step Indicator */}
+      {/* Step Indicator - Modified for apartment pre-selection */}
       <StepIndicatorContainer>
         <StepFlex>
           <StepCircle $active={currentStep >= 1} $completed={currentStep > 1}>
             1
           </StepCircle>
-          <StepLine $active={currentStep >= 2} />
-          <StepCircle $active={currentStep >= 2} $completed={currentStep > 2}>
-            2
-          </StepCircle>
+          {!apartmentId && (
+            <>
+              <StepLine $active={currentStep >= 2} />
+              <StepCircle $active={currentStep >= 2} $completed={currentStep > 2}>
+                2
+              </StepCircle>
+            </>
+          )}
         </StepFlex>
         <StepLabel $active={currentStep >= 1}>
-          {currentStep === 1 ? "Personal Information" : "Apartment Selection"}
+          {apartmentId ? "Personal Information" : 
+           currentStep === 1 ? "Personal Information" : "Apartment Selection"}
         </StepLabel>
+        {apartmentId && (
+          <InfoNote style={{ marginTop: '1rem' }}>
+            <InfoText>
+              📍 Adding resident to Apartment {apartmentId}
+            </InfoText>
+          </InfoNote>
+        )}
       </StepIndicatorContainer>
 
       {/* Step 1: Personal Information */}
@@ -779,8 +808,8 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
         </SectionCard>
       )}
 
-      {/* Step 2: Apartment Assignment */}
-      {currentStep === 2 && (
+      {/* Step 2: Apartment Assignment - Only show if no apartmentId provided */}
+      {currentStep === 2 && !apartmentId && (
         <SectionCard>
           <SectionHeader>
             <SectionIcon>
@@ -981,7 +1010,7 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
 
       {/* Navigation Buttons */}
       <ButtonGroup>
-        {currentStep > 1 && (
+        {currentStep > 1 && !apartmentId && (
           <Button
             type="button"
             variation="secondary"
@@ -994,7 +1023,7 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
         )}
 
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '1rem' }}>
-          {currentStep < 2 ? (
+          {!apartmentId && currentStep < 2 ? (
             <Button
               type="button"
               variation="primary"
@@ -1009,7 +1038,7 @@ export default function MultiStepResidentForm({ onCloseModal }: any) {
               type="button"
               variation="primary"
               size="compact"
-              onClick={handleSubmit}
+              onClick={apartmentId ? handleSubmit : (currentStep === 2 ? handleSubmit : nextStep)}
             >
               <HiOutlinePlusCircle />
               Add Resident
