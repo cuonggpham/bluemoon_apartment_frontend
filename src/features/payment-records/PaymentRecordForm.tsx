@@ -454,20 +454,9 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         return false; // Don't show fees already paid by this apartment
       }
 
-      // For mandatory fees, check if they belong to this apartment
-      if (fee.feeTypeEnum === 'MANDATORY' || fee.feeTypeEnum === 'Mandatory' ||
-          fee.feeTypeEnum === 'VEHICLE_PARKING' || fee.feeTypeEnum === 'Vehicle Parking' ||
-          fee.feeTypeEnum === 'FLOOR_AREA' || fee.feeTypeEnum === 'Floor Area') {
-        return fee.apartmentId === selectedApartment.addressNumber;
-      }
-      
-      // For voluntary fees, show all that haven't been paid by this apartment
-      if (fee.feeTypeEnum === 'VOLUNTARY' || fee.feeTypeEnum === 'Voluntary') {
-        return true;
-      }
-      
-      // For other fee types, show if not paid
-      return true;
+      // ALL fee types now have apartmentId - only show fees belonging to this apartment
+      // This includes MANDATORY, VOLUNTARY, VEHICLE_PARKING, and FLOOR_AREA fees
+      return fee.apartmentId === selectedApartment.addressNumber;
     });
   };
 
@@ -551,6 +540,22 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
     
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
       newErrors.amount = 'Please enter a valid amount';
+    } else if (selectedFee) {
+      // Validate amount based on fee type
+      const paymentAmount = parseFloat(formData.amount);
+      const feeAmount = selectedFee.amount;
+      
+      if (selectedFee.feeTypeEnum === 'VOLUNTARY') {
+        // Voluntary fees: minimum amount is fee amount
+        if (paymentAmount < feeAmount) {
+          newErrors.amount = `Voluntary fee requires minimum payment of ${formatCurrency(feeAmount)}`;
+        }
+      } else {
+        // Other fees: maximum amount is fee amount
+        if (paymentAmount > feeAmount) {
+          newErrors.amount = `Payment cannot exceed required amount of ${formatCurrency(feeAmount)}`;
+        }
+      }
     }
     
     setErrors(newErrors);
@@ -667,7 +672,12 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         {/* Step 2: Show fees for selected apartment */}
         {selectedApartment && (
           <FormGroup>
-            <Label htmlFor="feeId" id="feeId-label">Fee Item for Apartment {selectedApartment.addressNumber} *</Label>
+            <Label htmlFor="feeId" id="feeId-label">
+              Fee Item for Apartment {selectedApartment.addressNumber} * 
+              <span style={{ fontSize: '0.875rem', fontWeight: '400', color: '#6b7280' }}>
+                ({getAvailableFeesForApartment().length} unpaid fees available)
+              </span>
+            </Label>
             {getAvailableFeesForApartment().length > 0 ? (
               <Select
                 id="feeId"
@@ -694,7 +704,7 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
                 color: '#92400e',
                 fontWeight: '500'
               }}>
-                No unpaid fees available for this apartment
+                ℹ️ No unpaid fees available for apartment {selectedApartment.addressNumber}
               </div>
             )}
             {errors.feeId && <ErrorMessage>{errors.feeId}</ErrorMessage>}
@@ -790,11 +800,23 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
           />
           {selectedFee && (
             <div style={{ 
-              fontSize: '0.75rem', 
+              fontSize: '0.875rem', 
               color: '#6b7280', 
-              marginTop: '0.25rem' 
+              marginTop: '0.5rem',
+              padding: '0.75rem',
+              backgroundColor: selectedFee.feeTypeEnum === 'VOLUNTARY' ? '#f0f9ff' : '#fef3c7',
+              border: `1px solid ${selectedFee.feeTypeEnum === 'VOLUNTARY' ? '#0ea5e9' : '#f59e0b'}`,
+              borderRadius: '6px'
             }}>
-              Suggested amount: {formatCurrency(selectedFee.amount)}
+              <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
+                {selectedFee.feeTypeEnum === 'VOLUNTARY' ? '💝 Voluntary Fee' : '📋 Required Fee'}
+              </div>
+              <div>
+                {selectedFee.feeTypeEnum === 'VOLUNTARY' 
+                  ? `Minimum payment: ${formatCurrency(selectedFee.amount)} (can pay more)`
+                  : `Exact amount: ${formatCurrency(selectedFee.amount)} (cannot exceed)`
+                }
+              </div>
             </div>
           )}
           {errors.amount && <ErrorMessage>{errors.amount}</ErrorMessage>}
