@@ -198,7 +198,7 @@ interface Vehicle {
 interface ApartmentFormProps {
   apartment?: {
     addressNumber: string;
-    status: "Business" | "Residential" | "Vacant" | "";
+    status: "Business" | "Residential" | "";
     area: string;
     ownerName: string;
     ownerPhone: string;
@@ -228,7 +228,7 @@ export default function ApartmentForm({
   // Owner selection state
   const [selectedOwner, setSelectedOwner] = useState<any>(apartment?.owner || null);
 
-  const statusOptions = ["Business", "Residential", "Vacant"];
+  const statusOptions = ["Business", "Residential"];
 
   // Validation function
   const validateForm = () => {
