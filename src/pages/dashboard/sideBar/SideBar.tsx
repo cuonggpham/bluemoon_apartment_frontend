@@ -67,9 +67,9 @@ const SideBar = () => {
           </li>
         ))}
       </ul>
-      
-      <div className="profile_content">
+        <div className="profile_content">
         <div className="profile">
+          <i className="bx bx-user profile-icon-collapsed"></i>
           <div className="profile_details">
             <img
               src="https://i.pinimg.com/564x/5e/7b/9c/5e7b9c338994683cdadd9b52d95223cc.jpg"
