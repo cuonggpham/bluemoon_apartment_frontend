@@ -412,7 +412,7 @@ export default function ResidentForm({ resident }: any) {
         {
           area: apartmentData.area,
           status: apartmentData.status,
-          residentIds: updatedResidentIds
+          residents: updatedResidentIds
         }
       );
 
@@ -456,7 +456,7 @@ export default function ResidentForm({ resident }: any) {
         {
           area: apartmentData.area,
           status: apartmentData.status,
-          residentIds: updatedResidentIds
+          residents: updatedResidentIds
         }
       );
 
