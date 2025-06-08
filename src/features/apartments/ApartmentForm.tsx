@@ -8,7 +8,7 @@ import { HiOutlinePlusCircle, HiPencil, HiTrash, HiHome, HiUser, HiPhone, HiUser
 import Table from "../../components/Table";
 import ResidentSearchDropdown from "../../components/ResidentSearchDropdown";
 import MultiStepResidentForm from "../residents/MultiStepResidentForm";
-import axios from "axios";
+import api from "../../services/axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 
@@ -230,6 +230,8 @@ export default function ApartmentForm({
 
   const statusOptions = ["Business", "Residential"];
 
+
+
   // Validation function
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -311,7 +313,7 @@ export default function ApartmentForm({
     };
 
     try {
-      await axios.post("http://localhost:8080/api/v1/apartments", data);
+      await api.post("/apartments", data);
       toast.success("Apartment added successfully!");
       
       setTimeout(() => {
@@ -361,8 +363,8 @@ export default function ApartmentForm({
     // };
 
     try {
-      await axios.put(
-        `http://localhost:8080/api/v1/apartments/${apartment?.addressNumber}`,
+      await api.put(
+        `/apartments/${apartment?.addressNumber}`,
         data
       );
       toast.success("Apartment updated successfully!");
@@ -378,8 +380,8 @@ export default function ApartmentForm({
 
   const handleDelete = async () => {
     try {
-      await axios.delete(
-        `http://localhost:8080/api/v1/apartments/${apartment?.addressNumber}`
+      await api.delete(
+        `/apartments/${apartment?.addressNumber}`
       );
       toast.success("Apartment deleted successfully!");
       
@@ -532,6 +534,8 @@ export default function ApartmentForm({
           </ResidentsTable>
         </SectionCard>
       )}
+
+
 
       {/* Action Buttons */}
       <ButtonGroup>

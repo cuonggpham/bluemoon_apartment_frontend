@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./utility.css";
 import Table from "./Table";
-import axios from "axios";
+import api from "../services/axios";
 import { toast } from "react-toastify";
 import Pagination from "./Pagination";
 
@@ -16,8 +16,8 @@ const UtilityBillList = ({ refreshTrigger }: { refreshTrigger?: number }) => {
   const fetchUtilityBills = async (page = 1) => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/utilitybills?page=${page}&size=10`
+      const response = await api.get(
+        `/utilitybills?page=${page}&size=10`
       );
       
       setUtilityBills(response.data.data.result || []);
@@ -40,7 +40,7 @@ const UtilityBillList = ({ refreshTrigger }: { refreshTrigger?: number }) => {
   // Update payment status
   const updatePaymentStatus = async (billId: number) => {
     try {
-      await axios.post(`http://localhost:8080/api/v1/utilitybills/update/${billId}`);
+      await api.post(`/utilitybills/update/${billId}`);
       toast.success("Payment status updated successfully!");
       fetchUtilityBills(currentPage); // Refresh data
     } catch (error) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../../services/axios";
 import Button from "../../components/Button";
 import FormField from "../../components/FormField";
 import styled from "styled-components";
@@ -198,7 +198,7 @@ export default function ResidentAddModal({ onResidentsSelect }: ResidentAddModal
   // Hàm gọi API để lấy danh sách residents
   const apiAllResidents = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/residents?size=100&page=1`);
+      const response = await api.get(`/residents?size=100&page=1`);
       const residentsData = response.data.data.result;
 
       // Trích xuất id, name, và dob từ API
