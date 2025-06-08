@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import styled from "styled-components";
 import Heading from "./Heading";
-import axios from "axios";
+import api from "../services/axios";
 import { useEffect, useState } from "react";
 
 const ChartBox = styled.div`
@@ -118,9 +118,7 @@ async function prepareData(): Promise<ProcessedData[]> {
   // Hàm lấy dữ liệu căn hộ từ API
   const fetchApartments = async (): Promise<Apartment[]> => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/v1/residents?size=999"
-      );
+      const response = await api.get("/residents?size=999");
       return response.data.data.result; // Trả về danh sách căn hộ
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu cư dân:", error);

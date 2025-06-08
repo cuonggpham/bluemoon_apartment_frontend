@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./utility.css";
 import Table from "./Table";
 import * as XLSX from "xlsx";
-import axios from "axios";
+import api from "../services/axios";
 import { toast } from "react-toastify";
 
 const UtilityBill = () => {
@@ -20,8 +20,8 @@ const UtilityBill = () => {
   const fetchUtilityBills = async (page = 1) => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/utilitybills?page=${page}&size=10`
+      const response = await api.get(
+        `/utilitybills?page=${page}&size=10`
       );
       console.log("API Response:", response.data); // Debug log
       setUtilityBills(response.data.data.result || []);
@@ -43,7 +43,7 @@ const UtilityBill = () => {
   // Update payment status
   const updatePaymentStatus = async (billId: number) => {
     try {
-      await axios.post(`http://localhost:8080/api/v1/utilitybills/update/${billId}`);
+      await api.post(`/utilitybills/update/${billId}`);
       toast.success("Payment status updated successfully!");
       fetchUtilityBills(currentPage); // Refresh data
     } catch (error) {
@@ -75,8 +75,8 @@ const UtilityBill = () => {
       formData.append("file", selectedFile); // Thêm file vào formData
       formData.append("name", billName); // Thêm tên hóa đơn vào formData
 
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/utilitybills/import",
+      const response = await api.post(
+        "/utilitybills/import",
         formData,
         {
           headers: {

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import axios from "axios";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
 import api from "../../services/axios";

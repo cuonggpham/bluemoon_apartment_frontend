@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./utility.css";
 import Table from "./Table";
 import * as XLSX from "xlsx";
-import axios from "axios";
+import api from "../services/axios";
 import { toast } from "react-toastify";
 
 const UtilityBillUpload = ({ onSuccess }: { onSuccess?: () => void }) => {
@@ -33,8 +33,8 @@ const UtilityBillUpload = ({ onSuccess }: { onSuccess?: () => void }) => {
       formData.append("file", selectedFile);
       formData.append("name", billName);
 
-      await axios.post(
-        "http://localhost:8080/api/v1/utilitybills/import",
+      await api.post(
+        "/utilitybills/import",
         formData,
         {
           headers: {
