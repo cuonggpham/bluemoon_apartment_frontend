@@ -5,7 +5,7 @@ import Button from "../../components/Button";
 import Selector from "../../components/Selector";
 import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
 import { HiOutlinePlusCircle, HiPencil, HiTrash, HiPlus, HiMinus, HiHome, HiUser, HiIdentification } from "react-icons/hi2";
-import axios from "axios";
+import api from "../../services/axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 
@@ -395,8 +395,8 @@ export default function ResidentForm({ resident }: any) {
     setIsUpdatingApartments(true);    
     try {
       // Get current residents of this apartment first
-      const apartmentResponse = await axios.get(
-        `http://localhost:8080/api/v1/apartments/${selectedApartment.addressNumber}`
+      const apartmentResponse = await api.get(
+        `/apartments/${selectedApartment.addressNumber}`
       );
       
       const apartmentData = apartmentResponse.data.data;
@@ -407,8 +407,8 @@ export default function ResidentForm({ resident }: any) {
       const updatedResidentIds = [...currentResidentIds, parseInt(formValues.id)];
 
       // Update apartment assignments via apartment API
-      await axios.put(
-        `http://localhost:8080/api/v1/apartments/${selectedApartment.addressNumber}`,
+      await api.put(
+        `/apartments/${selectedApartment.addressNumber}`,
         {
           area: apartmentData.area,
           status: apartmentData.status,
@@ -438,8 +438,8 @@ export default function ResidentForm({ resident }: any) {
     setIsUpdatingApartments(true);
     try {
       // Get current apartment data
-      const apartmentResponse = await axios.get(
-        `http://localhost:8080/api/v1/apartments/${apartmentId}`
+      const apartmentResponse = await api.get(
+        `/apartments/${apartmentId}`
       );
       
       const apartmentData = apartmentResponse.data.data;
@@ -451,8 +451,8 @@ export default function ResidentForm({ resident }: any) {
         .map((res: any) => res.id);
 
       // Update apartment via API
-      await axios.put(
-        `http://localhost:8080/api/v1/apartments/${apartmentId}`,
+      await api.put(
+        `/apartments/${apartmentId}`,
         {
           area: apartmentData.area,
           status: apartmentData.status,
@@ -497,8 +497,8 @@ export default function ResidentForm({ resident }: any) {
     // or through the MultiStepResidentForm component
 
     try {
-      await axios.post(
-        "http://localhost:8080/api/v1/residents",
+      await api.post(
+        "/residents",
         data
       );
 
@@ -533,8 +533,8 @@ export default function ResidentForm({ resident }: any) {
     };
 
     try {
-      await axios.put(
-        `http://localhost:8080/api/v1/residents/${formValues.id}`,
+      await api.put(
+        `/residents/${formValues.id}`,
         data
       );
 
@@ -552,7 +552,7 @@ export default function ResidentForm({ resident }: any) {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/v1/residents/${formValues.id}`);
+      await api.delete(`/residents/${formValues.id}`);
       
       toast.success("Delete successful");
       

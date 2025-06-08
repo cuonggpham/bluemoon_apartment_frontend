@@ -5,7 +5,7 @@ import Selector from "../../components/Selector";
 import Button from "../../components/Button";
 import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
 import { HiOutlinePlusCircle, HiPencil, HiTrash, HiCurrencyDollar, HiBuildingOffice2, HiDocumentText } from "react-icons/hi2";
-import axios from "axios";
+import api from "../../services/axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 
@@ -284,14 +284,14 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
       // Use different endpoints based on fee type
       if (formValues.feeTypeEnum === "VOLUNTARY") {
         // Use bulk creation endpoint for voluntary fees
-        const response = await axios.post("http://localhost:8080/api/v1/fees/voluntary/create-for-all", data);
+        const response = await api.post("/fees/voluntary/create-for-all", data);
         
         // Extract the number of created fees from response
         const createdCount = response.data.data?.length || 0;
         toast.success(`Voluntary fee created successfully for ${createdCount} apartments!`);
       } else {
         // Use single creation endpoint for other fee types
-        await axios.post("http://localhost:8080/api/v1/fees", data);
+        await api.post("/fees", data);
         toast.success("Fee/Fund added successfully!");
       }
       
@@ -327,7 +327,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
     };
 
     try {
-      await axios.put(`http://localhost:8080/api/v1/fees/${formValues.id}`, data);
+      await api.put(`/fees/${formValues.id}`, data);
       toast.success("Fee/Fund updated successfully!");
       
       setTimeout(() => {
@@ -341,7 +341,7 @@ export default function FeeAndFundForm({ feeOrFund }: any) {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/v1/fees/${formValues.id}`);
+      await api.delete(`/fees/${formValues.id}`);
       toast.success("Fee/Fund deleted successfully!");
       
       setTimeout(() => {

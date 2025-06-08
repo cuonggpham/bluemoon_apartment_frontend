@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import ApartmentSearchDropdown from '../../components/ApartmentSearchDropdown';
+import api from '../../services/axios';
 
 // Custom debounce function
 const debounce = (func: Function, wait: number) => {
@@ -345,8 +346,8 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
 
   const fetchFees = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/fees/all');
-      const data = await response.json();
+      const response = await api.get('/fees/all');
+      const data = response.data;
       console.log('Fees API response:', data); // Debug log
       
       // Check if response is successful and has data
@@ -369,8 +370,8 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
 
   const fetchResidents = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/residents');
-      const data = await response.json();
+      const response = await api.get('/residents');
+      const data = response.data;
       console.log('Residents API response:', data); // Debug log
       
       // Check if response is successful and has data
@@ -391,8 +392,8 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
 
   const fetchApartments = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/apartments');
-      const data = await response.json();
+      const response = await api.get('/apartments');
+      const data = response.data;
       console.log('Apartments API response:', data); // Debug log
       
       // Check if response is successful and has data
@@ -413,8 +414,8 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
 
   const fetchPaymentRecords = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/payment-records');
-      const data = await response.json();
+      const response = await api.get('/payment-records');
+      const data = response.data;
       console.log('Payment Records API response:', data); // Debug log
       
       // Check if response is successful and has data
@@ -583,18 +584,12 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       
       console.log('Submitting payment:', submitData);
       
-      const response = await fetch('http://localhost:8080/api/v1/payment-records', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submitData),
-      });
+      const response = await api.post('/payment-records', submitData);
       
-      const responseData = await response.json();
+      const responseData = response.data;
       console.log('Payment response:', responseData);
       
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         toast.success('Payment recorded successfully!');
         
         // Reset form

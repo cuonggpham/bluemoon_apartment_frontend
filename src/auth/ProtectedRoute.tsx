@@ -1,10 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { isTokenExpired } from "../utils/authUtils";
 
 const ProtectedRoute = () => {
-  // Check if accessToken exists in localStorage
+  // Check if accessToken exists and is not expired
   const token = localStorage.getItem("accessToken");  
-  // If there's no accessToken, redirect to the login page
-  if (!token) {
+  
+  if (!token || isTokenExpired()) {
+    // Clear expired token and redirect to login
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("name");
     return <Navigate to="/signin" replace />;
   }
 

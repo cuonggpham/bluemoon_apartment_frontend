@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/axios";
 import Table from "../../components/Table";
 import Pagination from "../../components/Pagination";
 import ApartmentRow from "./ApartmentRow";
@@ -21,12 +21,12 @@ export default function ApartmentsTable({keyword}: ApartmentsTableProps) {
     try {
       let url: string;
       if(keyword) {
-        url= `http://localhost:8080/api/v1/apartments/${keyword}`
+        url= `/apartments/${keyword}`
       }
       else {
-        url= `http://localhost:8080/api/v1/apartments?page=${page}&size=${PAGE_SIZE}`
+        url= `/apartments?page=${page}&size=${PAGE_SIZE}`
       }
-      const response = await axios.get(url);
+      const response = await api.get(url);
 
       if(keyword) {
         

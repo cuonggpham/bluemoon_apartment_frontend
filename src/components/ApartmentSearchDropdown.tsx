@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import axios from "axios";
+import api from "../services/axios";
 
 const DropdownContainer = styled.div`
   position: relative;
@@ -175,7 +175,7 @@ export default function ApartmentSearchDropdown({
   useEffect(() => {
     const fetchApartments = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/v1/apartments?size=999&page=1`);
+        const response = await api.get(`/apartments?size=999&page=1`);
         const apartmentsData = response.data.data.result;
         const apartmentsList = apartmentsData.map((apartment: any) => ({
           addressNumber: apartment.addressNumber,

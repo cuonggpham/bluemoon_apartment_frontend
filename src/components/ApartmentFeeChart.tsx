@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import Heading from "./Heading";
 import styled from "styled-components";
-import axios from "axios";
+import api from "../services/axios";
 import { useEffect, useState } from "react";
 
 const ChartBox = styled.div`
@@ -76,9 +76,7 @@ export default function ApartmentFeeChart() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/v1/payment-records"
-        );
+        const response = await api.get("/payment-records");
         
         console.log('Payment Records API response:', response.data); // Debug log
         

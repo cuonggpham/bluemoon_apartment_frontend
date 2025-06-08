@@ -1,4 +1,5 @@
 import { FeeTypeEnum } from '../types/monthlyFee';
+import api from './axios';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
@@ -24,114 +25,79 @@ export const floorAreaFeeConfigApi = {
    * Get all active floor area fee configs
    */
   async getAllActiveConfigs(): Promise<FloorAreaFeeConfig[]> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs`);
-    if (!response.ok) throw new Error('Failed to fetch floor area fee configs');
-    const result = await response.json();
+    const response = await api.get('/floor-area-fee-configs');
     // Extract data from the wrapped response
-    return result.data || result;
+    return response.data.data || response.data;
   },
 
   /**
    * Get configs ready for auto generation
    */
   async getAutoGenerationConfigs(): Promise<FloorAreaFeeConfig[]> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/auto-generation`);
-    if (!response.ok) throw new Error('Failed to fetch auto-generation configs');
-    const result = await response.json();
-    return result.data || result;
+    const response = await api.get('/floor-area-fee-configs/auto-generation');
+    return response.data.data || response.data;
   },
 
   /**
    * Get currently effective configs
    */
   async getCurrentlyEffectiveConfigs(): Promise<FloorAreaFeeConfig[]> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/effective`);
-    if (!response.ok) throw new Error('Failed to fetch effective configs');
-    const result = await response.json();
-    return result.data || result;
+    const response = await api.get('/floor-area-fee-configs/effective');
+    return response.data.data || response.data;
   },
 
   /**
    * Get configs by fee type
    */
   async getConfigsByFeeType(feeType: FeeTypeEnum): Promise<FloorAreaFeeConfig[]> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/by-type/${feeType}`);
-    if (!response.ok) throw new Error('Failed to fetch configs by fee type');
-    const result = await response.json();
-    return result.data || result;
+    const response = await api.get(`/floor-area-fee-configs/by-type/${feeType}`);
+    return response.data.data || response.data;
   },
 
   /**
    * Get config by ID
    */
   async getConfigById(id: number): Promise<FloorAreaFeeConfig> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/${id}`);
-    if (!response.ok) throw new Error('Failed to fetch config by ID');
-    const result = await response.json();
-    return result.data || result;
+    const response = await api.get(`/floor-area-fee-configs/${id}`);
+    return response.data.data || response.data;
   },
 
   /**
    * Create new floor area fee config
    */
   async createConfig(config: Omit<FloorAreaFeeConfig, 'id'>): Promise<FloorAreaFeeConfig> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(config),
-    });
-    if (!response.ok) throw new Error('Failed to create floor area fee config');
-    const result = await response.json();
-    return result.data || result;
+    const response = await api.post('/floor-area-fee-configs', config);
+    return response.data.data || response.data;
   },
 
   /**
    * Update existing floor area fee config
    */
   async updateConfig(id: number, config: Partial<FloorAreaFeeConfig>): Promise<FloorAreaFeeConfig> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(config),
-    });
-    if (!response.ok) throw new Error('Failed to update floor area fee config');
-    const result = await response.json();
-    return result.data || result;
+    const response = await api.put(`/floor-area-fee-configs/${id}`, config);
+    return response.data.data || response.data;
   },
 
   /**
    * Deactivate config (soft delete)
    */
   async deactivateConfig(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/${id}/deactivate`, {
-      method: 'PUT',
-    });
-    if (!response.ok) throw new Error('Failed to deactivate floor area fee config');
+    await api.put(`/floor-area-fee-configs/${id}/deactivate`);
   },
 
   /**
    * Delete config permanently
    */
   async deleteConfig(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('Failed to delete floor area fee config');
+    await api.delete(`/floor-area-fee-configs/${id}`);
   },
 
   /**
    * Initialize default configs (for testing/setup)
    */
   async initializeDefaultConfigs(): Promise<string> {
-    const response = await fetch(`${API_BASE_URL}/floor-area-fee-configs/initialize-defaults`, {
-      method: 'POST',
-    });
-    if (!response.ok) throw new Error('Failed to initialize default configs');
-    return response.text();
+    const response = await api.post('/floor-area-fee-configs/initialize-defaults');
+    return response.data;
   },
 
   // ============ UTILITY METHODS ============

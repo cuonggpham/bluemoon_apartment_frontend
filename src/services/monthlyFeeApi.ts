@@ -1,4 +1,5 @@
 import { Fee, PaymentRecord, FeeTypeEnum, FeeHelpers, VehicleEnum } from '../types/monthlyFee';
+import api from './axios';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
@@ -25,37 +26,24 @@ export const monthlyFeeApi = {
       params.append('customFeeName', customFeeName);
     }
 
-    const response = await fetch(`${API_BASE_URL}/fees/monthly/generate?${params}`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) throw new Error('Failed to generate monthly fees');
-    const apiResponse = await response.json(); // Returns: { code, message, data: Fee[] }
-    return apiResponse.data; // Extract the data field
+    const response = await api.post(`/fees/monthly/generate?${params}`);
+    return response.data.data; // Extract the data field from axios response
   },
 
   // ============ FEE QUERY API ============
   async getUnpaidFeesByApartment(apartmentId: number) {
-    const response = await fetch(`${API_BASE_URL}/fees/monthly/unpaid/apartment/${apartmentId}`);
-    if (!response.ok) throw new Error('Failed to fetch unpaid fees');
-    const apiResponse = await response.json(); // Returns: { code, message, data: Fee[] }
-    return apiResponse.data; // Extract the data field
+    const response = await api.get(`/fees/monthly/unpaid/apartment/${apartmentId}`);
+    return response.data.data; // Extract the data field
   },
 
   async getFeesByMonth(billingMonth: string) {
-    const response = await fetch(`${API_BASE_URL}/fees/monthly/month/${billingMonth}`);
-    if (!response.ok) throw new Error('Failed to fetch fees by month');
-    const apiResponse = await response.json(); // Returns: { code, message, data: Fee[] }
-    return apiResponse.data; // Extract the data field
+    const response = await api.get(`/fees/monthly/month/${billingMonth}`);
+    return response.data.data; // Extract the data field
   },
 
   async deactivateFee(feeId: number) {
-    const response = await fetch(`${API_BASE_URL}/fees/${feeId}/deactivate`, {
-      method: 'PUT',
-    });
-    if (!response.ok) throw new Error('Failed to deactivate fee');
-    const apiResponse = await response.json();
-    return apiResponse.data; // Extract the data field
+    const response = await api.put(`/fees/${feeId}/deactivate`);
+    return response.data.data; // Extract the data field
   },
 
   // ============ PAYMENT API ============
@@ -68,27 +56,18 @@ export const monthlyFeeApi = {
       feeId: data.feeId.toString(),
     });
 
-    const response = await fetch(`${API_BASE_URL}/payment-records/recurring-fees?${params}`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) throw new Error('Failed to create recurring fee payment');
-    const apiResponse = await response.json(); // Returns: { code, message, data: PaymentRecord }
-    return apiResponse.data; // Extract the data field
+    const response = await api.post(`/payment-records/recurring-fees?${params}`);
+    return response.data.data; // Extract the data field from axios response
   },
 
   async getPayments() {
-    const response = await fetch(`${API_BASE_URL}/payment-records/recurring-fees`);
-    if (!response.ok) throw new Error('Failed to fetch recurring fee payments');
-    const apiResponse = await response.json(); // Returns: { code, message, data: PaymentRecord[] }
-    return apiResponse.data; // Extract the data field
+    const response = await api.get('/payment-records/recurring-fees');
+    return response.data.data; // Extract the data field
   },
 
   async getPaymentsByApartment(apartmentId: number) {
-    const response = await fetch(`${API_BASE_URL}/payment-records/recurring-fees/apartment/${apartmentId}`);
-    if (!response.ok) throw new Error('Failed to fetch recurring fee payments by apartment');
-    const apiResponse = await response.json(); // Returns: { code, message, data: PaymentRecord[] }
-    return apiResponse.data; // Extract the data field
+    const response = await api.get(`/payment-records/recurring-fees/apartment/${apartmentId}`);
+    return response.data.data; // Extract the data field
   },
 
   // ============ VEHICLE PRICE CONFIGURATION API ============
@@ -97,10 +76,8 @@ export const monthlyFeeApi = {
    * Get all active vehicle price settings
    */
   async getAllVehiclePriceSettings() {
-    const response = await fetch(`${API_BASE_URL}/vehicle-price-settings`);
-    if (!response.ok) throw new Error('Failed to fetch vehicle price settings');
-    const apiResponse = await response.json(); // Returns: { code, message, data: VehiclePriceSetting[] }
-    return apiResponse.data; // Extract the data field
+    const response = await api.get('/vehicle-price-settings');
+    return response.data.data; // Extract the data field
   },
 
   /**
@@ -140,10 +117,8 @@ export const monthlyFeeApi = {
    * Get parking price for specific vehicle type
    */
   async getParkingPriceByVehicleType(vehicleType: VehicleEnum): Promise<number> {
-    const response = await fetch(`${API_BASE_URL}/vehicle-price-settings/price/${vehicleType}`);
-    if (!response.ok) throw new Error(`Failed to fetch parking price for ${vehicleType}`);
-    const apiResponse = await response.json(); // Returns: { code, message, data: number }
-    return apiResponse.data; // Extract the data field
+    const response = await api.get(`/vehicle-price-settings/price/${vehicleType}`);
+    return response.data.data; // Extract the data field
   },
 
   /**
@@ -155,13 +130,8 @@ export const monthlyFeeApi = {
       pricePerVehicle: price.toString(),
     });
 
-    const response = await fetch(`${API_BASE_URL}/vehicle-price-settings?${params}`, {
-      method: 'POST',
-    });
-
-    if (!response.ok) throw new Error(`Failed to update parking price for ${vehicleType}`);
-    const apiResponse = await response.json();
-    return apiResponse.data; // Extract the data field
+    const response = await api.post(`/vehicle-price-settings?${params}`);
+    return response.data.data; // Extract the data field
   },
 
   // ============ UTILITY METHODS ============

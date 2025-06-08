@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
+import api from '../../services/axios';
 
 const TableContainer = styled.div`
   background: white;
@@ -154,13 +155,9 @@ export default function PaymentRecordTable({ refreshTrigger }: PaymentRecordTabl
   const fetchPaymentRecords = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/v1/payment-records');
+      const response = await api.get('/payment-records');
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const result = await response.json();
+      const result = response.data;
       
       // Handle the API response structure: { code: 200, data: [...], message: "..." }
       const data = result.data || result;
@@ -198,24 +195,13 @@ export default function PaymentRecordTable({ refreshTrigger }: PaymentRecordTabl
       const record = paymentRecords.find(r => r.id === updateMode.recordId);
       if (!record) return;
 
-      const response = await fetch(`http://localhost:8080/api/v1/payment-records/${updateMode.recordId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await api.put(`/payment-records/${updateMode.recordId}`, {
           payerId: record.payerId,
           feeId: record.feeId,
           paymentDate: record.paymentDate,
           amount: parseFloat(updateAmount),
           notes: record.notes
-        }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update payment');
-      }
 
       toast.success('Payment updated successfully!');
       setUpdateMode(null);
