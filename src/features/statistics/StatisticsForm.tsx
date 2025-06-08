@@ -3,6 +3,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Button from "../../components/Button";
+import api from "../../services/axios";
 import "./form.css";
 
 const StatisticsWrapper = styled.div`
@@ -182,9 +183,7 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
 
   const apiPaymentRecords = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/payment-records/apartment/${addressNumber}`
-      );
+      const response = await api.get(`/payment-records/apartment/${addressNumber}`);
       
       console.log('Payment Records API response:', response.data); // Debug log
       
@@ -205,8 +204,8 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
 
   const apiUtility = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/utilitybills/${addressNumber}`
+      const response = await api.get(
+        `/utilitybills/${addressNumber}`
       );
       setDataUtility(response.data.data || []);
     } catch (err) {
@@ -216,8 +215,8 @@ const StatisticsForm = ({ statistic }: StatisticsFormProps) => {
 
   const apiPayUtility = async (utilityId: string) => {
     try {
-      await axios.post(
-        `http://localhost:8080/api/v1/utilitybills/update/${utilityId}`
+      await api.post(
+        `/utilitybills/update/${utilityId}`
       );
       toast.success("Payment successful!");
       apiUtility();

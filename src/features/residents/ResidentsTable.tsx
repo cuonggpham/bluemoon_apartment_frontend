@@ -2,7 +2,7 @@ import Table from "../../components/Table";
 import ResidentRow from "./ResidentRow";
 import Pagination from "../../components/Pagination";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/axios";
 
 interface ResidentsTableProps {
   keyword: string;
@@ -16,8 +16,8 @@ export default function ResidentsTable({ keyword }: ResidentsTableProps) {
 
   const apiResidents = async (page: number = 1) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/residents?size=10&page=${page}&filter=name~'${keyword}'`
+      const response = await api.get(
+        `/residents?size=10&page=${page}&filter=name~'${keyword}'`
       );
       setResidents(response.data.data.result);
       setTotalPages(response.data.data.totalPages);

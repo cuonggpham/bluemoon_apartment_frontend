@@ -2,7 +2,7 @@ import Table from "../../components/Table";
 import VehicleRow from "./VehicleRow";
 import Pagination from "../../components/Pagination";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/axios";
 
 interface VehiclesTableProps {
   keyword: string;
@@ -16,8 +16,8 @@ export default function VehiclesTable({ keyword }: VehiclesTableProps) {
 
   const apiVehicles = async (page: number = 1) => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/vehicles?page=${page}&size=10&filter=id~'${keyword}'`
+      const response = await api.get(
+        `/vehicles?page=${page}&size=10&filter=id~'${keyword}'`
       );
 
       console.log(response.data.data.result);

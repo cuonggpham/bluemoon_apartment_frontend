@@ -1,6 +1,6 @@
 import "./LoginSignUp.css";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../services/axios";
 import { AuthService } from "../../services/AuthService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -34,7 +34,7 @@ const LoginSignUp = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/users/register", {
+      const response = await api.post("/users/register", {
         name: registerData.name,
         username: registerData.username,
         password: registerData.password,
@@ -58,7 +58,7 @@ const LoginSignUp = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/auth/login", {
+      const response = await api.post("/auth/login", {
         username: loginData.username,
         password: loginData.password,
       });

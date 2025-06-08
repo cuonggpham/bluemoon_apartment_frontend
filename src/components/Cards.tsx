@@ -9,7 +9,7 @@ import { GiMoneyStack } from "react-icons/gi";
 import { GiPayMoney } from "react-icons/gi";
 import { FaCar } from "react-icons/fa";
 
-import axios from "axios";
+import api from "../services/axios";
 
 const CardsStyled = styled.div`
   display: grid;
@@ -67,10 +67,10 @@ export default function Cards() {
         
         // Fetch all data concurrently
         const [apartmentsRes, residentsRes, vehiclesRes, paymentsRes] = await Promise.all([
-          axios.get("http://localhost:8080/api/v1/apartments?size=999"),
-          axios.get("http://localhost:8080/api/v1/residents?size=999"),
-          axios.get("http://localhost:8080/api/v1/vehicles?size=999"),
-          axios.get("http://localhost:8080/api/v1/payment-records")
+          api.get("/apartments?size=999"),
+          api.get("/residents?size=999"),
+          api.get("/vehicles?size=999"),
+          api.get("/payment-records")
         ]);
 
         setNumOfApartments(apartmentsRes.data.data.totalElements);

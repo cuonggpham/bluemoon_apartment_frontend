@@ -4,7 +4,7 @@ import FormField from "../../components/FormField";
 import Button from "../../components/Button";
 import Selector from "../../components/Selector";
 import { HiOutlinePlusCircle, HiArrowLeft, HiArrowRight, HiExclamationTriangle, HiUser, HiHome, HiIdentification, HiBuildingOffice2 } from "react-icons/hi2";
-import axios from "axios";
+import api from "../../services/axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 
@@ -489,7 +489,7 @@ export default function MultiStepResidentForm({ onCloseModal, apartmentId }: any
     setNoResultsFound(false);
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/apartments?size=50&page=1`);
+      const response = await api.get(`/apartments?size=50&page=1`);
       const apartments = response.data.data.result;
       
       const filtered = apartments.filter((apt: any) => 
@@ -673,7 +673,7 @@ export default function MultiStepResidentForm({ onCloseModal, apartmentId }: any
       };
 
       // Call the new transactional API endpoint
-      await axios.post("http://localhost:8080/api/v1/residents/with-apartment", payload);
+      await api.post("/residents/with-apartment", payload);
 
       toast.success("Resident created successfully!");
       

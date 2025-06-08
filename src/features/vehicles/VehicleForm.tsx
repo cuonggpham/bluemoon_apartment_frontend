@@ -5,7 +5,7 @@ import Selector from "../../components/Selector";
 import Button from "../../components/Button";
 import { HiOutlinePlusCircle, HiPencil, HiTrash, HiTruck, HiInformationCircle } from "react-icons/hi2";
 import ApartmentSearchDropdown from "../../components/ApartmentSearchDropdown";
-import axios from "axios";
+import api from "../../services/axios";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 
@@ -312,7 +312,7 @@ export default function VehicleForm({ vehicle }: any) {
       // Fallback: fetch apartment details for old structure
       const fetchApartmentDetails = async () => {
         try {
-          const response = await axios.get(`http://localhost:8080/api/v1/apartments/${vehicle.apartmentId}`);
+          const response = await api.get(`/apartments/${vehicle.apartmentId}`);
           const apartmentData = response.data.data;
           setSelectedApartment({
             addressNumber: apartmentData.addressNumber,
@@ -337,9 +337,8 @@ export default function VehicleForm({ vehicle }: any) {
     try {
       // Use apartmentId from formValues (which is set from apartment.addressNumber or direct apartmentId)
       console.log("Deleting vehicle with apartmentId:", formValues.apartmentId);
-      const response = await axios.delete(`http://localhost:8080/api/v1/vehicles/${formValues.apartmentId}`, {
+      const response = await api.delete(`/vehicles/${formValues.apartmentId}`, {
         data: { id: formValues.id }, // Payload gửi kèm
-        headers: { "Content-Type": "application/json" },
       });
       
       setTimeout(() => {
@@ -373,17 +372,15 @@ export default function VehicleForm({ vehicle }: any) {
     try {
       let response;
       if (vehicle) {
-        response = await axios.put(
-          `http://localhost:8080/api/v1/vehicles/${formValues.id}`,
-          vehicleData,
-          { headers: { "Content-Type": "application/json" } }
+        response = await api.put(
+          `/vehicles/${formValues.id}`,
+          vehicleData
         );
         toast.success("Vehicle updated successfully!");
       } else {
-        response = await axios.post(
-          "http://localhost:8080/api/v1/vehicles",
-          vehicleData,
-          { headers: { "Content-Type": "application/json" } }
+        response = await api.post(
+          "/vehicles",
+          vehicleData
         );
         toast.success("Vehicle added successfully!");
       }

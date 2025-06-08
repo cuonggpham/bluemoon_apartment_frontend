@@ -2,10 +2,12 @@ import "./sideBar.css";
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
+import { isManager, isAccountant, getCurrentUserRoles, getCurrentUser, ROLES } from "../../../utils/authUtils";
 
 const SideBar = () => {
   const [extended, setExtended] = useState(false);
   const [name, setName] = useState("");
+  const [userRoles, setUserRoles] = useState<string[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -14,6 +16,10 @@ const SideBar = () => {
     if (storedName) {
       setName(storedName);
     }
+    
+    // Get user roles
+    const roles = getCurrentUserRoles();
+    setUserRoles(roles);
   }, []);
 
   const handleLogout = () => {
@@ -28,17 +34,24 @@ const SideBar = () => {
     return false;
   };
 
-  const menuItems = [
-    { path: "/dashboard/", icon: "bx bxs-grid-alt", name: "Dashboard", tooltip: "Dashboard" },
-    { path: "/dashboard/residents", icon: "bx bx-user", name: "Resident Management", tooltip: "Resident Management" },
-    { path: "/dashboard/apartments", icon: "bx bxs-home", name: "Apartment Management", tooltip: "Apartment Management" },
-    { path: "/dashboard/vehicles", icon: "bx bxs-car", name: "Vehicle Management", tooltip: "Vehicle Management" },
-    { path: "/dashboard/fee-and-fund", icon: "bx bx-money-withdraw", name: "Fee and Fund", tooltip: "Fee and Fund" },
-    { path: "/dashboard/payment-recording", icon: "bx bx-credit-card", name: "Payment Recording", tooltip: "Payment Recording" },
-    { path: "/dashboard/monthly-fee", icon: "bx bx-receipt", name: "Monthly Fee Management", tooltip: "Monthly Fee Management" },
-    { path: "/dashboard/statistics", icon: "bx bx-folder", name: "Statistics", tooltip: "Statistics" },
-    { path: "/dashboard/utility-bills", icon: "bx bxs-bolt", name: "Utility Bills", tooltip: "Utility Bills" },
+  // Define menu items with role requirements
+  const allMenuItems = [
+    { path: "/dashboard/", icon: "bx bxs-grid-alt", name: "Dashboard", tooltip: "Dashboard", roles: [ROLES.MANAGER, ROLES.ACCOUNTANT] },
+    { path: "/dashboard/residents", icon: "bx bx-user", name: "Resident Management", tooltip: "Resident Management", roles: [ROLES.MANAGER] },
+    { path: "/dashboard/apartments", icon: "bx bxs-home", name: "Apartment Management", tooltip: "Apartment Management", roles: [ROLES.MANAGER] },
+    { path: "/dashboard/vehicles", icon: "bx bxs-car", name: "Vehicle Management", tooltip: "Vehicle Management", roles: [ROLES.MANAGER] },
+    { path: "/dashboard/user-management", icon: "bx bx-group", name: "User Management", tooltip: "User Management", roles: [ROLES.MANAGER] },
+    { path: "/dashboard/fee-and-fund", icon: "bx bx-money-withdraw", name: "Fee and Fund", tooltip: "Fee and Fund", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
+    { path: "/dashboard/payment-recording", icon: "bx bx-credit-card", name: "Payment Recording", tooltip: "Payment Recording", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
+    { path: "/dashboard/monthly-fee", icon: "bx bx-receipt", name: "Monthly Fee Management", tooltip: "Monthly Fee Management", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
+    { path: "/dashboard/statistics", icon: "bx bx-folder", name: "Statistics", tooltip: "Statistics", roles: [ROLES.MANAGER, ROLES.ACCOUNTANT] },
+    { path: "/dashboard/utility-bills", icon: "bx bxs-bolt", name: "Utility Bills", tooltip: "Utility Bills", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
   ];
+
+  // Filter menu items based on user roles
+  const menuItems = allMenuItems.filter(item => 
+    item.roles.some(role => userRoles.includes(role))
+  );
 
   return (
     <div className={extended ? "sidebar active" : "sidebar"}>
@@ -77,7 +90,9 @@ const SideBar = () => {
             />
             <div className="name_role">
               <div className="name">{name || "Unknown User"}</div>
-              <div className="role">Manager</div>
+              <div className="role">
+                {isManager() ? "Manager" : isAccountant() ? "Accountant" : "User"}
+              </div>
             </div>
           </div>
           <i

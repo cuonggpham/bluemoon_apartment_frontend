@@ -7,6 +7,7 @@ import Statistics from "./mainContent/Statistics";
 import Vehicles from "./mainContent/Vehicles";
 import PaymentRecording from "./mainContent/PaymentRecording";
 import MonthlyFeeManagement from "./mainContent/MonthlyFeeManagement";
+import UserManagement from "./mainContent/UserManagement";
 import SideBar from "./sideBar/SideBar";
 import { Routes, Route } from "react-router-dom";
 import UtilityBills from "./mainContent/UtilityBills";
@@ -27,6 +28,7 @@ const DashBoard = () => {
           <Route path="/monthly-fee" element={<MonthlyFeeManagement />}></Route>
           <Route path="/statistics" element={<Statistics />}></Route>
           <Route path="/utility-bills" element={<UtilityBills />}></Route>
+          <Route path="/user-management" element={<UserManagement />}></Route>
         </Routes>
       </div>
     </div>
