@@ -169,9 +169,27 @@ export default function PaymentRecordTable({ refreshTrigger }: PaymentRecordTabl
         console.error('Expected array but received:', data);
         setPaymentRecords([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching payment records:', error);
-      toast.error('Failed to load payment records');
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to load payment records';
+      
+      if (error.response?.data) {
+        // Handle backend error response structure: {code: 500, data: null, message: "..."}
+        const responseData = error.response.data;
+        if (responseData.message) {
+          errorMessage = responseData.message;
+          // Clean up error message by removing "Internal server error: " prefix if present
+          if (errorMessage.startsWith('Internal server error: ')) {
+            errorMessage = errorMessage.replace('Internal server error: ', '');
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
       setPaymentRecords([]);
     } finally {
       setLoading(false);
@@ -209,7 +227,25 @@ export default function PaymentRecordTable({ refreshTrigger }: PaymentRecordTabl
       await fetchPaymentRecords(); // Refresh data
     } catch (error: any) {
       console.error('Error updating payment:', error);
-      toast.error(error.message || 'Failed to update payment');
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to update payment';
+      
+      if (error.response?.data) {
+        // Handle backend error response structure: {code: 500, data: null, message: "..."}
+        const responseData = error.response.data;
+        if (responseData.message) {
+          errorMessage = responseData.message;
+          // Clean up error message by removing "Internal server error: " prefix if present
+          if (errorMessage.startsWith('Internal server error: ')) {
+            errorMessage = errorMessage.replace('Internal server error: ', '');
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     }
   };
 

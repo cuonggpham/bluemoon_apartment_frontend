@@ -688,7 +688,25 @@ export default function MultiStepResidentForm({ onCloseModal, apartmentId }: any
 
     } catch (error: any) {
       console.error("Error creating resident:", error);
-      toast.error(error.response?.data?.message || "Error creating resident");
+      
+      // Extract error message from backend response
+      let errorMessage = "Error creating resident";
+      
+      if (error?.response?.data) {
+        const responseData = error.response.data;
+        
+        // Check if there are validation errors in data object
+        if (responseData.data && typeof responseData.data === 'object') {
+          // Extract validation errors
+          const validationErrors = Object.values(responseData.data).join(', ');
+          errorMessage = validationErrors;
+        } else if (responseData.message) {
+          // Use general message from backend
+          errorMessage = responseData.message;
+        }
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
