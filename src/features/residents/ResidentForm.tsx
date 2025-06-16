@@ -508,9 +508,26 @@ export default function ResidentForm({ resident }: any) {
         window.location.reload();
       }, 1000);
 
-    } catch (err) {
-      toast.error("Có lỗi xảy ra!!");
-      console.error(err);
+    } catch (error: any) {
+      // Extract error message from backend response
+      let errorMessage = "Có lỗi xảy ra khi thêm resident!";
+      
+      if (error?.response?.data) {
+        const responseData = error.response.data;
+        
+        // Check if there are validation errors in data object
+        if (responseData.data && typeof responseData.data === 'object') {
+          // Extract validation errors
+          const validationErrors = Object.values(responseData.data).join(', ');
+          errorMessage = validationErrors;
+        } else if (responseData.message) {
+          // Use general message from backend
+          errorMessage = responseData.message;
+        }
+      }
+      
+      toast.error(errorMessage);
+      console.error(error);
     }
   };
   
@@ -544,9 +561,26 @@ export default function ResidentForm({ resident }: any) {
         window.location.reload();
       }, 1000);
 
-    } catch (err) {
-      toast.error("Có lỗi xảy ra khi cập nhật!");
-      console.error(err);
+    } catch (error: any) {
+      // Extract error message from backend response
+      let errorMessage = "Có lỗi xảy ra khi cập nhật resident!";
+      
+      if (error?.response?.data) {
+        const responseData = error.response.data;
+        
+        // Check if there are validation errors in data object
+        if (responseData.data && typeof responseData.data === 'object') {
+          // Extract validation errors
+          const validationErrors = Object.values(responseData.data).join(', ');
+          errorMessage = validationErrors;
+        } else if (responseData.message) {
+          // Use general message from backend
+          errorMessage = responseData.message;
+        }
+      }
+      
+      toast.error(errorMessage);
+      console.error(error);
     }
   };
 
@@ -559,9 +593,26 @@ export default function ResidentForm({ resident }: any) {
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-    } catch (err) {
-      toast.error("Có lỗi xảy ra!!");
-      console.error(err);
+    } catch (error: any) {
+      // Extract error message from backend response
+      let errorMessage = "Có lỗi xảy ra khi xóa resident!";
+      
+      if (error?.response?.data) {
+        const responseData = error.response.data;
+        
+        // Check if there are validation errors in data object
+        if (responseData.data && typeof responseData.data === 'object') {
+          // Extract validation errors
+          const validationErrors = Object.values(responseData.data).join(', ');
+          errorMessage = validationErrors;
+        } else if (responseData.message) {
+          // Use general message from backend
+          errorMessage = responseData.message;
+        }
+      }
+      
+      toast.error(errorMessage);
+      console.error(error);
     }
   };
 

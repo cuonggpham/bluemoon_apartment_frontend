@@ -4,7 +4,7 @@ import FeesAndFunds from "./mainContent/FeesAndFunds";
 import Overview from "./mainContent/Overview";
 import Resident from "./mainContent/Resident";
 import Statistics from "./mainContent/Statistics";
-import Vehicles from "./mainContent/Vehicles";
+import VehiclesProtected from "./mainContent/VehiclesProtected";
 import PaymentRecording from "./mainContent/PaymentRecording";
 import MonthlyFeeManagement from "./mainContent/MonthlyFeeManagement";
 import UserManagement from "./mainContent/UserManagement";
@@ -23,7 +23,7 @@ const DashBoard = () => {
           <Route path="/residents" element={<Resident />}></Route>
           <Route path="/apartments" element={<Apartments />}></Route>
           <Route path="/fee-and-fund" element={<FeesAndFunds />}></Route>
-          <Route path="/vehicles" element={<Vehicles />}></Route>          
+          <Route path="/vehicles" element={<VehiclesProtected />}></Route>          
           <Route path="/payment-recording" element={<PaymentRecording />}></Route>
           <Route path="/monthly-fee" element={<MonthlyFeeManagement />}></Route>
           <Route path="/statistics" element={<Statistics />}></Route>

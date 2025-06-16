@@ -362,9 +362,27 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         console.error('Unexpected API response structure:', data);
         toast.error('Invalid response format for fee items');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching fees:', error);
-      toast.error('Failed to load fee items');
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to load fee items';
+      
+      if (error.response?.data) {
+        // Handle backend error response structure: {code: 500, data: null, message: "..."}
+        const responseData = error.response.data;
+        if (responseData.message) {
+          errorMessage = responseData.message;
+          // Clean up error message by removing "Internal server error: " prefix if present
+          if (errorMessage.startsWith('Internal server error: ')) {
+            errorMessage = errorMessage.replace('Internal server error: ', '');
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -384,9 +402,27 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         console.error('Unexpected API response structure:', data);
         toast.error('Invalid response format for residents');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching residents:', error);
-      toast.error('Failed to load residents');
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to load residents';
+      
+      if (error.response?.data) {
+        // Handle backend error response structure: {code: 500, data: null, message: "..."}
+        const responseData = error.response.data;
+        if (responseData.message) {
+          errorMessage = responseData.message;
+          // Clean up error message by removing "Internal server error: " prefix if present
+          if (errorMessage.startsWith('Internal server error: ')) {
+            errorMessage = errorMessage.replace('Internal server error: ', '');
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -406,9 +442,27 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         console.error('Unexpected API response structure:', data);
         toast.error('Invalid response format for apartments');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching apartments:', error);
-      toast.error('Failed to load apartments');
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to load apartments';
+      
+      if (error.response?.data) {
+        // Handle backend error response structure: {code: 500, data: null, message: "..."}
+        const responseData = error.response.data;
+        if (responseData.message) {
+          errorMessage = responseData.message;
+          // Clean up error message by removing "Internal server error: " prefix if present
+          if (errorMessage.startsWith('Internal server error: ')) {
+            errorMessage = errorMessage.replace('Internal server error: ', '');
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -428,9 +482,27 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
         console.error('Unexpected API response structure:', data);
         toast.error('Invalid response format for payment records');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching payment records:', error);
-      toast.error('Failed to load payment records');
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to load payment records';
+      
+      if (error.response?.data) {
+        // Handle backend error response structure: {code: 500, data: null, message: "..."}
+        const responseData = error.response.data;
+        if (responseData.message) {
+          errorMessage = responseData.message;
+          // Clean up error message by removing "Internal server error: " prefix if present
+          if (errorMessage.startsWith('Internal server error: ')) {
+            errorMessage = errorMessage.replace('Internal server error: ', '');
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -619,7 +691,25 @@ export default function PaymentRecordForm({ onSuccess }: PaymentRecordFormProps)
       }
     } catch (error: any) {
       console.error('Error recording payment:', error);
-      toast.error(error.message || 'Failed to record payment. Please try again.');
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to record payment. Please try again.';
+      
+      if (error.response?.data) {
+        // Handle backend error response structure: {code: 500, data: null, message: "..."}
+        const responseData = error.response.data;
+        if (responseData.message) {
+          errorMessage = responseData.message;
+          // Clean up error message by removing "Internal server error: " prefix if present
+          if (errorMessage.startsWith('Internal server error: ')) {
+            errorMessage = errorMessage.replace('Internal server error: ', '');
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

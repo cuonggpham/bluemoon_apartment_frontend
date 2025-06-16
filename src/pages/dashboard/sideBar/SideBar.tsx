@@ -39,13 +39,14 @@ const SideBar = () => {
     { path: "/dashboard/", icon: "bx bxs-grid-alt", name: "Dashboard", tooltip: "Dashboard", roles: [ROLES.MANAGER, ROLES.ACCOUNTANT] },
     { path: "/dashboard/residents", icon: "bx bx-user", name: "Resident Management", tooltip: "Resident Management", roles: [ROLES.MANAGER] },
     { path: "/dashboard/apartments", icon: "bx bxs-home", name: "Apartment Management", tooltip: "Apartment Management", roles: [ROLES.MANAGER] },
-    { path: "/dashboard/vehicles", icon: "bx bxs-car", name: "Vehicle Management", tooltip: "Vehicle Management", roles: [ROLES.MANAGER] },
     { path: "/dashboard/user-management", icon: "bx bx-group", name: "User Management", tooltip: "User Management", roles: [ROLES.MANAGER] },
-    { path: "/dashboard/fee-and-fund", icon: "bx bx-money-withdraw", name: "Fee and Fund", tooltip: "Fee and Fund", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
-    { path: "/dashboard/payment-recording", icon: "bx bx-credit-card", name: "Payment Recording", tooltip: "Payment Recording", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
-    { path: "/dashboard/monthly-fee", icon: "bx bx-receipt", name: "Monthly Fee Management", tooltip: "Monthly Fee Management", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
-    { path: "/dashboard/statistics", icon: "bx bx-folder", name: "Statistics", tooltip: "Statistics", roles: [ROLES.MANAGER, ROLES.ACCOUNTANT] },
-    { path: "/dashboard/utility-bills", icon: "bx bxs-bolt", name: "Utility Bills", tooltip: "Utility Bills", roles: [ROLES.ACCOUNTANT, ROLES.MANAGER] },
+    // Manager-only menu items  
+    { path: "/dashboard/vehicles", icon: "bx bxs-car", name: "Vehicle Management", tooltip: "Vehicle Management", roles: [ROLES.MANAGER] },
+    { path: "/dashboard/fee-and-fund", icon: "bx bx-money-withdraw", name: "Fee and Fund", tooltip: "Fee and Fund", roles: [ROLES.ACCOUNTANT] },
+    { path: "/dashboard/payment-recording", icon: "bx bx-credit-card", name: "Payment Recording", tooltip: "Payment Recording", roles: [ROLES.ACCOUNTANT] },
+    { path: "/dashboard/monthly-fee", icon: "bx bx-receipt", name: "Monthly Fee Management", tooltip: "Monthly Fee Management", roles: [ROLES.ACCOUNTANT] },
+    { path: "/dashboard/statistics", icon: "bx bx-folder", name: "Statistics", tooltip: "Statistics", roles: [ROLES.ACCOUNTANT] },
+    { path: "/dashboard/utility-bills", icon: "bx bxs-bolt", name: "Utility Bills", tooltip: "Utility Bills", roles: [ROLES.ACCOUNTANT] },
   ];
 
   // Filter menu items based on user roles
@@ -84,10 +85,6 @@ const SideBar = () => {
         <div className="profile">
           <i className="bx bx-user profile-icon-collapsed"></i>
           <div className="profile_details">
-            <img
-              src="https://i.pinimg.com/564x/5e/7b/9c/5e7b9c338994683cdadd9b52d95223cc.jpg"
-              alt="Admin profile"
-            />
             <div className="name_role">
               <div className="name">{name || "Unknown User"}</div>
               <div className="role">
